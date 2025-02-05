@@ -55,7 +55,7 @@
   },
   {
    "fieldname": "erp_password",
-   "fieldtype": "Data",
+   "fieldtype": "Password",
    "label": "ERP Access Token"
   },
   {
@@ -121,7 +121,7 @@
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2025-02-05 16:02:44.967453",
+ "modified": "2025-02-05 16:25:25.810659",
  "modified_by": "Administrator",
  "module": "MBW Integration DMS",
  "name": "MBW Integration Settings",
