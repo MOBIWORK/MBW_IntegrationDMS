@@ -4,6 +4,7 @@
  "doctype": "DocType",
  "engine": "InnoDB",
  "field_order": [
+  "enable_dms",
   "dms_authentication_details_section",
   "og_name",
   "dms_password",
@@ -11,13 +12,21 @@
   "erp_authentication_details_section",
   "company",
   "erp_password",
-  "erp_api_secret"
+  "erp_api_secret",
+  "\u0111\u1ed3ng_b\u1ed9_s\u1ea3n_ph\u1ea9m_section",
+  "t\u1ef1_\u0111\u1ed9ng_\u0111\u1ed3ng_b\u1ed9_s\u1ea3n_ph\u1ea9m_sang_mbwdms",
+  "nh\u00f3m_s\u1ea3n_ph\u1ea9m",
+  "\u0111\u1ed3ng_b\u1ed9_\u0111\u01a1n_h\u00e0ng_section",
+  "t\u1ea7n_su\u1ea5t_\u0111\u1ed3ng_b\u1ed9_\u0111\u01a1n_h\u00e0ng_ph\u00fat",
+  "\u0111\u1ed3ng_b\u1ed9_t\u1ed3n_kho_section",
+  "b\u1eadt_\u0111\u1ed3ng_b\u1ed9_t\u1ed3n_kho",
+  "t\u1ea7n_su\u1ea5t_\u0111\u1ed3ng_b\u1ed9_t\u1ed3n_kho_ph\u00fat"
  ],
  "fields": [
   {
    "fieldname": "dms_authentication_details_section",
    "fieldtype": "Section Break",
-   "label": "DMS Authentication Details"
+   "label": "X\u00e1c th\u1ef1c h\u1ec7 th\u1ed1ng MBW.DMS"
   },
   {
    "fieldname": "og_name",
@@ -37,7 +46,7 @@
   {
    "fieldname": "erp_authentication_details_section",
    "fieldtype": "Section Break",
-   "label": "ERP Authentication Details"
+   "label": "X\u00e1c th\u1ef1c h\u1ec7 th\u1ed1ng ERPNEXT"
   },
   {
    "fieldname": "company",
@@ -53,12 +62,66 @@
    "fieldname": "erp_api_secret",
    "fieldtype": "Data",
    "label": "ERP API Secret"
+  },
+  {
+   "default": "0",
+   "fieldname": "enable_dms",
+   "fieldtype": "Check",
+   "label": "B\u1eadt t\u00ednh n\u0103ng \u0111\u1ed3ng b\u1ed9 MBW.DMS"
+  },
+  {
+   "fieldname": "\u0111\u1ed3ng_b\u1ed9_s\u1ea3n_ph\u1ea9m_section",
+   "fieldtype": "Section Break",
+   "label": "\u0110\u1ed3ng b\u1ed9 s\u1ea3n ph\u1ea9m"
+  },
+  {
+   "default": "0",
+   "description": "N\u1ebfu \u0111\u01b0\u1ee3c b\u1eadt, b\u1ea5t k\u1ef3 m\u1eb7t h\u00e0ng m\u1edbi n\u00e0o c\u00f3 \u0111\u00e1nh d\u1ea5u \"\u0111\u1ed3ng b\u1ed9 v\u1edbi MBW.DMS\" s\u1ebd \u0111\u01b0\u1ee3c t\u1ea3i l\u00ean MBW.DMS.",
+   "fieldname": "t\u1ef1_\u0111\u1ed9ng_\u0111\u1ed3ng_b\u1ed9_s\u1ea3n_ph\u1ea9m_sang_mbwdms",
+   "fieldtype": "Check",
+   "label": "T\u1ef1 \u0111\u1ed9ng \u0111\u1ed3ng b\u1ed9 s\u1ea3n ph\u1ea9m sang MBW.DMS"
+  },
+  {
+   "fieldname": "nh\u00f3m_s\u1ea3n_ph\u1ea9m",
+   "fieldtype": "Link",
+   "label": "Nh\u00f3m s\u1ea3n ph\u1ea9m",
+   "options": "Item Group"
+  },
+  {
+   "fieldname": "\u0111\u1ed3ng_b\u1ed9_\u0111\u01a1n_h\u00e0ng_section",
+   "fieldtype": "Section Break",
+   "label": "\u0110\u1ed3ng b\u1ed9 \u0111\u01a1n h\u00e0ng"
+  },
+  {
+   "default": "30",
+   "fieldname": "t\u1ea7n_su\u1ea5t_\u0111\u1ed3ng_b\u1ed9_\u0111\u01a1n_h\u00e0ng_ph\u00fat",
+   "fieldtype": "Select",
+   "label": "T\u1ea7n su\u1ea5t \u0111\u1ed3ng b\u1ed9 \u0111\u01a1n h\u00e0ng (ph\u00fat)",
+   "options": "10\n15\n30\n60"
+  },
+  {
+   "fieldname": "\u0111\u1ed3ng_b\u1ed9_t\u1ed3n_kho_section",
+   "fieldtype": "Section Break",
+   "label": "\u0110\u1ed3ng b\u1ed9 t\u1ed3n kho"
+  },
+  {
+   "default": "0",
+   "fieldname": "b\u1eadt_\u0111\u1ed3ng_b\u1ed9_t\u1ed3n_kho",
+   "fieldtype": "Check",
+   "label": "B\u1eadt \u0111\u1ed3ng b\u1ed9 t\u1ed3n kho"
+  },
+  {
+   "default": "10",
+   "fieldname": "t\u1ea7n_su\u1ea5t_\u0111\u1ed3ng_b\u1ed9_t\u1ed3n_kho_ph\u00fat",
+   "fieldtype": "Select",
+   "label": "T\u1ea7n su\u1ea5t \u0111\u1ed3ng b\u1ed9 t\u1ed3n kho (ph\u00fat)",
+   "options": "5\n10\n15\n30\n60"
   }
  ],
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2025-02-05 14:25:36.753778",
+ "modified": "2025-02-05 16:02:44.967453",
  "modified_by": "Administrator",
  "module": "MBW Integration DMS",
  "name": "MBW Integration Settings",
