@@ -1,0 +1,83 @@
+{
+ "actions": [],
+ "creation": "2025-02-05 14:07:15.477486",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "title",
+  "integration",
+  "status",
+  "method",
+  "message",
+  "traceback",
+  "request_data",
+  "response_data"
+ ],
+ "fields": [
+  {
+   "fieldname": "title",
+   "fieldtype": "Data",
+   "label": "Title"
+  },
+  {
+   "fieldname": "integration",
+   "fieldtype": "Data",
+   "label": "Integration"
+  },
+  {
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "label": "Status",
+   "options": "Success\nError\nQueued"
+  },
+  {
+   "fieldname": "method",
+   "fieldtype": "Small Text",
+   "label": "Method"
+  },
+  {
+   "fieldname": "message",
+   "fieldtype": "Code",
+   "label": "Message"
+  },
+  {
+   "fieldname": "traceback",
+   "fieldtype": "Code",
+   "label": "Traceback"
+  },
+  {
+   "fieldname": "request_data",
+   "fieldtype": "Code",
+   "label": "Request Data"
+  },
+  {
+   "fieldname": "response_data",
+   "fieldtype": "Code",
+   "label": "Response Data"
+  }
+ ],
+ "in_create": 1,
+ "links": [],
+ "modified": "2025-02-05 14:10:29.873753",
+ "modified_by": "Administrator",
+ "module": "MBW Integration DMS",
+ "name": "MBW Integration Log",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

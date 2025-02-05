@@ -1,0 +1,81 @@
+{
+ "actions": [],
+ "creation": "2025-02-05 14:22:18.685020",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "dms_authentication_details_section",
+  "og_name",
+  "dms_password",
+  "dms_api_secret",
+  "erp_authentication_details_section",
+  "company",
+  "erp_password",
+  "erp_api_secret"
+ ],
+ "fields": [
+  {
+   "fieldname": "dms_authentication_details_section",
+   "fieldtype": "Section Break",
+   "label": "DMS Authentication Details"
+  },
+  {
+   "fieldname": "og_name",
+   "fieldtype": "Data",
+   "label": "T\u00ean t\u1ed5 ch\u1ee9c"
+  },
+  {
+   "fieldname": "dms_password",
+   "fieldtype": "Password",
+   "label": "DMS Access Token"
+  },
+  {
+   "fieldname": "dms_api_secret",
+   "fieldtype": "Data",
+   "label": "DMS API Secret"
+  },
+  {
+   "fieldname": "erp_authentication_details_section",
+   "fieldtype": "Section Break",
+   "label": "ERP Authentication Details"
+  },
+  {
+   "fieldname": "company",
+   "fieldtype": "Data",
+   "label": "C\u00f4ng ty"
+  },
+  {
+   "fieldname": "erp_password",
+   "fieldtype": "Data",
+   "label": "ERP Access Token"
+  },
+  {
+   "fieldname": "erp_api_secret",
+   "fieldtype": "Data",
+   "label": "ERP API Secret"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "issingle": 1,
+ "links": [],
+ "modified": "2025-02-05 14:25:36.753778",
+ "modified_by": "Administrator",
+ "module": "MBW Integration DMS",
+ "name": "MBW Integration Settings",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "print": 1,
+   "read": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}
