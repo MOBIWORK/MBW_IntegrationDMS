@@ -96,7 +96,7 @@ def _retry_job(job: str):
 	frappe.only_for("System Manager")
 
 	doc = frappe.get_doc("MBW Integration Log", job)
-	if not doc.method.startswith("mbw_integrations.") or doc.status != "Error":
+	if not doc.method.startswith("mbw_integration_dms.") or doc.status != "Error":
 		return
 
 	doc.db_set("status", "Queued", update_modified=False)

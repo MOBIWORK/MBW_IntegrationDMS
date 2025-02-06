@@ -26,9 +26,8 @@
   },
   {
    "fieldname": "status",
-   "fieldtype": "Select",
-   "label": "Status",
-   "options": "Success\nError\nQueued"
+   "fieldtype": "Data",
+   "label": "Status"
   },
   {
    "fieldname": "method",
@@ -58,7 +57,7 @@
  ],
  "in_create": 1,
  "links": [],
- "modified": "2025-02-05 14:10:29.873753",
+ "modified": "2025-02-06 18:18:30.833388",
  "modified_by": "Administrator",
  "module": "MBW Integration DMS",
  "name": "MBW Integration Log",
