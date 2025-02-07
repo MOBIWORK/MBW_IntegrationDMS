@@ -15,9 +15,9 @@ def sync_region_job():
 
         # Lấy danh sách region chưa đồng bộ
         regions = frappe.get_all(
-            "Region",
+            "Territory",
             filters={"is_sync": False},
-            fields=["region_name", "region_code", "is_sync"]
+            fields=["territory_name", "name", "is_sync"]
         )
 
         if not regions:
@@ -29,8 +29,8 @@ def sync_region_job():
 
         formatted_data = [
             {
-                "code": ct["region_code"],  # Mã danh mục
-                "name": ct["region_name"],  # Tên danh mục
+                "code": ct["name"],  # Mã danh mục
+                "name": ct["territory_name"],  # Tên danh mục
                 "isActive": True  # Trạng thái danh mục (mặc định True)
             }
             for ct in regions
@@ -60,7 +60,7 @@ def sync_region_job():
         # Nếu thành công, cập nhật is_sync = True
         if success:
             for ct in regions:
-                frappe.db.set_value("Region", ct["region_code"], "is_sync", True)
+                frappe.db.set_value("Territory", {"name": ct["name"]}, "is_sync", True)
             frappe.db.commit()
 
             create_dms_log(

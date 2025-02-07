@@ -60,7 +60,7 @@ def sync_unit_job():
         # Nếu thành công, cập nhật is_sync = True
         if success:
             for ct in units:
-                frappe.db.set_value("UOM", ct["name"], "is_sync", True)
+                frappe.db.set_value("UOM", {"name": ct["name"]}, "is_sync", True)
             frappe.db.commit()
 
             create_dms_log(

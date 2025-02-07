@@ -5,6 +5,7 @@ from mbw_integration_dms.mbw_integration_dms.apiclient import DMSApiClient
 
 
 # Đồng bộ danh sách ngành hàng
+@frappe.whitelist(allow_guest=True)
 def sync_industry():
     frappe.enqueue("mbw_integration_dms.mbw_integration_dms.industry.sync_industry_job", queue="long", timeout=300)
     return {"message": "Industry Sync job has been queued."}
@@ -15,9 +16,9 @@ def sync_industry_job():
 
         # Lấy danh sách Industry chưa đồng bộ
         industrys = frappe.get_all(
-            "Industry",
+            "Industry Type",
             filters={"is_sync": False},
-            fields=["industry_name", "industry_code", "is_sync"]
+            fields=["name", "industry", "is_sync"]
         )
 
         if not industrys:
@@ -29,8 +30,8 @@ def sync_industry_job():
 
         formatted_data = [
             {
-                "code": ct["industry_code"],  # Mã danh mục
-                "name": ct["industry_name"],  # Tên danh mục
+                "code": ct["name"],  # Mã danh mục
+                "name": ct["industry"],  # Tên danh mục
                 "isActive": True  # Trạng thái danh mục (mặc định True)
             }
             for ct in industrys
@@ -60,7 +61,7 @@ def sync_industry_job():
         # Nếu thành công, cập nhật is_sync = True
         if success:
             for ct in industrys:
-                frappe.db.set_value("Industry", ct["industry_name"], "is_sync", True)
+                frappe.db.set_value("Industry Type", {"name": ct["name"]}, "is_sync", True)
             frappe.db.commit()
 
             create_dms_log(

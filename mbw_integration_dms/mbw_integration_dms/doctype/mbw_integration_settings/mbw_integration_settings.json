@@ -35,7 +35,7 @@
   },
   {
    "fieldname": "dms_password",
-   "fieldtype": "Password",
+   "fieldtype": "Data",
    "label": "DMS Access Token"
   },
   {
@@ -55,7 +55,7 @@
   },
   {
    "fieldname": "erp_password",
-   "fieldtype": "Password",
+   "fieldtype": "Data",
    "label": "ERP Access Token"
   },
   {
@@ -121,7 +121,7 @@
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2025-02-05 16:25:25.810659",
+ "modified": "2025-02-07 10:58:39.769101",
  "modified_by": "Administrator",
  "module": "MBW Integration DMS",
  "name": "MBW Integration Settings",

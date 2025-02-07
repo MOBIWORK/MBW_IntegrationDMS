@@ -60,7 +60,7 @@ def sync_brand_job():
         # Nếu thành công, cập nhật is_sync = True
         if success:
             for ct in brands:
-                frappe.db.set_value("Brand", ct["name"], "is_sync", True)
+                frappe.db.set_value("Brand", {"name": ct["name"]}, "is_sync", True)
             frappe.db.commit()
 
             create_dms_log(

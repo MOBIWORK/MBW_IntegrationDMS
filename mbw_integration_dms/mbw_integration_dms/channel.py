@@ -53,14 +53,13 @@ def sync_channel_job():
         # Gửi dữ liệu qua API DMS
         response, success = dms_client.request(
             endpoint="/CategorySync",
-            method="POST",
             body=request_payload
         )
 
         # Nếu thành công, cập nhật is_sync = True
         if success:
             for ct in channels:
-                frappe.db.set_value("Channel", ct["channel_code"], "is_sync", True)
+                frappe.db.set_value("Channel", {"channel_code": ct["channel_code"]}, "is_sync", True)
             frappe.db.commit()
 
             create_dms_log(

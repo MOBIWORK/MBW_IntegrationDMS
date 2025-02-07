@@ -15,9 +15,9 @@ def sync_provider_job():
 
         # Lấy danh sách provider chưa đồng bộ
         providers = frappe.get_all(
-            "Provider",
+            "Supplier",
             filters={"is_sync": False},
-            fields=["name", "provider_name", "is_sync"]
+            fields=["name", "supplier_name", "is_sync"]
         )
 
         if not providers:
@@ -30,7 +30,7 @@ def sync_provider_job():
         formatted_data = [
             {
                 "code": ct["name"],  # Mã danh mục
-                "name": ct["provider_name"],  # Tên danh mục
+                "name": ct["supplier_name"],  # Tên danh mục
                 "isActive": True  # Trạng thái danh mục (mặc định True)
             }
             for ct in providers
@@ -60,7 +60,7 @@ def sync_provider_job():
         # Nếu thành công, cập nhật is_sync = True
         if success:
             for ct in providers:
-                frappe.db.set_value("Provider", ct["name"], "is_sync", True)
+                frappe.db.set_value("Supplier", {"name": ct["name"]}, "is_sync", True)
             frappe.db.commit()
 
             create_dms_log(

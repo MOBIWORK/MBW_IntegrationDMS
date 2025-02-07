@@ -63,7 +63,7 @@ def sync_customer_type_job():
         # Nếu thành công, cập nhật is_sync = True
         if success:
             for ct in customer_types:
-                frappe.db.set_value("Customer Type", ct["customer_type_id"], "is_sync", True)
+                frappe.db.set_value("Customer Type", {"customer_type_id": ct["customer_type_id"]}, "is_sync", True)
             frappe.db.commit()
 
             create_dms_log(
@@ -150,7 +150,7 @@ def sync_customer_group_job():
         # Nếu thành công, cập nhật is_sync = True
         if success:
             for ct in customer_groups:
-                frappe.db.set_value("DMS Customer Group", ct["customer_group"], "is_sync", True)
+                frappe.db.set_value("DMS Customer Group", {"customer_groupct": ["customer_group"]}, "is_sync", True)
             frappe.db.commit()
 
             create_dms_log(

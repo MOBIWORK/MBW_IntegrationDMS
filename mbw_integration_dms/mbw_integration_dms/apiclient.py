@@ -17,7 +17,7 @@ class DMSApiClient:
     """ DMS REST API """
 
     def __init__(
-		self, url: Optional[str] = None, access_token: Optional[str] = None,
+		self, url: Optional[str] = None, access_token: Optional[str] = None
 	):
         self.settings = frappe.get_doc(SETTING_DOCTYPE)
         self.base_url = self.settings.dms_api_secret or f"http://apierpnext.mobiwork.vn/PublicAPI"
@@ -31,7 +31,7 @@ class DMSApiClient:
         self.access_token = self.settings.dms_password
         self._auth_headers = {
             "Content-Type": "application/json",
-            "Authorization": f"Bearer {self.access_token}"
+            "tokenkey": self.access_token,
         }
 
     def request(
@@ -55,7 +55,7 @@ class DMSApiClient:
 
         try:
             response = requests.request(
-				url=url, method=method, headers=headers, json=body, params=params, files=files
+				method=method, url=url, headers=headers, json=body, params=params, files=files
 			)
             response.raise_for_status()
         except Exception:
