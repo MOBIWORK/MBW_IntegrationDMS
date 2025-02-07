@@ -10,7 +10,6 @@ frappe.pages['dms-import-category'].on_page_load = function(wrapper) {
 CategoryImporter = class {
 	constructor(wrapper) {
 		this.wrapper = $(wrapper).find(".layout-main-section");
-		this.page = wrapper.page;
 		this.init();
 		this.syncRunning = false;
 	}
@@ -18,7 +17,7 @@ CategoryImporter = class {
 	init() {
 		frappe.run_serially([
 			() => this.addMarkup(),
-			() => this.fetchCategoryCount(),
+			// () => this.fetchCategoryCount(),
 			() => this.addTable(),
 			() => this.checkSyncStatus(),
 			() => this.listen(),
@@ -120,29 +119,23 @@ CategoryImporter = class {
 				//     align: 'center',
 				// },
 				{
-					name: "ID",
-					align: "left",
-					editable: false,
-					focusable: false,
-				},
-				{
 					name: "Name",
 					editable: false,
 					focusable: false,
 				},
 				{
-					name: "SKUs",
+					name: "Category",
 					editable: false,
 					focusable: false,
 				},
 				{
-					name: "Status",
+					name: "Doctype",
 					align: "center",
 					editable: false,
 					focusable: false,
 				},
 				{
-					name: "Action",
+					name: "Status",
 					align: "center",
 					editable: false,
 					focusable: false,
@@ -155,32 +148,29 @@ CategoryImporter = class {
 		this.wrapper.find(".dms-datatable-footer").show();
 	}
 
-	async fetchdmsCategories(from_ = null) {
+	async fetchdmsCategories(page=1) {
 		try {
 			const {
-				message: { categories, nextUrl, prevUrl },
-			} = await frappe.call({
-				method: "dms_import_categories.dms_import_categories.get_dms_categories",
-				args: { from_ },
+				message: categories }
+			  = await frappe.call({
+				method: "mbw_integration_dms.mbw_integration_dms.page.dms_import_category.dms_import_category.get_categories",
+				args: { page: page},
 			});
-			this.nextUrl = nextUrl;
-			this.prevUrl = prevUrl;
-
+			this.next_page = page + 1;
+			this.prev_page = page > 1 ? page - 1 : page;
 			const dmsCategories = categories.map((category) => ({
 				// 'Image': category.image && category.image.src && `<img style="height: 50px" src="${category.image.src}">`,
-				ID: category.id,
-				Name: category.title,
-				SKUs:
-					category.variants &&
-					category.variants.map((a) => `${a.sku}`).join(", "),
-				Status: this.getCategoriesyncStatus(category.synced),
-				Action: !category.synced
-					? `<button type="button" class="btn btn-default btn-xs btn-sync mx-2" data-category="${category.id}"> Sync </button>`
-					: `<button type="button" class="btn btn-default btn-xs btn-resync mx-2" data-category="${category.id}"> Re-sync </button>`,
+				Name: category.name,
+				Category: category.category,
+				Doctype: category.doctype,
+				Status: !category.is_sync
+					? `<button type="button" class="btn btn-default btn-xs btn-sync mx-2" data-category="${category.name}"> Sync </button>`
+					: `<button type="button" class="btn btn-default btn-xs btn-resync mx-2" data-category="${category.name}"> Synced </button>`,
 			}));
 
 			return dmsCategories;
 		} catch (error) {
+			console.log(error)
 			frappe.throw(__("Error fetching categories."));
 		}
 	}
@@ -278,16 +268,16 @@ CategoryImporter = class {
 		const _this = $(currentTarget);
 
 		$(".btn-paginate").prop("disabled", true);
-		this.dmscategoryTable.showToastMessage("Loading...");
+		this.dmsCategoryTable.showToastMessage("Loading...");
 
-		const newcategories = await this.fetchdmscategories(
-			_this.hasClass("btn-next") ? this.nextUrl : this.prevUrl
+		const newCategories = await this.fetchdmsCategories(
+			_this.hasClass("btn-next") ? this.next_page : this.prev_page
 		);
 
-		this.dmscategoryTable.refresh(newcategories);
+		this.dmsCategoryTable.refresh(newCategories);
 
 		$(".btn-paginate").prop("disabled", false);
-		this.dmscategoryTable.clearToastMessage();
+		this.dmsCategoryTable.clearToastMessage();
 	}
 
 	syncAll() {
@@ -298,12 +288,12 @@ CategoryImporter = class {
 			frappe.msgprint(__("Sync already in progress"));
 		} else {
 			frappe.call({
-				method: "dms_import_categories.dms_import_categories.import_all_categories",
+				method: "mbw_integration_dms.mbw_integration_dms.page.dms_import_category.dms_import_category.sync_all_categories",
 			});
 		}
 
 		// sync progress
-		this.logSync();
+		// this.logSync();
 	}
 
 	logSync() {
