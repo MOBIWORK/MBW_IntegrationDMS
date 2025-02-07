@@ -4,6 +4,13 @@ from mbw_integration_dms.mbw_integration_dms.utils import create_dms_log
 from mbw_integration_dms.mbw_integration_dms.apiclient import DMSApiClient
 
 
+def sync_customer():
+    frappe.enqueue("mbw_integration_dms.mbw_integration_dms.customer.sync_customer_job", queue="long", timeout=300)
+    return {"message": "Customer Sync job has been queued."}
+
+def sync_customer_job():
+    pass
+
 # Đồng bộ danh sách loại khách hàng
 def sync_customer_type():
     """
