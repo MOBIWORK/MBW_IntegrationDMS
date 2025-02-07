@@ -1,0 +1,54 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2025-02-06 17:06:53.574680",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "customer_type_id",
+  "customer_type_name",
+  "is_sync"
+ ],
+ "fields": [
+  {
+   "fieldname": "customer_type_id",
+   "fieldtype": "Data",
+   "label": "Customer Type ID"
+  },
+  {
+   "fieldname": "customer_type_name",
+   "fieldtype": "Data",
+   "label": "Customer Type Name"
+  },
+  {
+   "default": "0",
+   "fieldname": "is_sync",
+   "fieldtype": "Check",
+   "label": "Is Sync"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2025-02-06 17:07:35.016006",
+ "modified_by": "Administrator",
+ "module": "MBW Integration DMS",
+ "name": "Customer Type",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

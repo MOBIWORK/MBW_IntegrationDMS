@@ -16,6 +16,3 @@ EVENT_MAPPER = {
 	"orders/paid": "",
 	"orders/cancelled": "",
 }
-
-
-# custom fields
