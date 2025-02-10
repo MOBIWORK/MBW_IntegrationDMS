@@ -29,10 +29,28 @@ ProductImporter = class {
 		const jobs = await frappe.db.get_list("RQ Job", {
 			filters: { status: ("in", ("queued", "started")) },
 		});
-		this.syncRunning =
-			jobs.find(
-				(job) => job.job_name == "dms.job.sync.all.products"
-			) !== undefined;
+
+		// console.log("Fetched Jobs:", jobs);
+
+		const filteredJobs = jobs.filter((job) =>
+			["queued", "started"].includes(job.status)
+		);
+
+		// console.log("Filtered Jobs:", filteredJobs);
+		let list_job = ["mbw_integration_dms.mbw_integration_dms.brand.sync_brand_job",
+			"mbw_integration_dms.mbw_integration_dms.channel.sync_channel_job",
+			"mbw_integration_dms.mbw_integration_dms.customer.sync_customer_type_job",
+			"mbw_integration_dms.mbw_integration_dms.customer.sync_customer_group_job",
+			"mbw_integration_dms.mbw_integration_dms.industry.sync_industry_job",
+			"mbw_integration_dms.mbw_integration_dms.provider.sync_provider_job",
+			"mbw_integration_dms.mbw_integration_dms.region.sync_region_job",
+			"mbw_integration_dms.mbw_integration_dms.unit.sync_unit_job",
+			"mbw_integration_dms.mbw_integration_dms.warehouse.sync_warehouse_job"
+		]
+		this.syncRunning = filteredJobs.find(
+			(job) =>
+				list_job.includes(job.job_name)
+		);
 
 		if (this.syncRunning) {
 			this.toggleSyncAllButton();

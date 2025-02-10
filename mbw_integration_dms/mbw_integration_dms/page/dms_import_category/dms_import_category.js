@@ -28,10 +28,20 @@ CategoryImporter = class {
 		const jobs = await frappe.db.get_list("RQ Job", {
 			filters: { status: ("in", ("queued", "started")) },
 		});
-		this.syncRunning =
-			jobs.find(
-				(job) => job.job_name == "dms.job.sync.all.categories"
-			) !== undefined;
+
+		// console.log("Fetched Jobs:", jobs);
+
+		const filteredJobs = jobs.filter((job) =>
+			["queued", "started"].includes(job.status)
+		);
+
+		// console.log("Filtered Jobs:", filteredJobs);
+
+		this.syncRunning = filteredJobs.find(
+			(job) =>
+				job.job_name ===
+				"mbw_integration_dms.mbw_integration_dms.product.sync_product_job"
+		);
 
 		if (this.syncRunning) {
 			this.toggleSyncAllButton();

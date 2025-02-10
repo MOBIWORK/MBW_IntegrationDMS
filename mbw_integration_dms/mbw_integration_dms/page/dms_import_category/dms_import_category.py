@@ -8,6 +8,7 @@ from mbw_integration_dms.mbw_integration_dms.industry import sync_industry
 from mbw_integration_dms.mbw_integration_dms.provider import sync_provider
 from mbw_integration_dms.mbw_integration_dms.region import sync_region
 from mbw_integration_dms.mbw_integration_dms.unit import sync_unit
+from mbw_integration_dms.mbw_integration_dms.warehouse import sync_warehouse
 
 CATEGORY_DOCTYPE = ["Brand", "Industry Type", "Supplier", "UOM", "Customer Type", "DMS Customer Group", "Territory", "Channel", "Warehouse"]
 CATEGORIES = ["Brand", "Industry", "Provider", "Unit", "CustomerType", "CustomerGroup", "Region", "Channel", "Warehouse"]
@@ -65,4 +66,5 @@ def sync_all_categories():
     sync_customer_group()
     sync_region()
     sync_unit()
+    sync_warehouse()
     return {"message": "Sync all category job has been queued."}
