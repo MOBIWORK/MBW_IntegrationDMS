@@ -1,4 +1,5 @@
 import frappe
+from frappe import _
 
 from mbw_integration_dms.mbw_integration_dms.utils import create_dms_log
 from mbw_integration_dms.mbw_integration_dms.apiclient import DMSApiClient
@@ -116,8 +117,80 @@ def sync_product_job():
 
 # Xóa sản phẩm
 def delete_product(doc, method):
+    """Xóa sản phẩm khỏi ERPNext nếu xóa thành công bên DMS"""
     dms_client = DMSApiClient()
 
-    
+    request_payload = {
+        "orgid": dms_client.orgid,
+        "data": doc.item_code
+    }
+
+    # Ghi log request
+    create_dms_log(
+        status="Processing",
+        method="POST",
+        request_data=request_payload,
+        message=f"Sending delete request for product {doc.item_code}"
+    )
+
+    # Gửi request xóa sản phẩm đến API của đối tác
+    response, success = dms_client.request(
+        endpoint="/ProductDel",
+        method="POST",
+        body=request_payload
+    )
+
+    # Nếu API đối tác trả về lỗi, không xóa sản phẩm bên ERPNext
+    if not success or not response.get("status"):
+        frappe.throw(f"Không thể xóa sản phẩm {doc.item_code} bên đối tác: {response.get('message', 'Lỗi không xác định')}")
+
+    # Nếu thành công, ghi log và tiếp tục xóa sản phẩm trong ERPNext
+    create_dms_log(
+        status="Success",
+        response_data=response,
+        message=f"Product {doc.item_code} deleted successfully from both ERPNext and DMS."
+    )
 
 
+def delete_multiple_products(item_codes):
+    """Xóa nhiều sản phẩm trong ERPNext và DMS"""
+    if not item_codes:
+        return {"status": False, "message": "Không có sản phẩm để xóa."}
+
+    try:
+        # Xóa sản phẩm trong ERPNext**
+        for item_code in item_codes:
+            if not frappe.db.exists("Item", item_code):
+                frappe.throw(_("Sản phẩm {0} không tồn tại!").format(item_code))
+
+        frappe.db.sql("""
+            DELETE FROM `tabItem`
+            WHERE item_code IN ({})
+        """.format(", ".join(["%s"] * len(item_codes))), tuple(item_codes))
+        
+        frappe.db.commit()  # Commit ngay khi xóa thành công
+
+        # Xóa sản phẩm bên đối tác nếu xóa ERPNext thành công**
+        dms_client = DMSApiClient()
+        request_payload = {
+            "orgid": dms_client.orgid,
+            "data": item_codes
+        }
+
+        response, success = dms_client.request(
+            endpoint="/ProductDel",
+            method="POST",
+            body=request_payload
+        )
+
+        if success:
+            return {"status": True, "message": f"Đã xóa thành công {len(item_codes)} sản phẩm."}
+        else:
+            # Nếu API xóa đối tác lỗi, rollback lại ERPNext
+            frappe.db.rollback()
+            frappe.throw(_("Lỗi khi xóa sản phẩm bên DMS: {0}").format(response.get("message", "Không rõ lỗi")))
+
+    except Exception as e:
+        frappe.db.rollback()  # Rollback nếu có lỗi
+        frappe.log_error(f"Lỗi khi xóa sản phẩm: {str(e)}", "Product Deletion")
+        return {"status": False, "message": f"Lỗi khi xóa sản phẩm: {str(e)}"}
