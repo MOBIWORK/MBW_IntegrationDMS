@@ -129,21 +129,28 @@ CategoryImporter = class {
 					name: "Category",
 					editable: false,
 					focusable: false,
-					width: 150,
+					width: 130,
 				},
 				{
 					name: "Doctype",
 					align: "center",
 					editable: false,
 					focusable: false,
-					width: 150,
+					width: 130,
 				},
 				{
 					name: "Status",
 					align: "center",
 					editable: false,
 					focusable: false,
-					width: 150,
+					width: 130,
+				},
+				{
+					name: "Action",
+					align: "center",
+					editable: false,
+					focusable: false,
+					width: 130,
 				},
 			],
 			data: await this.fetchdmsCategories(),
@@ -168,9 +175,10 @@ CategoryImporter = class {
 				Name: category.name,
 				Category: category.category,
 				Doctype: category.doctype,
-				Status: !category.is_sync
-					? `<button type="button" class="btn btn-default btn-xs btn-sync mx-2" data-category="${category.name}"> Sync </button>`
-					: `<button type="button" class="btn btn-default btn-xs btn-resync mx-2" data-category="${category.name}"> Synced </button>`,
+				Status: this.getCategoriesyncStatus(category.is_sync),
+				Action: !category.is_sync
+					? `<button type="button" class="btn btn-default btn-xs btn-sync mx-2" data-category="${category.id}"> Sync </button>`
+					: `<button type="button" class="btn btn-default btn-xs btn-resync mx-2" data-category="${category.id}"> Re-sync </button>`,
 			}));
 
 			return dmsCategories;

@@ -67,12 +67,12 @@ ProductImporter = class {
                                 </div>
                                 <div class="product-count py-3 d-flex justify-content-stretch">
                                     <div class="text-center p-3 mx-2 rounded w-100" style="background-color: var(--bg-color)">
-                                        <h2 id="count-products-dms">-</h2>
-                                        <p class="text-muted m-0">in DMS</p>
-                                    </div>
-                                    <div class="text-center p-3 mx-2 rounded w-100" style="background-color: var(--bg-color)">
                                         <h2 id="count-products-erpnext">-</h2>
                                         <p class="text-muted m-0">in ERPNext</p>
+                                    </div>
+                                    <div class="text-center p-3 mx-2 rounded w-100" style="background-color: var(--bg-color)">
+                                        <h2 id="count-products-pending">-</h2>
+                                        <p class="text-muted m-0">Pending sync</p>
                                     </div>
                                     <div class="text-center p-3 mx-2 rounded w-100" style="background-color: var(--bg-color)">
                                         <h2 id="count-products-synced">-</h2>
@@ -98,12 +98,12 @@ ProductImporter = class {
 	async fetchProductCount() {
 		try {
 			const {
-				message: { erpnextCount, dmsCount, syncedCount },
+				message: { erpnextCount, pendingCount, syncedCount },
 			} = await frappe.call({
-				method: "dms_import_products.dms_import_products.get_product_count",
+				method: "mbw_integration_dms.mbw_integration_dms.page.dms_import_products.dms_import_products.get_count_products",
 			});
 
-			this.wrapper.find("#count-products-dms").text(dmsCount);
+			this.wrapper.find("#count-products-pending").text(pendingCount);
 			this.wrapper.find("#count-products-erpnext").text(erpnextCount);
 			this.wrapper.find("#count-products-synced").text(syncedCount);
 		} catch (error) {
@@ -115,37 +115,33 @@ ProductImporter = class {
 		const listElement = this.wrapper.find("#dms-product-list")[0];
 		this.dmsProductTable = new frappe.DataTable(listElement, {
 			columns: [
-				// {
-				//     name: 'Image',
-				//     align: 'center',
-				// },
 				{
-					name: "ID",
+					name: "Item Code",
 					align: "left",
 					editable: false,
 					focusable: false,
+					width: 200,
 				},
 				{
-					name: "Name",
+					name: "Item Name",
+					align: "left",
 					editable: false,
 					focusable: false,
-				},
-				{
-					name: "SKUs",
-					editable: false,
-					focusable: false,
+					width: 250,
 				},
 				{
 					name: "Status",
 					align: "center",
 					editable: false,
 					focusable: false,
+					width: 150,
 				},
 				{
 					name: "Action",
 					align: "center",
 					editable: false,
 					focusable: false,
+					width: 150,
 				},
 			],
 			data: await this.fetchdmsProducts(),
@@ -155,26 +151,23 @@ ProductImporter = class {
 		this.wrapper.find(".dms-datatable-footer").show();
 	}
 
-	async fetchdmsProducts(from_ = null) {
+	async fetchdmsProducts(page = 1) {
 		try {
 			const {
-				message: { products, nextUrl, prevUrl },
+				message: products,
 			} = await frappe.call({
-				method: "dms_import_products.dms_import_products.get_dms_products",
-				args: { from_ },
+				method: "mbw_integration_dms.mbw_integration_dms.page.dms_import_products.dms_import_products.get_products",
+				args: { page },
 			});
-			this.nextUrl = nextUrl;
-			this.prevUrl = prevUrl;
+			this.next_page = page + 1;
+			this.prev_page = page > 1 ? page - 1 : page;
 
 			const dmsProducts = products.map((product) => ({
 				// 'Image': product.image && product.image.src && `<img style="height: 50px" src="${product.image.src}">`,
-				ID: product.id,
-				Name: product.title,
-				SKUs:
-					product.variants &&
-					product.variants.map((a) => `${a.sku}`).join(", "),
-				Status: this.getProductSyncStatus(product.synced),
-				Action: !product.synced
+				"Item Code": product.item_code,
+				"Item Name": product.item_name,
+				Status: this.getProductSyncStatus(product.is_sync),
+				Action: !product.is_sync
 					? `<button type="button" class="btn btn-default btn-xs btn-sync mx-2" data-product="${product.id}"> Sync </button>`
 					: `<button type="button" class="btn btn-default btn-xs btn-resync mx-2" data-product="${product.id}"> Re-sync </button>`,
 			}));
@@ -281,7 +274,7 @@ ProductImporter = class {
 		this.dmsProductTable.showToastMessage("Loading...");
 
 		const newProducts = await this.fetchdmsProducts(
-			_this.hasClass("btn-next") ? this.nextUrl : this.prevUrl
+			_this.hasClass("btn-next") ? this.next_page : this.prev_page
 		);
 
 		this.dmsProductTable.refresh(newProducts);
@@ -298,12 +291,12 @@ ProductImporter = class {
 			frappe.msgprint(__("Sync already in progress"));
 		} else {
 			frappe.call({
-				method: "dms_import_products.dms_import_products.import_all_products",
+				method: "mbw_integration_dms.mbw_integration_dms.page.dms_import_products.dms_import_products.sync_all_products",
 			});
 		}
 
 		// sync progress
-		this.logSync();
+		// this.logSync();
 	}
 
 	logSync() {
