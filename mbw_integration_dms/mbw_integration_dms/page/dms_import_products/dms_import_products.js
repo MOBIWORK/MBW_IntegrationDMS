@@ -63,7 +63,7 @@ ProductImporter = class {
             <div class="row">
                 <div class="col-lg-8 d-flex align-items-stretch">
                     <div class="card border-0 shadow-sm p-3 mb-3 w-100 rounded-sm" style="background-color: var(--card-bg)">
-                        <h5 class="border-bottom pb-2">Products in DMS</h5>
+                        <h5 class="border-bottom pb-2">Products in ERPNext</h5>
                         <div id="dms-product-list">
                             <div class="text-center">Loading...</div>
                         </div>
