@@ -17,7 +17,7 @@ CategoryImporter = class {
 	init() {
 		frappe.run_serially([
 			() => this.addMarkup(),
-			// () => this.fetchCategoryCount(),
+			() => this.fetchCategoryCount(),
 			() => this.addTable(),
 			() => this.checkSyncStatus(),
 			() => this.listen(),
@@ -44,7 +44,7 @@ CategoryImporter = class {
             <div class="row">
                 <div class="col-lg-8 d-flex align-items-stretch">
                     <div class="card border-0 shadow-sm p-3 mb-3 w-100 rounded-sm" style="background-color: var(--card-bg)">
-                        <h5 class="border-bottom pb-2">Category in DMS</h5>
+                        <h5 class="border-bottom pb-2">Category in ERPNext</h5>
                         <div id="dms-category-list">
                             <div class="text-center">Loading...</div>
                         </div>
@@ -66,12 +66,12 @@ CategoryImporter = class {
                                 </div>
                                 <div class="category-count py-3 d-flex justify-content-stretch">
                                     <div class="text-center p-3 mx-2 rounded w-100" style="background-color: var(--bg-color)">
-                                        <h2 id="count-categories-dms">-</h2>
-                                        <p class="text-muted m-0">in DMS</p>
-                                    </div>
-                                    <div class="text-center p-3 mx-2 rounded w-100" style="background-color: var(--bg-color)">
                                         <h2 id="count-categories-erpnext">-</h2>
                                         <p class="text-muted m-0">in ERPNext</p>
+                                    </div>
+                                    <div class="text-center p-3 mx-2 rounded w-100" style="background-color: var(--bg-color)">
+                                        <h2 id="count-categories-pending">-</h2>
+                                        <p class="text-muted m-0">Pending Sync</p>
                                     </div>
                                     <div class="text-center p-3 mx-2 rounded w-100" style="background-color: var(--bg-color)">
                                         <h2 id="count-categories-synced">-</h2>
@@ -97,12 +97,13 @@ CategoryImporter = class {
 	async fetchCategoryCount() {
 		try {
 			const {
-				message: { erpnextCount, dmsCount, syncedCount },
+				message: { erpnextCount, pendingCount, syncedCount },
 			} = await frappe.call({
-				method: "dms_import_categories.dms_import_categories.get_category_count",
+				method: "mbw_integration_dms.mbw_integration_dms.page.dms_import_category.dms_import_category.get_count_categories",
 			});
+			console.log(erpnextCount)
 
-			this.wrapper.find("#count-categories-dms").text(dmsCount);
+			this.wrapper.find("#count-categories-pending").text(pendingCount);
 			this.wrapper.find("#count-categories-erpnext").text(erpnextCount);
 			this.wrapper.find("#count-categories-synced").text(syncedCount);
 		} catch (error) {
@@ -122,23 +123,27 @@ CategoryImporter = class {
 					name: "Name",
 					editable: false,
 					focusable: false,
+					width: 200,
 				},
 				{
 					name: "Category",
 					editable: false,
 					focusable: false,
+					width: 150,
 				},
 				{
 					name: "Doctype",
 					align: "center",
 					editable: false,
 					focusable: false,
+					width: 150,
 				},
 				{
 					name: "Status",
 					align: "center",
 					editable: false,
 					focusable: false,
+					width: 150,
 				},
 			],
 			data: await this.fetchdmsCategories(),

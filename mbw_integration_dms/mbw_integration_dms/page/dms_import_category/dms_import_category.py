@@ -34,7 +34,26 @@ def get_categories(page):
 
 @frappe.whitelist()
 def get_count_categories():
-    pass
+    erpnextCount = 0
+    pendingCount = 0
+    syncedCount = 0
+    for idx, category in enumerate(CATEGORY_DOCTYPE):
+        all_category = frappe.db.count(
+            category
+        )
+        synced_category = frappe.db.count(
+            category,
+            filters={"is_sync": True},
+        )
+        erpnextCount += all_category
+        syncedCount += synced_category
+        pendingCount += all_category - synced_category
+    data = {
+        "erpnextCount": erpnextCount,
+        "pendingCount": pendingCount,
+        "syncedCount": syncedCount,
+    }
+    return data
 
 @frappe.whitelist()
 def sync_all_categories():
