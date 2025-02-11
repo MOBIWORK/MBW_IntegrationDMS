@@ -57,7 +57,7 @@ def sync_channel_job():
         )
 
         # Nếu thành công, cập nhật is_sync = True
-        if success:
+        if response.get("status"):
             for ct in channels:
                 frappe.db.set_value("Channel", {"channel_code": ct["channel_code"]}, "is_sync", True)
             frappe.db.commit()

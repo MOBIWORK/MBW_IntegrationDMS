@@ -125,7 +125,10 @@ app_license = "mit"
 doc_events = {
 	"Item": {
 		"on_trash": "mbw_integration_dms.mbw_integration_dms.product.delete_product"
-	}
+	},
+    "Customer": {
+        "on_trash": "mbw_integration_dms.mbw_integration_dms.customer.delete_customer"
+    }
 }
 
 # Scheduled Tasks

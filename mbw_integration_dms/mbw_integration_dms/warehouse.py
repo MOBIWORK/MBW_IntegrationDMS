@@ -58,7 +58,7 @@ def sync_warehouse_job():
         )
 
         # Nếu thành công, cập nhật is_sync = True
-        if success:
+        if response.get("status"):
             for ct in warehouses:
                 frappe.db.set_value("Warehouse", {"name": ct["name"]}, "is_sync", True)
             frappe.db.commit()
