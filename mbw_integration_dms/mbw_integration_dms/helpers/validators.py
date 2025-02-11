@@ -1,5 +1,6 @@
 import re
 from datetime import datetime
+import pytz
 
 
 # Kiểm tra định dạng email truyền lên có đúng định dạng không
@@ -48,7 +49,7 @@ def validate_date(value):
     except:
         raise Exception("Không đúng định dạng timestamp `%s`" % value)
 
-import pytz
+
 # Kiểm tra trường datetime truyền lên
 def validate_datetime(value):
     try:
