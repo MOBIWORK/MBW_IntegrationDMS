@@ -76,6 +76,7 @@ def _extract_basic_auth(auth_header):
         decoded_credentials = base64.b64decode(encoded_credentials).decode("utf-8")
         api_key, api_secret = decoded_credentials.split(":", 1)
         return api_key, api_secret
+    
     except Exception:
         frappe.throw(_("Invalid Basic Auth format"))
 
@@ -83,7 +84,7 @@ def _validate_request(api_key, api_secret, req):
     """Xác thực API key và secret với dữ liệu trong ERPNext settings."""
     settings = frappe.get_single("MBW Integration Settings")
 
-    if settings.erp_api_secret != api_key or settings.erp_password != api_secret:
+    if settings.erp_api_key != api_key or settings.erp_api_secret != api_secret:
         create_dms_log(
             status="Error",
             request_data=req.data,

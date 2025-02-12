@@ -6,12 +6,12 @@
  "field_order": [
   "enable_dms",
   "dms_authentication_details_section",
-  "og_name",
-  "dms_password",
-  "dms_api_secret",
+  "orgid",
+  "dms_access_token",
+  "dms_api_url",
   "erp_authentication_details_section",
   "company",
-  "erp_password",
+  "erp_api_key",
   "erp_api_secret",
   "\u0111\u1ed3ng_b\u1ed9_s\u1ea3n_ph\u1ea9m_section",
   "t\u1ef1_\u0111\u1ed9ng_\u0111\u1ed3ng_b\u1ed9_s\u1ea3n_ph\u1ea9m_sang_mbwdms",
@@ -29,21 +29,6 @@
    "label": "X\u00e1c th\u1ef1c h\u1ec7 th\u1ed1ng MBW.DMS"
   },
   {
-   "fieldname": "og_name",
-   "fieldtype": "Data",
-   "label": "T\u00ean t\u1ed5 ch\u1ee9c"
-  },
-  {
-   "fieldname": "dms_password",
-   "fieldtype": "Data",
-   "label": "DMS Access Token"
-  },
-  {
-   "fieldname": "dms_api_secret",
-   "fieldtype": "Data",
-   "label": "DMS API Secret"
-  },
-  {
    "fieldname": "erp_authentication_details_section",
    "fieldtype": "Section Break",
    "label": "X\u00e1c th\u1ef1c h\u1ec7 th\u1ed1ng ERPNEXT"
@@ -52,11 +37,6 @@
    "fieldname": "company",
    "fieldtype": "Data",
    "label": "C\u00f4ng ty"
-  },
-  {
-   "fieldname": "erp_password",
-   "fieldtype": "Data",
-   "label": "ERP Access Token"
   },
   {
    "fieldname": "erp_api_secret",
@@ -116,12 +96,32 @@
    "fieldtype": "Select",
    "label": "T\u1ea7n su\u1ea5t \u0111\u1ed3ng b\u1ed9 t\u1ed3n kho (ph\u00fat)",
    "options": "5\n10\n15\n30\n60"
+  },
+  {
+   "fieldname": "dms_api_url",
+   "fieldtype": "Data",
+   "label": "DMS API URL"
+  },
+  {
+   "fieldname": "erp_api_key",
+   "fieldtype": "Data",
+   "label": "ERP API Key"
+  },
+  {
+   "fieldname": "dms_access_token",
+   "fieldtype": "Data",
+   "label": "DMS Access Token"
+  },
+  {
+   "fieldname": "orgid",
+   "fieldtype": "Data",
+   "label": "T\u00ean t\u1ed5 ch\u1ee9c"
   }
  ],
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2025-02-07 10:58:39.769101",
+ "modified": "2025-02-12 09:29:36.388427",
  "modified_by": "Administrator",
  "module": "MBW Integration DMS",
  "name": "MBW Integration Settings",

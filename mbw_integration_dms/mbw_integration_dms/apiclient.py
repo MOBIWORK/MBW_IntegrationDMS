@@ -20,15 +20,14 @@ class DMSApiClient:
 		self, url: Optional[str] = None, access_token: Optional[str] = None
 	):
         self.settings = frappe.get_doc(SETTING_DOCTYPE)
-        self.base_url = self.settings.dms_api_secret or f"http://apierpnext.mobiwork.vn/PublicAPI"
-        self.access_token = self.settings.dms_password
-        self.orgid = self.settings.og_name
+        self.base_url = self.settings.dms_api_url or f"http://apierpnext.mobiwork.vn/PublicAPI"
+        self.access_token = self.settings.dms_access_token
+        self.orgid = self.settings.orgid
         self.__initialize_auth()
 
     def __initialize_auth(self):
         """Initialize and setup authentication details"""
-		
-        self.access_token = self.settings.dms_password
+        
         self._auth_headers = {
             "Content-Type": "application/json",
             "tokenkey": self.access_token,
