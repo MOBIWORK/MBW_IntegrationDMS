@@ -1,3 +1,6 @@
+# Copyright (c) 2025, TuanBD MBWD
+# For license information, please see LICENSE
+
 from typing import Any, Dict, List, Optional, Tuple
 
 import frappe

@@ -1,40 +1,35 @@
 {
  "actions": [],
+ "allow_import": 1,
  "allow_rename": 1,
- "autoname": "field:channel_name",
- "creation": "2025-02-06 19:19:10.300294",
+ "autoname": "field:ma_tinh",
+ "creation": "2025-02-12 14:21:44.630610",
+ "default_view": "List",
  "doctype": "DocType",
  "engine": "InnoDB",
  "field_order": [
-  "channel_name",
-  "channel_code",
-  "is_sync"
+  "ma_tinh",
+  "ten_tinh"
  ],
  "fields": [
   {
-   "fieldname": "channel_name",
+   "fieldname": "ma_tinh",
    "fieldtype": "Data",
-   "label": "Channel Name",
+   "label": "M\u00e3 t\u1ec9nh th\u00e0nh",
    "unique": 1
   },
   {
-   "fieldname": "channel_code",
+   "fieldname": "ten_tinh",
    "fieldtype": "Data",
-   "label": "Channel Code"
-  },
-  {
-   "default": "0",
-   "fieldname": "is_sync",
-   "fieldtype": "Check",
-   "label": "Is Sync"
+   "label": "T\u00ean t\u1ec9nh th\u00e0nh"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-02-12 16:57:21.882779",
+ "modified": "2025-02-12 16:10:40.004421",
  "modified_by": "Administrator",
  "module": "MBW Integration DMS",
- "name": "Channel",
+ "name": "DMS Province",
  "naming_rule": "By fieldname",
  "owner": "Administrator",
  "permissions": [
@@ -55,6 +50,6 @@
  "sort_field": "modified",
  "sort_order": "DESC",
  "states": [],
- "title_field": "channel_name",
+ "title_field": "ten_tinh",
  "translated_doctype": 1
 }

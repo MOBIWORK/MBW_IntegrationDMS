@@ -3,7 +3,6 @@
 
 import frappe
 import pydash
-import json
 
 from mbw_integration_dms.mbw_integration_dms.utils import create_dms_log
 from mbw_integration_dms.mbw_integration_dms.apiclient import DMSApiClient
@@ -54,7 +53,8 @@ def sync_customer_job():
                 "khu_vuc": i["territory"],
                 "sdt": i["mobile_no"],
                 "nguoi_lien_he": i["customer_primary_contact"],
-                "address": i["customer_primary_address"]
+                "address": i["customer_primary_address"],
+                "address_shipping": i["customer_primary_address"]
             }
             for i in customers
         ]
@@ -331,11 +331,11 @@ def sync_customer_group_job():
 
 # Thêm mới khách hàng
 @frappe.whitelist(methods="POST")
-def create_customers(customers):
+def create_customers(**kwargs):
     results = []
 
     try:
-        customers = json.loads(customers)
+        customers = kwargs.get("data", [])
 
         if not isinstance(customers, list):
             frappe.throw("Dữ liệu đầu vào không hợp lệ. Phải là danh sách khách hàng.")
@@ -343,14 +343,14 @@ def create_customers(customers):
         for customer_data in customers:
             try:
                 customer_data = frappe._dict(customer_data)
-                dms_customer_code = customer_data.get("dms_customer_code")
+                customer_code_dms = customer_data.get("customer_code_dms")
 
-                # Kiểm tra nếu khách hàng đã tồn tại theo dms_customer_code
-                if frappe.db.exists("Customer", {"dms_customer_code": dms_customer_code}):
+                # Kiểm tra nếu khách hàng đã tồn tại theo customer_code_dms
+                if frappe.db.exists("Customer", {"customer_code_dms": customer_code_dms}):
                     create_dms_log(
                         status="Skipped",
                         request_data=customer_data,
-                        message=f"Customer with dms_customer_code {dms_customer_code} already exists."
+                        message=f"Customer with customer_code_dms {customer_code_dms} already exists."
                     )
                     results.append({"customer_code": customer_data.get("customer_code"), "status": "Skipped"})
                     continue  # Bỏ qua khách hàng này và tiếp tục với khách hàng khác
@@ -372,7 +372,7 @@ def create_customers(customers):
 
                 # Tạo mới khách hàng
                 new_customer = frappe.new_doc("Customer")
-                required_fields = ["customer_code", "customer_name", "dms_customer_code"]
+                required_fields = ["customer_code", "customer_name", "customer_code_dms"]
                 normal_fields = [
                     "customer_details", "website", "customer_group", "territory", 
                     "dms_customer_type", "sfa_sale_channel", "mobile_no", "tax_id", 
@@ -513,7 +513,7 @@ def update_customer(**kwargs):
         fields = [
             "customer_code", "customer_name", "customer_group", "territory",
             "website", "customer_type", "dms_customer_type", "sfa_sale_channel",
-            "dms_customer_code", "tax_id", "email_id", "mobile_no"
+            "customer_code_dms", "tax_id", "email_id", "mobile_no"
         ]
         date_fields = ["custom_birthday"]
 

@@ -1,40 +1,42 @@
 {
  "actions": [],
+ "allow_import": 1,
  "allow_rename": 1,
- "autoname": "field:channel_name",
- "creation": "2025-02-06 19:19:10.300294",
+ "autoname": "field:ma_xa",
+ "creation": "2025-02-12 14:48:14.202663",
+ "default_view": "List",
  "doctype": "DocType",
  "engine": "InnoDB",
  "field_order": [
-  "channel_name",
-  "channel_code",
-  "is_sync"
+  "ma_xa",
+  "ten_xa",
+  "ma_quan_huyen"
  ],
  "fields": [
   {
-   "fieldname": "channel_name",
+   "fieldname": "ma_xa",
    "fieldtype": "Data",
-   "label": "Channel Name",
+   "label": "M\u00e3 ph\u01b0\u1eddng/x\u00e3",
    "unique": 1
   },
   {
-   "fieldname": "channel_code",
+   "fieldname": "ten_xa",
    "fieldtype": "Data",
-   "label": "Channel Code"
+   "label": "T\u00ean ph\u01b0\u1eddng/x\u00e3"
   },
   {
-   "default": "0",
-   "fieldname": "is_sync",
-   "fieldtype": "Check",
-   "label": "Is Sync"
+   "fieldname": "ma_quan_huyen",
+   "fieldtype": "Link",
+   "label": "Qu\u1eadn/huy\u1ec7n",
+   "options": "DMS District"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-02-12 16:57:21.882779",
+ "modified": "2025-02-12 16:11:18.648279",
  "modified_by": "Administrator",
  "module": "MBW Integration DMS",
- "name": "Channel",
+ "name": "DMS Ward",
  "naming_rule": "By fieldname",
  "owner": "Administrator",
  "permissions": [
@@ -55,6 +57,6 @@
  "sort_field": "modified",
  "sort_order": "DESC",
  "states": [],
- "title_field": "channel_name",
+ "title_field": "ten_xa",
  "translated_doctype": 1
 }
