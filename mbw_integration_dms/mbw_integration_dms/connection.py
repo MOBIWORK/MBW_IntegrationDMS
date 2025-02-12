@@ -1,5 +1,6 @@
 import frappe
 import json
+import base64
 from frappe import _
 
 from mbw_integration_dms.mbw_integration_dms.constants import (
@@ -33,15 +34,25 @@ def get_callback_url() -> str:
 
 @frappe.whitelist(allow_guest=True)
 def store_request_data() -> None:
-	if frappe.request:
-		hmac_header = frappe.get_request_header("X-ERP-JWT")
+    """Nhận request từ đối tác, xác thực Basic Auth và xử lý dữ liệu."""
+    if frappe.request:
+        auth_header = frappe.get_request_header("Authorization")
 
-		_validate_request(frappe.request, hmac_header)
+        # Kiểm tra header Authorization
+        if not auth_header or not auth_header.startswith("Basic "):
+            frappe.throw(_("Missing or invalid Authorization header"))
 
-		data = json.loads(frappe.request.data)
-		event = frappe.request.headers.get("X-ERP-Topic")
+        # Giải mã Basic Auth để lấy api_key và api_secret
+        api_key, api_secret = _extract_basic_auth(auth_header)
 
-		return process_request(data, event)
+        # Kiểm tra xác thực với dữ liệu trong settings
+        _validate_request(api_key, api_secret, frappe.request)
+
+        # Xử lý dữ liệu từ request
+        data = json.loads(frappe.request.data)
+        event = frappe.request.headers.get("X-ERP-Topic")
+
+        return process_request(data, event)
 
 
 def process_request(data, event):
@@ -58,10 +69,25 @@ def process_request(data, event):
 	)
 
 
-def _validate_request(req, hmac_header):
-	settings = frappe.get_doc(SETTING_DOCTYPE)
-	secret_key = settings.dms_password
+def _extract_basic_auth(auth_header):
+    """Giải mã Basic Auth và trả về (api_key, api_secret)."""
+    try:
+        encoded_credentials = auth_header.split("Basic ")[1]
+        decoded_credentials = base64.b64decode(encoded_credentials).decode("utf-8")
+        api_key, api_secret = decoded_credentials.split(":", 1)
+        return api_key, api_secret
+    
+    except Exception:
+        frappe.throw(_("Invalid Basic Auth format"))
 
-	if secret_key != hmac_header:
-		create_dms_log(status="Error", request_data=req.data)
-		frappe.throw(_("Unverified Webhook Data"))
+def _validate_request(api_key, api_secret, req):
+    """Xác thực API key và secret với dữ liệu trong ERPNext settings."""
+    settings = frappe.get_single("MBW Integration Settings")
+
+    if settings.erp_api_key != api_key or settings.erp_api_secret != api_secret:
+        create_dms_log(
+            status="Error",
+            request_data=req.data,
+            message="Unauthorized API access attempt"
+        )
+        frappe.throw(_("Unauthorized API access"))

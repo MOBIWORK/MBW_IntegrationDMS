@@ -59,7 +59,7 @@ def sync_industry_job():
         )
 
         # Nếu thành công, cập nhật is_sync = True
-        if success:
+        if response.get("status"):
             for ct in industrys:
                 frappe.db.set_value("Industry Type", {"name": ct["name"]}, "is_sync", True)
             frappe.db.commit()
