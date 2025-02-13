@@ -5,8 +5,8 @@ frappe.pages['dms-import-products'].on_page_load = function(wrapper) {
 		single_column: true
 	});
 	new ProductImporter(wrapper)
-	new CategoryImporter(wrapper)
 	new CustomerImporter(wrapper)
+	new CategoryImporter(wrapper)
 }
 
 ProductImporter = class {
@@ -1071,7 +1071,7 @@ CustomerImporter = class {
 	// }
 
 	toggleSyncAllButton(disable = true) {
-		const btn = $("#btn-sync-all-product");
+		const btn = $("#btn-sync-all-customer");
 
 		const _toggleClass = (d) => (d ? "btn-success" : "btn-primary");
 		const _toggleText = () => (disable ? "Syncing..." : "Sync Products");
