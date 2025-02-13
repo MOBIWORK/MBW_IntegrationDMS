@@ -170,7 +170,7 @@ ProductImporter = class {
 				method: "mbw_integration_dms.mbw_integration_dms.page.dms_import_products.dms_import_products.get_products",
 				args: { page },
 			});
-			this.next_page = page + 1;
+			this.next_page = products.length > 0 ? page + 1 : page;
 			this.prev_page = page > 1 ? page - 1 : page;
 
 			const dmsProducts = products.map((product) => ({
@@ -541,7 +541,7 @@ CategoryImporter = class {
 				method: "mbw_integration_dms.mbw_integration_dms.page.dms_import_products.dms_import_category.get_categories",
 				args: { page: page},
 			});
-			this.next_page = page + 1;
+			this.next_page = categories.length > 0 ? page + 1 : page;
 			this.prev_page = page > 1 ? page - 1 : page;
 			const dmsCategories = categories.map((category) => ({
 				// 'Image': category.image && category.image.src && `<img style="height: 50px" src="${category.image.src}">`,
