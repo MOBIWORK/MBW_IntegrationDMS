@@ -4,7 +4,7 @@
 import frappe
 import pydash
 
-from mbw_integration_dms.mbw_integration_dms.utils import create_dms_log
+from mbw_integration_dms.mbw_integration_dms.utils import create_dms_log, create_partner_log
 from mbw_integration_dms.mbw_integration_dms.apiclient import DMSApiClient
 
 from mbw_integration_dms.mbw_integration_dms.helpers import configs
@@ -360,6 +360,13 @@ def create_customers(**kwargs):
                         message=f"Customer {customer_code_dms} updated successfully."
                     )
 
+                    create_partner_log(
+                        id=id_log_dms,
+                        status=True,
+                        title="Customer updated successfully.",
+                        message=f"Customer {customer_code_dms} updated successfully."
+                    )
+
                     results.append({"customer_code": customer_code_dms, "status": "Updated"})
                     continue  # Tiếp tục với khách hàng khác
 
@@ -456,6 +463,13 @@ def create_customers(**kwargs):
                     response_data={"customer": new_customer.name},
                     message=f"Customer {new_customer.name} created successfully."
                 )
+
+                create_partner_log(
+                    id=id_log_dms,
+                    status=True,
+                    title="Customer create successfully.",
+                    message=f"Customer {customer_code_dms} create successfully."
+                )
                 
                 results.append({"customer_code": customer_data.get("customer_code"), "status": "Success"})
 
@@ -467,6 +481,13 @@ def create_customers(**kwargs):
                 create_dms_log(
                     status="Failed",
                     request_data=customer_data,
+                    message=error_message
+                )
+
+                create_partner_log(
+                    id=id_log_dms,
+                    status=False,
+                    title="Customer create failed.",
                     message=error_message
                 )
 
