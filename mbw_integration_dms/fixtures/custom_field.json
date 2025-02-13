@@ -698,7 +698,7 @@
   "dt": "Customer",
   "fetch_from": null,
   "fetch_if_empty": 0,
-  "fieldname": "custom_is_sync",
+  "fieldname": "is_sync",
   "fieldtype": "Check",
   "hidden": 1,
   "hide_border": 0,
