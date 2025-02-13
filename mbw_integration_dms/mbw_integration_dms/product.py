@@ -1,3 +1,6 @@
+# Copyright (c) 2025, TuanBD MBWD
+# For license information, please see LICENSE
+
 import frappe
 from frappe import _
 

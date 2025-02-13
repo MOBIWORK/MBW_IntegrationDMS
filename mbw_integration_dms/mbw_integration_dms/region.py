@@ -1,3 +1,6 @@
+# Copyright (c) 2025, TuanBD MBWD
+# For license information, please see LICENSE
+
 import frappe
 
 from mbw_integration_dms.mbw_integration_dms.utils import create_dms_log

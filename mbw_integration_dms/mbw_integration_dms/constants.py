@@ -1,4 +1,5 @@
 # Copyright (c) 2025, TuanBD MBWD
+# For license information, please see LICENSE
 
 MODULE_NAME = "MBW Integration DMS"
 SETTING_DOCTYPE = "MBW Integration Settings"
@@ -10,6 +11,6 @@ WEBHOOK_EVENTS = []
 EVENT_MAPPER = {
 	"customers_create": "mbw_integration_dms.mbw_integration_dms.customer.create_customers",
     "customers_update": "mbw_integration_dms.mbw_integration_dms.customer.update_customer",
-    "sales_order_create": "",
+    "sales_order_create": "mbw_integration_dms.mbw_integration_dms.sales_order.create_sales_order",
     "sales_order_delete": "",
 }

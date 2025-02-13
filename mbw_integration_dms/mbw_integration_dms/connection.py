@@ -1,10 +1,12 @@
+# Copyright (c) 2025, TuanBD MBWD
+# For license information, please see LICENSE
+
 import frappe
 import json
 import base64
 from frappe import _
 
 from mbw_integration_dms.mbw_integration_dms.constants import (
-	SETTING_DOCTYPE,
 	EVENT_MAPPER
 )
 
@@ -32,7 +34,7 @@ def get_callback_url() -> str:
 	return f"https://{url}/api/method/mbw_integration_dms.mbw_integration_dms.connection.store_request_data"
  
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def store_request_data() -> None:
     """Nhận request từ đối tác, xác thực Basic Auth và xử lý dữ liệu."""
     if frappe.request:
@@ -65,12 +67,13 @@ def process_request(data, event):
 		queue="short",
 		timeout=300,
 		is_async=True,
-		**{"payload": data, "request_id": log.name},
+		data=data,
+        request_id=log.name
 	)
 
 
 def _extract_basic_auth(auth_header):
-    """Giải mã Basic Auth và trả về (api_key, api_secret)."""
+    """Giải mã Basic Auth và trả về api_key và api_secret"""
     try:
         encoded_credentials = auth_header.split("Basic ")[1]
         decoded_credentials = base64.b64decode(encoded_credentials).decode("utf-8")
@@ -81,7 +84,7 @@ def _extract_basic_auth(auth_header):
         frappe.throw(_("Invalid Basic Auth format"))
 
 def _validate_request(api_key, api_secret, req):
-    """Xác thực API key và secret với dữ liệu trong ERPNext settings."""
+    """Xác thực API key và secret với dữ liệu trong MBW Integration Settings"""
     settings = frappe.get_single("MBW Integration Settings")
 
     if settings.erp_api_key != api_key or settings.erp_api_secret != api_secret:
