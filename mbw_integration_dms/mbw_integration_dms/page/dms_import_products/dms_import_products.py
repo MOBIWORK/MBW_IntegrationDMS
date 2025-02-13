@@ -43,3 +43,21 @@ def get_count_products():
 @frappe.whitelist()
 def sync_all_products():
     return sync_product()
+
+@frappe.whitelist()
+def get_sales_orders(page):
+    page_size = 20
+    start_idx = (int(page) - 1) * page_size
+    query = f"""
+                SELECT 
+                    so.name, so.is_sync
+                FROM `tabSales Order` so
+                WHERE 
+                    so.is_sales_dms = 1 
+                    AND so.is_sync = 0
+
+                ORDER BY so.name
+                LIMIT {start_idx}, {page_size}
+            """
+    data = frappe.db.sql(query, as_dict=True)
+    return data
