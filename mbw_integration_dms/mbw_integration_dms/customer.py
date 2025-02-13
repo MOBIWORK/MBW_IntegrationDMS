@@ -344,17 +344,26 @@ def create_customers(**kwargs):
             try:
                 customer_data = frappe._dict(customer_data)
                 customer_code_dms = customer_data.get("customer_code_dms")
+                id_log_dms = customer_data.get("id_log")
 
                 # Kiểm tra nếu khách hàng đã tồn tại theo customer_code_dms
-                if frappe.db.exists("Customer", {"customer_code_dms": customer_code_dms}):
-                    create_dms_log(
-                        status="Skipped",
-                        request_data=customer_data,
-                        message=f"Customer with customer_code_dms {customer_code_dms} already exists."
-                    )
-                    results.append({"customer_code": customer_data.get("customer_code"), "status": "Skipped"})
-                    continue  # Bỏ qua khách hàng này và tiếp tục với khách hàng khác
+                existing_customer = frappe.db.exists("Customer", {"customer_code_dms": customer_code_dms})
 
+                if existing_customer:
+                    # Nếu tồn tại, gọi hàm update_customer thay vì bỏ qua
+                    update_result = update_customer(**customer_data)
+
+                    create_dms_log(
+                        status="Updated",
+                        request_data=customer_data,
+                        response_data=update_result,
+                        message=f"Customer {customer_code_dms} updated successfully."
+                    )
+
+                    results.append({"customer_code": customer_code_dms, "status": "Updated"})
+                    continue  # Tiếp tục với khách hàng khác
+
+                # Nếu không tồn tại, tiến hành tạo mới khách hàng
                 phone_number = ""
                 address = customer_data.get("address")
                 contact = customer_data.get("contact")
@@ -406,7 +415,7 @@ def create_customers(**kwargs):
                 new_contact = None
                 if contact and contact.get("first_name"):
                     new_contact = frappe.new_doc("Contact")
-                    contact_fields = ["first_name", "address"]
+                    contact_fields = "first_name"
                     for key, value in contact.items():
                         if key in contact_fields:
                             new_contact.set(key, value)
@@ -421,13 +430,6 @@ def create_customers(**kwargs):
                             "is_primary_mobile_no": 1
                         })
                     new_contact.insert()
-
-                    # Liên kết địa chỉ với contact
-                    if contact.get("address_title") and contact.get("city"):
-                        link_cs_contact = {"link_doctype": new_contact.doctype, "link_name": new_contact.name}
-                        current_address_contact = create_address_customer(contact, link_cs_contact)
-                        new_contact.address = current_address_contact.name if frappe.db.exists("Address", current_address_contact.name) else current_address_contact.address_title
-                        new_contact.save()
 
                 # Liên kết địa chỉ với khách hàng
                 if current_address:
@@ -458,7 +460,7 @@ def create_customers(**kwargs):
                 results.append({"customer_code": customer_data.get("customer_code"), "status": "Success"})
 
             except Exception as e:
-                error_message = f"Error creating customer {customer_data.get('customer_code')}: {str(e)}"
+                error_message = f"Error creating/updating customer {customer_data.get('customer_code')}: {str(e)}"
                 frappe.logger().error(error_message)
 
                 # Ghi log thất bại
@@ -572,22 +574,11 @@ def set_primary_address(customer, address_data):
 
 def update_customer_contacts(customer, contacts, customer_name):
     for contact_data in contacts:
-        if contact_data.get("city") and contact_data.get("address_line1"):
-            address_data = {
-                "address_title": contact_data["address_title"],
-                "address_line1": contact_data["address_line1"],
-                "city": contact_data["city"],
-                "county": contact_data.get("county"),
-                "state": contact_data.get("state")
-            }
-        else:
-            address_data = {}
-
         contact = frappe.get_doc("Contact", contact_data.get("name")) if frappe.db.exists("Contact", contact_data.get("name")) else None
         if contact:
             unlink_and_delete_contact(contact, customer_name)
 
-        new_contact = create_new_contact(contact_data, customer_name, address_data)
+        new_contact = create_new_contact(contact_data, customer_name)
         
         if new_contact and pydash.find(contacts, lambda x: x.get("primary") == 1):
             customer.customer_primary_contact = new_contact.name
@@ -618,10 +609,5 @@ def create_new_contact(contact_data, customer_name, address_data):
 
     new_contact.append("links", {"link_doctype": "Customer", "link_name": customer_name})
     new_contact.insert()
-
-    if address_data:
-        link_cs_address = {"link_doctype": "Contact", "link_name": new_contact.name}
-        new_contact.address = create_address_customer(address_data, link_cs_address)
-        new_contact.save()
 
     return new_contact

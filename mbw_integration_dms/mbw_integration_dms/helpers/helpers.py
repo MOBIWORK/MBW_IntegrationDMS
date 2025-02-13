@@ -8,8 +8,8 @@ import pydash
 def create_address_customer(address_info, link_to_customer):
     try:
         key_info = {
-            "address_title", "address_type", "address_line1", "city", "county", 
-            "state", "is_primary_address", "is_shipping_address", "address_location"
+            "address_title", "address_type", "address_line1"
+            "is_primary_address", "is_shipping_address"
         }
         address_info = frappe._dict(address_info)
         id_address = address_info.get("name") or False
