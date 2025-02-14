@@ -55,7 +55,7 @@ def sync_warehouse_job():
 
         # Gửi dữ liệu qua API DMS
         response, success = dms_client.request(
-            endpoint="/CategorySync",
+            endpoint="/PublicAPI/CategorySync",
             method="POST",
             body=request_payload
         )

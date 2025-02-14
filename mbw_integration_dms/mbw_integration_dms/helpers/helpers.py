@@ -62,6 +62,7 @@ def create_partner_log(id_log_dms, status, title, message=""):
     dms_client = DMSApiClient()
 
     payload = {
+        "orgid": dms_client.orgid,
         "id": id_log_dms,
         "status": status,
         "title": title,

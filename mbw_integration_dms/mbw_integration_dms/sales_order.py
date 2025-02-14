@@ -15,7 +15,7 @@ from mbw_integration_dms.mbw_integration_dms.helpers.validators import (
     validate_not_none,
 )
 
-# Tạo mới đơn hàng
+# Tạo mới đơn hàng DMS to ERP
 @frappe.whitelist(methods="POST")
 def create_sale_order(**kwargs):
     from mbw_integration_dms.mbw_integration_dms.customer import create_customers

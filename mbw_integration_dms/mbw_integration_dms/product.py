@@ -81,7 +81,7 @@ def sync_product_job():
 
         # Gửi dữ liệu qua API DMS
         response, success = dms_client.request(
-            endpoint="/ProductSync",
+            endpoint="/PublicAPI/ProductSync",
             method="POST",
             body=request_payload
         )
