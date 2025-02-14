@@ -2,7 +2,7 @@
 # For license information, please see LICENSE
 
 import frappe
-from mbw_integration_dms.mbw_integration_dms.utils import create_dms_log
+from mbw_integration_dms.mbw_integration_dms.utils import create_dms_log, create_partner_log
 from mbw_integration_dms.mbw_integration_dms.customer import create_customers
 from mbw_integration_dms.mbw_integration_dms.helpers import configs
 from mbw_integration_dms.mbw_integration_dms.helpers.validators import (
@@ -87,6 +87,13 @@ def create_sale_order(**kwargs):
             message=f"Sales Order {new_order.name} created successfully."
         )
 
+        create_partner_log(
+            id=id_log_dms,
+            status=True,
+            title="Sales Order create successfully.",
+            message=f"Sales Order {new_order.name} create successfully."
+        )
+
         return {"name": new_order.name}
 
     except Exception as e:
@@ -94,8 +101,9 @@ def create_sale_order(**kwargs):
 
         # Ghi log lỗi
         create_dms_log(
-            status="Failed",
-            request_data=kwargs,
+            id=id_log_dms,
+            status=False,
+            title="Sales Order create failed.",
             message=f"Error creating Sales Order: {str(e)}"
         )
 
