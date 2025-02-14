@@ -4,11 +4,14 @@
 import frappe
 import pydash
 
-from mbw_integration_dms.mbw_integration_dms.utils import create_dms_log, create_partner_log
+from mbw_integration_dms.mbw_integration_dms.utils import create_dms_log
 from mbw_integration_dms.mbw_integration_dms.apiclient import DMSApiClient
 
 from mbw_integration_dms.mbw_integration_dms.helpers import configs
-from mbw_integration_dms.mbw_integration_dms.helpers.helpers import create_address_customer
+from mbw_integration_dms.mbw_integration_dms.helpers.helpers import (
+    create_address_customer,
+    create_partner_log
+)
 from mbw_integration_dms.mbw_integration_dms.helpers.validators import (
     validate_date, 
     validate_phone_number, 
@@ -465,7 +468,7 @@ def create_customers(**kwargs):
                 )
 
                 create_partner_log(
-                    id=id_log_dms,
+                    id_log_dms=id_log_dms,
                     status=True,
                     title="Customer create successfully.",
                     message=f"Customer {customer_code_dms} create successfully."
@@ -485,7 +488,7 @@ def create_customers(**kwargs):
                 )
 
                 create_partner_log(
-                    id=id_log_dms,
+                    id_log_dms=id_log_dms,
                     status=False,
                     title="Customer create failed.",
                     message=error_message

@@ -3,6 +3,8 @@
 
 import frappe
 import pydash
+from mbw_integration_dms.mbw_integration_dms.apiclient import DMSApiClient
+
 
 # Xử lý thêm mới/cập nhật địa chỉ
 def create_address_customer(address_info, link_to_customer):
@@ -55,3 +57,25 @@ def update_address(doc, info, keys, link_to_doctype=None):
     if link_to_doctype:
         links = pydash.filter_(doc.get("links"), lambda x: x.get("link_doctype") != link_to_doctype.get("link_doctype") and x.get("link_name") != link_to_doctype.get("link_name"))
         doc.set("links", links)
+
+def create_partner_log(id_log_dms, status, title, message=""):
+    dms_client = DMSApiClient()
+
+    payload = {
+        "id": id_log_dms,
+        "status": status,
+        "title": title,
+        "message": message
+    }
+
+    try:
+        response = dms_client.request(
+            endpoint="/sync_log",
+            method="POST",
+            body=payload
+        )
+        return response.json()
+    
+    except Exception as e:
+        frappe.logger().error(f"Lỗi gửi log đến DMS: {str(e)}")
+        return {"error": str(e)}

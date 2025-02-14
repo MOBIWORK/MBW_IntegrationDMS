@@ -2,9 +2,13 @@
 # For license information, please see LICENSE
 
 import frappe
-from mbw_integration_dms.mbw_integration_dms.utils import create_dms_log, create_partner_log
-from mbw_integration_dms.mbw_integration_dms.customer import create_customers
+import json
+
+from mbw_integration_dms.mbw_integration_dms.utils import (
+    create_dms_log
+)
 from mbw_integration_dms.mbw_integration_dms.helpers import configs
+from mbw_integration_dms.mbw_integration_dms.helpers.helpers import create_partner_log
 from mbw_integration_dms.mbw_integration_dms.helpers.validators import (
     validate_date, 
     validate_choice,
@@ -14,9 +18,12 @@ from mbw_integration_dms.mbw_integration_dms.helpers.validators import (
 # Tạo mới đơn hàng
 @frappe.whitelist(methods="POST")
 def create_sale_order(**kwargs):
+    from mbw_integration_dms.mbw_integration_dms.customer import create_customers
+
     try:
         kwargs = frappe._dict(kwargs)
         customer_code_dms = kwargs.get("customer")
+        customer_name = frappe.get_value("Customer", {"customer_code_dms": customer_code_dms}, "name")
 
         # Ghi log bắt đầu xử lý đơn hàng
         create_dms_log(
@@ -26,7 +33,7 @@ def create_sale_order(**kwargs):
             message=f"Processing Sales Order for customer {customer_code_dms}"
         )
 
-        # 🛠 Kiểm tra khách hàng có tồn tại không
+        # Kiểm tra khách hàng có tồn tại không
         existing_customer = frappe.db.exists("Customer", {"customer_code_dms": customer_code_dms})
 
         if not existing_customer:
@@ -45,12 +52,24 @@ def create_sale_order(**kwargs):
         # Dữ liệu bắn lên để tạo sale order mới
         discount_amount = float(kwargs.get("discount_amount", 0))
         apply_discount_on = kwargs.get("apply_discount_on")
+        promotions = kwargs.get("promotion_dms", [])
         id_log_dms = kwargs.get("id_log")
 
-        new_order.customer = validate_not_none(customer_code_dms)
+        user_mail = kwargs.get("email_employee")
+        user_name = frappe.get_value("Employee", {"user_id": user_mail}, "name")
+        sales_person = frappe.get_value("Sales Person", {"employee": user_name}, "name")
+
+        new_order.customer = validate_not_none(customer_name)
         new_order.dms_so_code = kwargs.get("dms_so_code")
-        new_order.delivery_date = validate_date(kwargs.delivery_date)  # Ngày giao
-        new_order.set_warehouse = validate_not_none(kwargs.get("set_warehouse"))  # Kho hàng
+        new_order.delivery_date = validate_date(kwargs.delivery_date / 1000)
+        new_order.set_warehouse = validate_not_none(kwargs.get("set_warehouse"))
+        new_order.dms_so_code = kwargs.get("dms_so_code")
+        new_order.dms_so_id = kwargs.get("dms_so_id")
+
+        new_order.append("sales_team", {
+            "sales_person": sales_person,
+            "allocated_percentage": 100,
+        })
 
         if apply_discount_on is not None:
             new_order.apply_discount_on = validate_choice(configs.discount_type)(apply_discount_on)
@@ -75,6 +94,25 @@ def create_sale_order(**kwargs):
                 "additional_notes": item_data.get("additional_notes"),
                 "is_free_item": item_data.get("is_free_item")
             })
+        
+        value_sp = ["SP_ST_SP", "TIEN_SP", "SP_SL_SP", "MUTI_SP_ST_SP", "MUTI_SP_SL_SP", "MUTI_TIEN_SP"]
+        for promo in promotions:
+            ptype_data = json.loads(promo["ptype"])
+            ptype_label = ptype_data.get("label")
+            ptype_value = ptype_data.get("value")
+
+            product = promo.get("product")
+            for item in product:
+                new_order.append("promotion_result", {
+                    "promotion_id": promo.get("id"),
+                    "promotion_code": ptype_value,
+                    "promotions_name": ptype_label,
+                    "promotion_item_id": item.get("_id"),
+                    "promotion_item_code": item.get("ma_san_pham"),
+                    "promotional_item_name": item.get("ten_san_pham"),
+                    "promotional_quantity": item.get("so_luong") if ptype_value in value_sp else 0,
+                    "promotional_amount": item.get("so_luong") if ptype_value not in value_sp else 0
+                })
 
         new_order.insert()
         frappe.db.commit()
@@ -88,10 +126,10 @@ def create_sale_order(**kwargs):
         )
 
         create_partner_log(
-            id=id_log_dms,
+            id_log_dms=id_log_dms,
             status=True,
             title="Sales Order create successfully.",
-            message=f"Sales Order {new_order.name} create successfully."
+            message=f"Sales Order {new_order.name} created successfully."
         )
 
         return {"name": new_order.name}
@@ -101,7 +139,12 @@ def create_sale_order(**kwargs):
 
         # Ghi log lỗi
         create_dms_log(
-            id=id_log_dms,
+            status="Error",
+            request_data=kwargs,
+            message=f"Error creating Sales Order: {str(e)}"
+        )
+        create_partner_log(
+            id_log_dms=id_log_dms,
             status=False,
             title="Sales Order create failed.",
             message=f"Error creating Sales Order: {str(e)}"

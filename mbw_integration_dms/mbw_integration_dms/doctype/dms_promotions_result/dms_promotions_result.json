@@ -1,0 +1,72 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2025-02-14 10:53:45.069798",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "promotion_id",
+  "promotion_code",
+  "promotions_name",
+  "promotion_item_id",
+  "promotion_item_code",
+  "promotional_item_name",
+  "promotional_quantity",
+  "promotional_amount"
+ ],
+ "fields": [
+  {
+   "fieldname": "promotion_id",
+   "fieldtype": "Data",
+   "label": "Promotion ID"
+  },
+  {
+   "fieldname": "promotion_code",
+   "fieldtype": "Data",
+   "label": "Promotion Code"
+  },
+  {
+   "fieldname": "promotions_name",
+   "fieldtype": "Data",
+   "label": "Promotions Name"
+  },
+  {
+   "fieldname": "promotion_item_id",
+   "fieldtype": "Data",
+   "label": "Promotion Item Id"
+  },
+  {
+   "fieldname": "promotion_item_code",
+   "fieldtype": "Data",
+   "label": "Promotion Item Code"
+  },
+  {
+   "fieldname": "promotional_item_name",
+   "fieldtype": "Data",
+   "label": "Promotional Item Name"
+  },
+  {
+   "fieldname": "promotional_quantity",
+   "fieldtype": "Float",
+   "label": "Promotional Quantity"
+  },
+  {
+   "fieldname": "promotional_amount",
+   "fieldtype": "Currency",
+   "label": "Promotional Amount"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2025-02-14 10:58:10.958521",
+ "modified_by": "Administrator",
+ "module": "MBW Integration DMS",
+ "name": "DMS Promotions Result",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

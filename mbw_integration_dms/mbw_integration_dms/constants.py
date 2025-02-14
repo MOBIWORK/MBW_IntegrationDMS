@@ -10,6 +10,6 @@ WEBHOOK_EVENTS = []
 
 EVENT_MAPPER = {
 	"customers_create": "mbw_integration_dms.mbw_integration_dms.customer.create_customers",
-    "sales_order_create": "mbw_integration_dms.mbw_integration_dms.sales_order.create_sales_order",
-    "sales_order_delete": "mbw_integration_dms.mbw_integration_dms.sales_order.cancel_sales_order",
+    "sales_order_create": "mbw_integration_dms.mbw_integration_dms.sales_order.create_sale_order",
+    "sales_order_delete": "mbw_integration_dms.mbw_integration_dms.sales_order.cancel_sale_order",
 }
