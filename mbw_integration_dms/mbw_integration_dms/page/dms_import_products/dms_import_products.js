@@ -6,7 +6,7 @@ frappe.pages['dms-import-products'].on_page_load = function(wrapper) {
 	});
 	new ProductImporter(wrapper)
 	new CustomerImporter(wrapper)
-	new SalesOrderImporter(wrapper)
+	// new SalesOrderImporter(wrapper)
 	new CategoryImporter(wrapper)
 
 }
