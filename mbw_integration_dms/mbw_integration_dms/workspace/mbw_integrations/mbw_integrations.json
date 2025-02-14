@@ -1,0 +1,108 @@
+{
+ "charts": [],
+ "content": "[{\"id\":\"LCi7v0RSNe\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\"><b>T\u00edch h\u1ee3p h\u1ec7 th\u1ed1ng MBW.DMS</b></span>\",\"col\":12}},{\"id\":\"b44tuu4Nyl\",\"type\":\"card\",\"data\":{\"card_name\":\"Ch\u1ee9c n\u0103ng\",\"col\":4}},{\"id\":\"_dvTYTlxWk\",\"type\":\"card\",\"data\":{\"card_name\":\"Danh m\u1ee5c d\u1eef li\u1ec7u\",\"col\":4}},{\"id\":\"TzKjP2I0Ts\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\"><b>T\u00edch h\u1ee3p Shopify</b></span>\",\"col\":12}},{\"id\":\"sycMP_CGDj\",\"type\":\"card\",\"data\":{\"card_name\":\"Ch\u1ee9c n\u0103ng\",\"col\":4}},{\"id\":\"kvcJqpZlz1\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\"><b>T\u00edch h\u1ee3p Amazon</b></span>\",\"col\":12}},{\"id\":\"bb8g3YhSO5\",\"type\":\"card\",\"data\":{\"card_name\":\"Ch\u1ee9c n\u0103ng\",\"col\":4}}]",
+ "creation": "2025-02-14 15:57:44.445680",
+ "custom_blocks": [],
+ "docstatus": 0,
+ "doctype": "Workspace",
+ "for_user": "",
+ "hide_custom": 0,
+ "icon": "branch",
+ "idx": 1,
+ "indicator_color": "orange",
+ "is_hidden": 0,
+ "label": "MBW Integrations",
+ "links": [
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Danh m\u1ee5c d\u1eef li\u1ec7u",
+   "link_count": 3,
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Card Break"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Lo\u1ea1i kh\u00e1ch h\u00e0ng",
+   "link_count": 0,
+   "link_to": "Customer Type",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "K\u00eanh",
+   "link_count": 0,
+   "link_to": "Channel",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Nh\u00f3m kh\u00e1ch h\u00e0ng",
+   "link_count": 0,
+   "link_to": "DMS Customer Group",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Ch\u1ee9c n\u0103ng",
+   "link_count": 3,
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Card Break"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "C\u1ea5u h\u00ecnh",
+   "link_count": 0,
+   "link_to": "Amazon SP API Settings",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Nh\u1eadt k\u00ed t\u00edch h\u1ee3p",
+   "link_count": 0,
+   "link_to": "Ecommerce Integration Log",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "\u0110\u1ed3ng b\u1ed9 d\u1eef li\u1ec7u th\u1ee7 c\u00f4ng",
+   "link_count": 0,
+   "link_to": "dms-import-products",
+   "link_type": "Page",
+   "onboard": 0,
+   "type": "Link"
+  }
+ ],
+ "modified": "2025-02-14 16:28:48.322870",
+ "modified_by": "Administrator",
+ "module": "MBW Integration DMS",
+ "name": "MBW Integrations",
+ "number_cards": [],
+ "owner": "Administrator",
+ "parent_page": "",
+ "public": 1,
+ "quick_lists": [],
+ "roles": [],
+ "sequence_id": 22.0,
+ "shortcuts": [],
+ "title": "MBW Integrations"
+}
