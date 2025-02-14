@@ -19,6 +19,7 @@ from mbw_integration_dms.mbw_integration_dms.helpers.validators import (
 @frappe.whitelist(methods="POST")
 def create_sale_order(**kwargs):
     from mbw_integration_dms.mbw_integration_dms.customer import create_customers
+    id_log_dms = kwargs.get("id_log")
 
     try:
         kwargs = frappe._dict(kwargs)
@@ -53,7 +54,6 @@ def create_sale_order(**kwargs):
         discount_amount = float(kwargs.get("discount_amount", 0))
         apply_discount_on = kwargs.get("apply_discount_on")
         promotions = kwargs.get("promotion_dms", [])
-        id_log_dms = kwargs.get("id_log")
 
         user_mail = kwargs.get("email_employee")
         user_name = frappe.get_value("Employee", {"user_id": user_mail}, "name")
@@ -143,6 +143,7 @@ def create_sale_order(**kwargs):
             request_data=kwargs,
             message=f"Error creating Sales Order: {str(e)}"
         )
+        
         create_partner_log(
             id_log_dms=id_log_dms,
             status=False,

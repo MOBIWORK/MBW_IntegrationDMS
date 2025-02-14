@@ -32,7 +32,7 @@ def sync_customer_job():
         customers = frappe.get_all(
             "Customer",
             filters={"is_sync": False, "is_sales_dms": True},
-            fileds=["customer_code", "customer_code", "is_sales_dms", "email_id", "mobile_no", "tax_id", "customer_group",
+            fileds=["customer_code_dms", "customer_name", "is_sales_dms", "email_id", "mobile_no", "tax_id", "customer_group",
                     "dms_customer_type", "sfa_sale_channel", "territory", "customer_primary_contact", "customer_primary_address"]
         )
 
@@ -45,7 +45,7 @@ def sync_customer_job():
 
         formatted_data = [
             {
-                "code": i["customer_code"],
+                "code": i["customer_code_dms"],
                 "name": i["customer_name"],
                 "trang_thai": True,
                 "email": i["email_id"],
@@ -336,7 +336,8 @@ def sync_customer_group_job():
 @frappe.whitelist(methods="POST")
 def create_customers(**kwargs):
     results = []
-
+    id_log_dms = customer_data.get("id_log")
+    
     try:
         customers = kwargs.get("data", [])
 
@@ -347,7 +348,6 @@ def create_customers(**kwargs):
             try:
                 customer_data = frappe._dict(customer_data)
                 customer_code_dms = customer_data.get("customer_code_dms")
-                id_log_dms = customer_data.get("id_log")
 
                 # Kiểm tra nếu khách hàng đã tồn tại theo customer_code_dms
                 existing_customer = frappe.db.exists("Customer", {"customer_code_dms": customer_code_dms})
@@ -370,7 +370,7 @@ def create_customers(**kwargs):
                         message=f"Customer {customer_code_dms} updated successfully."
                     )
 
-                    results.append({"customer_code": customer_code_dms, "status": "Updated"})
+                    results.append({"customer_code_dms": customer_code_dms, "status": "Updated"})
                     continue  # Tiếp tục với khách hàng khác
 
                 # Nếu không tồn tại, tiến hành tạo mới khách hàng
@@ -386,12 +386,12 @@ def create_customers(**kwargs):
                     status="Processing",
                     method="POST",
                     request_data=customer_data,
-                    message=f"Creating customer {customer_data.get('customer_code')}"
+                    message=f"Creating customer {customer_data.get('customer_name')}"
                 )
 
                 # Tạo mới khách hàng
                 new_customer = frappe.new_doc("Customer")
-                required_fields = ["customer_code", "customer_name", "customer_code_dms"]
+                required_fields = [ "customer_name", "customer_code_dms"]
                 normal_fields = [
                     "customer_details", "website", "customer_group", "territory", 
                     "dms_customer_type", "sfa_sale_channel", "mobile_no", "tax_id", 
@@ -407,7 +407,7 @@ def create_customers(**kwargs):
                         required = validate_not_none(value)
                         new_customer.set(key, required)
                     elif key in date_fields:
-                        custom_birthday = validate_date(value)
+                        custom_birthday = validate_date(value/1000)
                         new_customer.set(key, custom_birthday)
                     elif key in choice_fields:
                         customer_type = validate_choice(configs.customer_type)(value)
@@ -474,10 +474,10 @@ def create_customers(**kwargs):
                     message=f"Customer {customer_code_dms} create successfully."
                 )
                 
-                results.append({"customer_code": customer_data.get("customer_code"), "status": "Success"})
+                results.append({"customer_code_dms": customer_data.get("customer_code"), "status": "Success"})
 
             except Exception as e:
-                error_message = f"Error creating/updating customer {customer_data.get('customer_code')}: {str(e)}"
+                error_message = f"Error creating/updating customer {customer_data.get('customer_code_dms')}: {str(e)}"
                 frappe.logger().error(error_message)
 
                 # Ghi log thất bại
@@ -508,7 +508,7 @@ def create_customers(**kwargs):
                 except Exception as cleanup_error:
                     frappe.logger().error(f"Cleanup failed: {str(cleanup_error)}")
 
-                results.append({"customer_code": customer_data.get("customer_code"), "status": "Failed", "error": str(e)})
+                results.append({"customer_code_dms": customer_data.get("customer_code_dms"), "status": "Failed", "error": str(e)})
 
         return {"results": results}
 
@@ -537,7 +537,7 @@ def update_customer(**kwargs):
 
         # Cập nhật các trường cơ bản của khách hàng
         fields = [
-            "customer_code", "customer_name", "customer_group", "territory",
+            "customer_name", "customer_group", "territory",
             "website", "customer_type", "dms_customer_type", "sfa_sale_channel",
             "customer_code_dms", "tax_id", "email_id", "mobile_no"
         ]

@@ -80,3 +80,52 @@ def create_partner_log(id_log_dms, status, title, message=""):
     except Exception as e:
         frappe.logger().error(f"Lỗi gửi log đến DMS: {str(e)}")
         return {"error": str(e)}
+    
+def update_dms_order_status(doc):
+    """Gửi API cập nhật trạng thái SO bên DMS khi trạng thái SO thay đổi thành 'Delivered'."""
+    dms_client = DMSApiClient()
+    
+    payload = {
+        "id": doc.dms_so_id,
+        "ma_don": doc.name,
+        "orgid": dms_client.orgid,
+        "status": "Đã giao hàng",
+    }
+
+    try:
+        response = dms_client.request(
+            endpoint="/PublicAPI/postOrderStatus",
+            method="POST",
+            body=payload
+        )
+        return response.json()
+
+    except Exception as e:
+        frappe.logger().error(f"Failed to update DMS order for SO {doc.name}: {str(e)}")
+
+def on_sales_order_update(doc, event):
+    """Kiểm tra nếu trạng thái thay đổi thành 'Delivered' thì gọi API cập nhật DMS."""
+
+    if "status" in doc.get_dirty_fields() and doc.status == "Delivered" :
+        update_dms_order_status(doc)
+
+def update_stt_so_cancel(doc):
+    dms_client = DMSApiClient()
+    
+    payload = {
+        "id": doc.dms_so_id,
+        "ma_don": doc.name,
+        "orgid": dms_client.orgid,
+        "status": "Từ chối",
+    }
+
+    try:
+        response = dms_client.request(
+            endpoint="/PublicAPI/postOrderStatus",
+            method="POST",
+            body=payload
+        )
+        return response.json()
+
+    except Exception as e:
+        frappe.logger().error(f"Failed to update DMS order for SO {doc.name}: {str(e)}")
