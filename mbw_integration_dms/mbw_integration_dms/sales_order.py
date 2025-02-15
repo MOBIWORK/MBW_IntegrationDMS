@@ -2,6 +2,7 @@
 # For license information, please see LICENSE
 
 import frappe
+from frappe import _
 import json
 
 from mbw_integration_dms.mbw_integration_dms.utils import (
@@ -65,6 +66,7 @@ def create_sale_order(**kwargs):
         new_order.set_warehouse = validate_not_none(kwargs.get("set_warehouse"))
         new_order.dms_so_code = kwargs.get("dms_so_code")
         new_order.dms_so_id = kwargs.get("dms_so_id")
+        new_order.is_sale_dms = 1
 
         new_order.append("sales_team", {
             "sales_person": sales_person,
@@ -152,3 +154,9 @@ def create_sale_order(**kwargs):
         )
 
         return {"error": str(e)}
+
+
+def prevent_edit_dms_sales_order(doc, event):
+    """Chặn chỉnh sửa Sales Order nếu is_sale_dms = True"""
+    if doc.docstatus == 0 and doc.is_sale_dms:
+        frappe.throw(_("Bạn không thể chỉnh sửa đơn hàng từ DMS"))
