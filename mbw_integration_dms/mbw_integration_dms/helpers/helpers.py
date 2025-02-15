@@ -58,6 +58,7 @@ def update_address(doc, info, keys, link_to_doctype=None):
         links = pydash.filter_(doc.get("links"), lambda x: x.get("link_doctype") != link_to_doctype.get("link_doctype") and x.get("link_name") != link_to_doctype.get("link_name"))
         doc.set("links", links)
 
+# Tạo log bên partner
 def create_partner_log(id_log_dms, status, title, message=""):
     dms_client = DMSApiClient()
 
@@ -80,7 +81,8 @@ def create_partner_log(id_log_dms, status, title, message=""):
     except Exception as e:
         frappe.logger().error(f"Lỗi gửi log đến DMS: {str(e)}")
         return {"error": str(e)}
-    
+
+# Cập nhật trạng thái đơn bên DMS
 def update_dms_order_status(doc):
     """Gửi API cập nhật trạng thái SO bên DMS khi trạng thái SO thay đổi thành 'Delivered'."""
     dms_client = DMSApiClient()

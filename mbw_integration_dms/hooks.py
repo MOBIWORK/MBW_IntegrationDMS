@@ -137,7 +137,7 @@ doc_events = {
     },
     "Sales Order": {
         "on_cancel": "mbw_integration_dms.mbw_integration_dms.helpers.helpers.update_stt_so_cancel",
-        "on_update": "mbw_integration_dms.mbw_integration_dms.helpers.helpers.on_sales_order_update"
+        "on_update_after_submit": "mbw_integration_dms.mbw_integration_dms.helpers.helpers.on_sales_order_update"
     }
 }
 

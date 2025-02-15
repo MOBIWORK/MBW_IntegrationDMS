@@ -19,7 +19,7 @@ def sync_product_job():
 
         query = """
             SELECT 
-                i.name, i.item_code, i.item_name, i.industry, i.brand, i.description,
+                i.name, i.item_code, i.item_name, i.industry, i.brand, i.description, i.standard_rate,
                 it.item_tax_template, s.supplier as provider,
 
                 (SELECT um.uom FROM `tabUOM Conversion Detail` um 
@@ -59,6 +59,8 @@ def sync_product_job():
                 "brand": i["brand"],
                 "unit_even": i["unit_even"],
                 "unit_odd": i["unit_odd"],
+                "gia_le": i["standard_rate"],
+                "gia": i["standard_rate"] * i["unit_even_conversion"],
                 "conversion_rate": i["unit_even_conversion"],
                 "tax": frappe.db.get_value("Item Tax Template Detail", {"parent": i.get("item_tax_template")}, "tax_rate") if i.get("item_tax_template") else 0,
                 "description": i["description"]
