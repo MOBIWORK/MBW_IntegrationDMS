@@ -13,7 +13,7 @@ def sync_region():
     frappe.enqueue("mbw_integration_dms.mbw_integration_dms.region.sync_region_job", queue="long", timeout=300, key = key_realtime_categories)
     return {"message": "Region Sync job has been queued."}
 
-def sync_region_job():
+def sync_region_job(*args, **kwargs):
     try:
         create_dms_log(status="Queued", message="region sync job started.")
 
