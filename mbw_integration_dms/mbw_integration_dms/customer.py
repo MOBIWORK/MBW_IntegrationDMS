@@ -19,12 +19,16 @@ from mbw_integration_dms.mbw_integration_dms.helpers.validators import (
     validate_not_none,
 )
 
+from mbw_integration_dms.mbw_integration_dms.product import publish
+
+key_realtime_customer = "dms.key.sync.all.customers"
+key_realtime_categories = "dms.key.sync.all.categories"
 
 def sync_customer():
-    frappe.enqueue("mbw_integration_dms.mbw_integration_dms.customer.sync_customer_job", queue="long", timeout=300)
+    frappe.enqueue("mbw_integration_dms.mbw_integration_dms.customer.sync_customer_job", queue="long", timeout=300, key=key_realtime_customer)
     return {"message": "Customer Sync job has been queued."}
 
-def sync_customer_job():
+def sync_customer_job(*args, **kwargs):
     try:
         create_dms_log(status="Queued", message="Customer sync job started.")
 
@@ -38,6 +42,7 @@ def sync_customer_job():
 
         if not customers:
             create_dms_log(status="Skipped", message="No new customer to sync.")
+            publish(key_realtime_customer, "No new customer to sync.", done = True)
             return {"message": "No new data to sync."}
         
         # Khởi tạo API Client
@@ -93,6 +98,7 @@ def sync_customer_job():
                 response_data=response,
                 message="Customers synced successfully."
             )
+            publish(key_realtime_customer, "Customers synced successfully.", done = True)
             return {"message": "Customers synced successfully."}
         else:
             create_dms_log(
@@ -101,6 +107,7 @@ def sync_customer_job():
                 message="Failed to sync customers."
             )
             frappe.logger().error(f"Failed to sync: {response}")
+            publish(key_realtime_customer, f"Failed to sync: {response}", error = True)
             return {"error": response}
 
     except Exception as e:
@@ -110,6 +117,7 @@ def sync_customer_job():
             message="Exception occurred while syncing customer.",
             rollback=True
         )
+        publish(key_realtime_customer, f"Sync Error: {str(e)}", error = True)
         frappe.logger().error(f"Sync Error: {str(e)}")
         return {"error": str(e)}
     
@@ -165,10 +173,10 @@ def sync_customer_type():
     """
     Đưa job vào hàng đợi để đồng bộ Customer Type
     """
-    frappe.enqueue("mbw_integration_dms.mbw_integration_dms.customer.sync_customer_type_job", queue="long", timeout=300)
+    frappe.enqueue("mbw_integration_dms.mbw_integration_dms.customer.sync_customer_type_job", queue="long", timeout=300, key=key_realtime_categories)
     return {"message": "Customer Type Sync job has been queued."}
 
-def sync_customer_type_job():
+def sync_customer_type_job(*args, **kwargs):
     try:
         create_dms_log(status="Queued", message="Customer Type sync job started.")
 
@@ -181,6 +189,7 @@ def sync_customer_type_job():
 
         if not customer_types:
             create_dms_log(status="Skipped", message="No new customer types to sync.")
+            publish(key_realtime_categories, f"No new customer types to sync.", done=True)
             return {"message": "No new data to sync."}
 
         # Khởi tạo API Client
@@ -227,6 +236,7 @@ def sync_customer_type_job():
                 response_data=response,
                 message="Customer Types synced successfully."
             )
+            publish(key_realtime_categories, f"Customer Types synced successfully.", done = True)
             return {"message": "Customer Types synced successfully."}
         else:
             create_dms_log(
@@ -235,6 +245,7 @@ def sync_customer_type_job():
                 message="Failed to sync customer types."
             )
             frappe.logger().error(f"Failed to sync: {response}")
+            publish(key_realtime_categories, f"Failed to sync: {response}", error = True)
             return {"error": response}
 
     except Exception as e:
@@ -245,14 +256,15 @@ def sync_customer_type_job():
             rollback=True
         )
         frappe.logger().error(f"Sync Error: {str(e)}")
+        publish(key_realtime_categories, f"Sync Error: {str(e)}", error = True)
         return {"error": str(e)}
     
 # Đồng bộ danh sách nhóm khách hàng
 def sync_customer_group():
-    frappe.enqueue("mbw_integration_dms.mbw_integration_dms.customer.sync_customer_group_job", queue="long", timeout=300)
+    frappe.enqueue("mbw_integration_dms.mbw_integration_dms.customer.sync_customer_group_job", queue="long", timeout=300, key=key_realtime_categories)
     return {"message": "Customer Group Sync job has been queued."}
 
-def sync_customer_group_job():
+def sync_customer_group_job(*args, **kwargs):
     try:
         create_dms_log(status="Queued", message="Customer Type sync job started.")
 
@@ -265,6 +277,7 @@ def sync_customer_group_job():
 
         if not customer_groups:
             create_dms_log(status="Skipped", message="No new customer group to sync.")
+            publish(key_realtime_categories, f"No new customer group to sync.", done=True)
             return {"message": "No new data to sync."}
 
         # Khởi tạo API Client
@@ -311,6 +324,7 @@ def sync_customer_group_job():
                 response_data=response,
                 message="Customer Group synced successfully."
             )
+            publish(key_realtime_categories, f"Customer Group synced successfully.", done = True)
             return {"message": "Customer Group synced successfully."}
         else:
             create_dms_log(
@@ -319,6 +333,7 @@ def sync_customer_group_job():
                 message="Failed to sync customer group."
             )
             frappe.logger().error(f"Failed to sync: {response}")
+            publish(key_realtime_categories, f"Failed to sync: {response}", error = True)
             return {"error": response}
 
     except Exception as e:
@@ -329,6 +344,7 @@ def sync_customer_group_job():
             rollback=True
         )
         frappe.logger().error(f"Sync Error: {str(e)}")
+        publish(key_realtime_categories, f"Sync Error: {str(e)}", error = True)
         return {"error": str(e)}
     
 

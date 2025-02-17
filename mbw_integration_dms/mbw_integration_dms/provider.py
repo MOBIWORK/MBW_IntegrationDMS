@@ -5,14 +5,15 @@ import frappe
 
 from mbw_integration_dms.mbw_integration_dms.utils import create_dms_log
 from mbw_integration_dms.mbw_integration_dms.apiclient import DMSApiClient
+from mbw_integration_dms.mbw_integration_dms.product import publish
 
-
+key_realtime_categories = "dms.key.sync.all.categories"
 # Đồng bộ danh sách nhà cung cấp
 def sync_provider():
-    frappe.enqueue("mbw_integration_dms.mbw_integration_dms.provider.sync_provider_job", queue="long", timeout=300)
+    frappe.enqueue("mbw_integration_dms.mbw_integration_dms.provider.sync_provider_job", queue="long", timeout=300, key = key_realtime_categories)
     return {"message": "Provider Sync job has been queued."}
 
-def sync_provider_job():
+def sync_provider_job(*args, **kwargs):
     try:
         create_dms_log(status="Queued", message="Provider sync job started.")
 
@@ -25,6 +26,7 @@ def sync_provider_job():
 
         if not providers:
             create_dms_log(status="Skipped", message="No new provider to sync.")
+            publish(key_realtime_categories, "No new provider to sync.", done=True)
             return {"message": "No new data to sync."}
 
         # Khởi tạo API Client
@@ -71,6 +73,7 @@ def sync_provider_job():
                 response_data=response,
                 message="Provider synced successfully."
             )
+            publish(key_realtime_categories, "Provider synced successfully.", done=True)
             return {"message": "Provider synced successfully."}
         else:
             create_dms_log(
@@ -79,6 +82,7 @@ def sync_provider_job():
                 message="Failed to sync provider."
             )
             frappe.logger().error(f"Failed to sync: {response}")
+            publish(key_realtime_categories, "Failed to sync provider.", error=True)
             return {"error": response}
 
     except Exception as e:
@@ -89,4 +93,5 @@ def sync_provider_job():
             rollback=True
         )
         frappe.logger().error(f"Sync Error: {str(e)}")
+        publish(key_realtime_categories, f"Sync Error: {str(e)}", error=True)
         return {"error": str(e)}

@@ -5,14 +5,15 @@ import frappe
 
 from mbw_integration_dms.mbw_integration_dms.utils import create_dms_log
 from mbw_integration_dms.mbw_integration_dms.apiclient import DMSApiClient
+from mbw_integration_dms.mbw_integration_dms.product import publish
 
-
+key_realtime_categories = "dms.key.sync.all.categories"
 # Đồng bộ danh sách kênh
 def sync_channel():
-    frappe.enqueue("mbw_integration_dms.mbw_integration_dms.channel.sync_channel_job", queue="long", timeout=300)
+    frappe.enqueue("mbw_integration_dms.mbw_integration_dms.channel.sync_channel_job", queue="long", timeout=300, key=key_realtime_categories)
     return {"message": "Channel Sync job has been queued."}
 
-def sync_channel_job():
+def sync_channel_job(*args, **kwargs):
     try:
         create_dms_log(status="Queued", message="Channel sync job started.")
 
@@ -25,6 +26,7 @@ def sync_channel_job():
 
         if not channels:
             create_dms_log(status="Skipped", message="No new channel to sync.")
+            publish(key_realtime_categories, "No new data to sync.", done= True)
             return {"message": "No new data to sync."}
 
         # Khởi tạo API Client
@@ -70,6 +72,7 @@ def sync_channel_job():
                 response_data=response,
                 message="Channel synced successfully."
             )
+            publish(key_realtime_categories, "Channel synced successfully.", done= True)
             return {"message": "Channel synced successfully."}
         else:
             create_dms_log(
@@ -78,6 +81,7 @@ def sync_channel_job():
                 message="Failed to sync channel."
             )
             frappe.logger().error(f"Failed to sync: {response}")
+            publish(key_realtime_categories, "Failed to sync channel.", error=True)
             return {"error": response}
 
     except Exception as e:
@@ -88,4 +92,5 @@ def sync_channel_job():
             rollback=True
         )
         frappe.logger().error(f"Sync Error: {str(e)}")
+        publish(key_realtime_categories, f"Sync Error: {str(e)}", error=True)
         return {"error": str(e)}

@@ -7,13 +7,13 @@ from frappe import _
 from mbw_integration_dms.mbw_integration_dms.utils import create_dms_log
 from mbw_integration_dms.mbw_integration_dms.apiclient import DMSApiClient
 
-
+key_realtime_product = "dms.key.sync.all.products"
 # Đồng bộ danh sách sản phẩm
 def sync_product():
-    frappe.enqueue("mbw_integration_dms.mbw_integration_dms.product.sync_product_job", queue="long", timeout=300)
+    frappe.enqueue("mbw_integration_dms.mbw_integration_dms.product.sync_product_job", queue="long", timeout=300, key = key_realtime_product)
     return {"message": "Product Sync job has been queued."}
 
-def sync_product_job():
+def sync_product_job(*args, **kwargs):
     try:
         create_dms_log(status="Queued", message="Brand sync job started.")
 
@@ -45,6 +45,7 @@ def sync_product_job():
 
         if not items:
             create_dms_log(status="Skipped", message="No new item to sync.")
+            publish(key_realtime_product, "No new item to sync.", done= True)
             return {"message": "No new data to sync."}
         
         # Khởi tạo API Client
@@ -99,6 +100,7 @@ def sync_product_job():
                 response_data=response,
                 message="Item synced successfully."
             )
+            publish(key_realtime_product,"Item synced successfully.", done=True)
             return {"message": "Item synced successfully."}
         else:
             error_message = response.get("message", "Failed to sync item.")
@@ -111,6 +113,7 @@ def sync_product_job():
             )
 
             frappe.logger().error(f"Failed to sync: {response}")
+            publish(key_realtime_product ,f"Failed to sync: {response}", error=True)
             return {"error": error_message, "details": errors_detail}
 
     except Exception as e:
@@ -121,6 +124,7 @@ def sync_product_job():
             rollback=True
         )
         frappe.logger().error(f"Sync Error: {str(e)}")
+        publish(key_realtime_product,f"Sync Error: {str(e)}", error=True)
         return {"error": str(e)}
     
 
@@ -172,3 +176,14 @@ def delete_product(doc, method):
         frappe.db.rollback()
         frappe.log_error(f"Lỗi khi xóa sản phẩm: {str(e)}", "Product Deletion")
         frappe.throw(f"Lỗi khi xóa sản phẩm: {str(e)}")
+
+def publish(key, message, synced=False, error=False, done=False, br=True):
+    frappe.publish_realtime(
+		key,
+		{
+			"synced": synced,
+			"error": error,
+			"message": message + ("<br /><br />" if br else ""),
+			"done": done,
+		},
+	)

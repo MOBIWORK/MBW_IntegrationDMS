@@ -49,7 +49,7 @@ ProductImporter = class {
 
 		if (this.syncRunning) {
 			this.toggleSyncAllButton();
-			// this.logSync();
+			this.logSync();
 		}
 	}
 
@@ -309,7 +309,7 @@ ProductImporter = class {
 		}
 
 		// sync progress
-		// this.logSync();
+		this.logSync();
 	}
 
 	logSync() {
@@ -366,6 +366,7 @@ ProductImporter = class {
 CategoryImporter = class {
 	constructor(wrapper) {
 		this.wrapper = $(wrapper).find(".layout-main-section");
+		this.log_category = 0
 		this.init();
 		this.syncRunning = false;
 	}
@@ -458,7 +459,7 @@ CategoryImporter = class {
 
                         <div class="card border-0 shadow-sm p-3 mb-3 rounded-sm" style="background-color: var(--card-bg); display: none;">
                             <h5 class="border-bottom pb-2">Sync Log</h5>
-                            <div class="control-value like-disabled-input for-description overflow-auto" id="dms-sync-log" style="max-height: 500px;"></div>
+                            <div class="control-value like-disabled-input for-description overflow-auto" id="dms-sync-log-categories" style="max-height: 500px;"></div>
                         </div>
 
                     </div>
@@ -679,13 +680,12 @@ CategoryImporter = class {
 				method: "mbw_integration_dms.mbw_integration_dms.page.dms_import_products.dms_import_category.sync_all_categories",
 			});
 		}
-
+		this.log_category = 0;
 		// sync progress
-		// this.logSync();
+		this.logSync();
 	}
-
 	logSync() {
-		const _log = $("#dms-sync-log");
+		const _log = $("#dms-sync-log-categories");
 		_log.parents(".card").show();
 		_log.text(""); // clear logs
 
@@ -699,11 +699,11 @@ CategoryImporter = class {
 				message = `<pre class="mb-0">${message}</pre>`;
 				_log.append(message);
 				_log.scrollTop(_log[0].scrollHeight);
-
+				this.log_category = this.log_category + 1;
 				if (synced)
 					this.updateSyncedCount(_syncedCounter, _erpnextCounter);
 
-				if (done) {
+				if (done && this.log_category === 9) {
 					frappe.realtime.off("dms.key.sync.all.categories");
 					this.toggleSyncAllButton(false);
 					this.fetchCategoryCount();
@@ -773,7 +773,7 @@ CustomerImporter = class {
 
 		if (this.syncRunning) {
 			this.toggleSyncAllButton();
-			// this.logSync();
+			this.logSync();
 		}
 	}
 
@@ -821,7 +821,7 @@ CustomerImporter = class {
 
                         <div class="card border-0 shadow-sm p-3 mb-3 rounded-sm" style="background-color: var(--card-bg); display: none;">
                             <h5 class="border-bottom pb-2">Sync Log</h5>
-                            <div class="control-value like-disabled-input for-description overflow-auto" id="dms-sync-log" style="max-height: 500px;"></div>
+                            <div class="control-value like-disabled-input for-description overflow-auto" id="dms-sync-log-customers" style="max-height: 500px;"></div>
                         </div>
 
                     </div>
@@ -1040,7 +1040,7 @@ CustomerImporter = class {
 		}
 
 		// sync progress
-		// this.logSync();
+		this.logSync();
 	}
 	toggleSyncAllButton(disable = true) {
 		const btn = $("#btn-sync-all-customer");
@@ -1052,6 +1052,35 @@ CustomerImporter = class {
 			.addClass(_toggleClass(disable))
 			.removeClass(_toggleClass(!disable))
 			.text(_toggleText());
+	}
+
+	logSync() {
+		const _log = $("#dms-sync-log-customers");
+		_log.parents(".card").show();
+		_log.text(""); // clear logs
+
+		// define counters here to prevent calling jquery every time
+		const _syncedCounter = $("#count-customers-synced");
+		const _erpnextCounter = $("#count-customers-erpnext");
+
+		frappe.realtime.on(
+			"dms.key.sync.all.customers",
+			({ message, synced, done, error }) => {
+				message = `<pre class="mb-0">${message}</pre>`;
+				_log.append(message);
+				_log.scrollTop(_log[0].scrollHeight);
+
+				if (synced)
+					this.updateSyncedCount(_syncedCounter, _erpnextCounter);
+
+				if (done) {
+					frappe.realtime.off("dms.key.sync.all.customers");
+					this.toggleSyncAllButton(false);
+					this.fetchCategoryCount();
+					this.syncRunning = false;
+				}
+			}
+		);
 	}
 
 	updateSyncedCount(_syncedCounter, _erpnextCounter) {
