@@ -126,6 +126,7 @@ ProductImporter = class {
 
 	async addTable() {
 		const listElement = this.wrapper.find("#dms-product-list")[0];
+		const data = await this.fetchdmsProducts();
 		this.dmsProductTable = new frappe.DataTable(listElement, {
 			columns: [
 				{
@@ -160,9 +161,12 @@ ProductImporter = class {
 			data: await this.fetchdmsProducts(),
 			layout: "fixed",
 		});
-
-		this.wrapper.find(".dms-datatable-footer").show();
-	}
+		if (data.length === 0) {
+			let scrollable = this.wrapper.find("#dms-product-list .dt-scrollable")[0];
+			scrollable.style.height = "auto";
+		}
+			this.wrapper.find(".dms-datatable-footer").show();
+		}
 
 	async fetchdmsProducts(page = 1) {
 		try {
@@ -532,7 +536,11 @@ CategoryImporter = class {
 			data: await this.fetchdmsCategories(),
 			layout: "fixed",
 		});
-
+		const data = await this.fetchdmsCategories()
+		if (data.length === 0) {
+			let scrollable = this.wrapper.find("#dms-category-list .dt-scrollable")[0];
+			scrollable.style.height = "auto";
+		}
 		this.wrapper.find(".dms-datatable-footer").show();
 	}
 
@@ -891,7 +899,11 @@ CustomerImporter = class {
 			data: await this.fetchdmsCustomers(),
 			layout: "fixed",
 		});
-
+		const data = await this.fetchdmsCustomers();
+		if (data.length === 0) {
+			let scrollable = this.wrapper.find("#dms-customer-list .dt-scrollable")[0];
+			scrollable.style.height = "auto";
+		}
 		this.wrapper.find(".dms-datatable-footer").show();
 	}
 
