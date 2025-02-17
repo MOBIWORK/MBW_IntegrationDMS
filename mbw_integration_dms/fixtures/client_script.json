@@ -1,1 +1,24 @@
-[]
+[
+ {
+  "docstatus": 0,
+  "doctype": "Client Script",
+  "dt": "Item",
+  "enabled": 1,
+  "modified": "2025-02-17 23:29:46.140872",
+  "module": "MBW Integration DMS",
+  "name": "Xác định đvt chẵn lẻ của Item",
+  "script": "frappe.ui.form.on('Item', {\n    validate: function(frm) {\n        ensure_unique_selection(frm, 'uoms', 'unit_odd');\n        ensure_unique_selection(frm, 'uoms', 'unit_even');\n    }\n});\n\nfunction ensure_unique_selection(frm, child_table, fieldname) {\n    let selected_rows = frm.doc[child_table].filter(row => row[fieldname]);\n\n    if (selected_rows.length > 1) {\n        selected_rows.forEach((row, index) => {\n            if (index > 0) {\n                row[fieldname] = 0;\n            }\n        });\n        frappe.msgprint(__('Chỉ được chọn 1 sản phẩm là đơn vị chẵn và 1 sản phẩm là đơn vị lẻ '));\n        frm.refresh_field(child_table);\n    }\n}\n\nfrappe.ui.form.on('UOM Conversion Detail', {\n    unit_odd: function(frm, cdt, cdn) {\n        toggle_other_rows(frm, cdt, cdn, 'unit_odd', 'unit_even');\n    },\n    unit_even: function(frm, cdt, cdn) {\n        toggle_other_rows(frm, cdt, cdn, 'unit_even', 'unit_odd');\n    }\n});\n\nfunction toggle_other_rows(frm, cdt, cdn, selected_field, other_field) {\n    let child = locals[cdt][cdn];\n\n    if (child[selected_field]) {\n        frm.doc.uoms.forEach(row => {\n            if (row.name !== child.name) {\n                row[selected_field] = 0;\n            }\n            // Khi chọn một dòng là chẵn/lẻ, tự động bỏ tích dòng đó ở trường còn lại\n            row[other_field] = (row.name === child.name) ? 0 : row[other_field];\n        });\n        frm.refresh_field('uoms');\n    }\n}\n",
+  "view": "Form"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Client Script",
+  "dt": "Sales Order",
+  "enabled": 1,
+  "modified": "2025-02-17 23:47:05.799807",
+  "module": "MBW Integration DMS",
+  "name": "Ko cho phép sửa các trường từ DMS trong SO",
+  "script": "frappe.ui.form.on('Sales Order', {\n    refresh: function(frm) {\n        if (frm.doc.source == 'DMS' && frm.doc.docstatus == 0) {  \n            // Vô hiệu hóa bảng con (Không cho thêm/sửa/xóa hàng)\n            frm.fields_dict[\"items\"].grid.df.cannot_add_rows = true;\n            frm.fields_dict[\"items\"].grid.df.cannot_delete_rows = true;\n            frm.refresh_field(\"items\");\n        }\n    }\n});\n\nfrappe.ui.form.on('Sales Order Item', {\n    refresh: function(frm, cdt, cdn) {\n        let row = locals[cdt][cdn];\n        if (frm.doc.source == 'DMS' && frm.doc.docstatus == 0) {  \n            // Danh sách các trường trong bảng con cần khóa\n            let fields_to_disable = [\"item_code\", \"qty\", \"rate\", \"amount\"];\n            fields_to_disable.forEach(field => {\n                frappe.model.set_df_property(cdt, field, 'read_only', 1);\n            });\n        }\n    }\n});\n",
+  "view": "Form"
+ }
+]

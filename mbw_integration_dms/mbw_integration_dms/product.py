@@ -8,6 +8,7 @@ from mbw_integration_dms.mbw_integration_dms.utils import create_dms_log
 from mbw_integration_dms.mbw_integration_dms.apiclient import DMSApiClient
 
 key_realtime_product = "dms.key.sync.all.products"
+
 # Đồng bộ danh sách sản phẩm
 def sync_product():
     frappe.enqueue("mbw_integration_dms.mbw_integration_dms.product.sync_product_job", queue="long", timeout=300, key = key_realtime_product)
@@ -19,18 +20,22 @@ def sync_product_job(*args, **kwargs):
 
         query = """
             SELECT 
-                i.name, i.item_code, i.item_name, i.industry, i.brand, i.description, i.standard_rate,
+                i.name, i.item_code, i.item_name, i.industry, i.brand, i.description, i.stock_uom,
                 it.item_tax_template, s.supplier as provider,
 
                 (SELECT um.uom FROM `tabUOM Conversion Detail` um 
                     WHERE um.parent = i.item_code AND um.unit_even = 1 LIMIT 1) AS unit_even,
+                (SELECT um.price_dms FROM `tabUOM Conversion Detail` um 
+                    WHERE um.parent = i.item_code AND um.unit_even = 1 LIMIT 1) AS price_unit_even,
                 (SELECT um.conversion_factor FROM `tabUOM Conversion Detail` um 
                     WHERE um.parent = i.item_code AND um.unit_even = 1 LIMIT 1) AS unit_even_conversion,
 
-                (SELECT um.uom FROM `tabUOM Conversion Detail` um 
-                    WHERE um.parent = i.item_code AND um.unit_odd = 1 LIMIT 1) AS unit_odd,
+                (SELECT um.price_dms FROM `tabUOM Conversion Detail` um 
+                    WHERE um.parent = i.item_code 
+                    ORDER BY um.unit_odd DESC, um.idx ASC LIMIT 1) AS price_unit_odd,
                 (SELECT um.conversion_factor FROM `tabUOM Conversion Detail` um 
-                    WHERE um.parent = i.item_code AND um.unit_odd = 1 LIMIT 1) AS unit_odd_conversion
+                    WHERE um.parent = i.item_code 
+                    ORDER BY um.unit_odd DESC, um.idx ASC LIMIT 1) AS unit_odd_conversion
 
             FROM `tabItem` i
             LEFT JOIN `tabItem Tax` it ON i.name = it.parent
@@ -59,9 +64,9 @@ def sync_product_job(*args, **kwargs):
                 "provider": i["provider"],
                 "brand": i["brand"],
                 "unit_even": i["unit_even"],
-                "unit_odd": i["unit_odd"],
-                "gia_le": i["standard_rate"],
-                "gia": i["standard_rate"] * i["unit_even_conversion"],
+                "unit_odd": i["stock_uom"],
+                "gia_le": i["price_unit_odd"],
+                "gia": i["price_unit_even"],
                 "conversion_rate": i["unit_even_conversion"],
                 "tax": frappe.db.get_value("Item Tax Template Detail", {"parent": i.get("item_tax_template")}, "tax_rate") if i.get("item_tax_template") else 0,
                 "description": i["description"]
