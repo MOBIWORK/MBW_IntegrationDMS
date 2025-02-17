@@ -65,7 +65,7 @@ def process_request(data, event):
 	frappe.enqueue(
 		method=EVENT_MAPPER[event],
 		queue="short",
-		timeout=300,
+		timeout=30,
 		is_async=True,
 		data=data,
         request_id=log.name

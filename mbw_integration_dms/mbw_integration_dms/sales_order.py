@@ -9,6 +9,7 @@ from mbw_integration_dms.mbw_integration_dms.utils import (
     create_dms_log
 )
 from mbw_integration_dms.mbw_integration_dms.helpers import configs
+from mbw_integration_dms.mbw_integration_dms.customer import create_customers
 from mbw_integration_dms.mbw_integration_dms.helpers.helpers import create_partner_log
 from mbw_integration_dms.mbw_integration_dms.helpers.validators import (
     validate_date, 
@@ -18,12 +19,12 @@ from mbw_integration_dms.mbw_integration_dms.helpers.validators import (
 
 # Tạo mới đơn hàng DMS to ERP
 @frappe.whitelist(methods="POST")
-def create_sale_order(**kwargs):
-    from mbw_integration_dms.mbw_integration_dms.customer import create_customers
-    id_log_dms = kwargs.get("id_log")
+def create_sale_order(data=None, **kwargs):
+    if data:
+        kwargs = data
+    id_log_dms = kwargs.get("id_log", None)
 
     try:
-        kwargs = frappe._dict(kwargs)
         customer_code_dms = kwargs.get("customer")
         customer_name = frappe.get_value("Customer", {"customer_code_dms": customer_code_dms}, "name")
 
@@ -62,7 +63,7 @@ def create_sale_order(**kwargs):
 
         new_order.customer = validate_not_none(customer_name)
         new_order.dms_so_code = kwargs.get("dms_so_code")
-        new_order.delivery_date = validate_date(kwargs.delivery_date / 1000)
+        new_order.delivery_date = validate_date(kwargs.get("delivery_date") / 1000)
         new_order.set_warehouse = validate_not_none(kwargs.get("set_warehouse"))
         new_order.dms_so_code = kwargs.get("dms_so_code")
         new_order.dms_so_id = kwargs.get("dms_so_id")
@@ -117,7 +118,6 @@ def create_sale_order(**kwargs):
                 })
 
         new_order.insert()
-        frappe.db.commit()
 
         # Ghi log thành công
         create_dms_log(
@@ -127,13 +127,15 @@ def create_sale_order(**kwargs):
             message=f"Sales Order {new_order.name} created successfully."
         )
 
-        create_partner_log(
-            id_log_dms=id_log_dms,
-            status=True,
-            title="Sales Order create successfully.",
-            message=f"Sales Order {new_order.name} created successfully."
-        )
+        if id_log_dms:
+            create_partner_log(
+                id_log_dms=id_log_dms,
+                status=True,
+                title="Sales Order create successfully.",
+                message=f"Sales Order {new_order.name} created successfully."
+            )
 
+        frappe.db.commit()
         return {"name": new_order.name}
 
     except Exception as e:
@@ -145,13 +147,14 @@ def create_sale_order(**kwargs):
             request_data=kwargs,
             message=f"Error creating Sales Order: {str(e)}"
         )
-        
-        create_partner_log(
-            id_log_dms=id_log_dms,
-            status=False,
-            title="Sales Order create failed.",
-            message=f"Error creating Sales Order: {str(e)}"
-        )
+
+        if id_log_dms:
+            create_partner_log(
+                id_log_dms=id_log_dms,
+                status=False,
+                title="Sales Order create failed.",
+                message=f"Error creating Sales Order: {str(e)}"
+            )
 
         return {"error": str(e)}
 

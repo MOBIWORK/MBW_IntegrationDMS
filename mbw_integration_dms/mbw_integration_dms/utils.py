@@ -7,8 +7,7 @@ from mbw_integration_dms.mbw_integration_dms.doctype.mbw_integration_log.mbw_int
 )
 
 from mbw_integration_dms.mbw_integration_dms.constants import (
-	MODULE_NAME,
-    SETTING_DOCTYPE
+	MODULE_NAME
 )
 
 def create_dms_log(**kwargs):

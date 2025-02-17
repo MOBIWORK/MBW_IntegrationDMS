@@ -21,8 +21,9 @@ class DMSApiClient:
 
     def __init__(
 		self, url: Optional[str] = None, access_token: Optional[str] = None
-	):
-        self.settings = frappe.get_doc(SETTING_DOCTYPE)
+	):  
+        company = frappe.defaults.get_user_default("company")
+        self.settings = frappe.get_doc(SETTING_DOCTYPE, {"name": company})
         self.base_url = self.settings.dms_api_url or f"http://apierpnext.mobiwork.vn"
         self.access_token = self.settings.dms_access_token
         self.orgid = self.settings.orgid

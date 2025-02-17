@@ -352,8 +352,6 @@ def sync_customer_group_job(*args, **kwargs):
 @frappe.whitelist(methods="POST")
 def create_customers(**kwargs):
     results = []
-    id_log_dms = customer_data.get("id_log")
-    
     try:
         customers = kwargs.get("data", [])
 
@@ -361,6 +359,7 @@ def create_customers(**kwargs):
             frappe.throw("Dữ liệu đầu vào không hợp lệ. Phải là danh sách khách hàng.")
 
         for customer_data in customers:
+            id_log_dms = customer_data.get("id_log", "")
             try:
                 customer_data = frappe._dict(customer_data)
                 customer_code_dms = customer_data.get("customer_code_dms")
@@ -378,13 +377,14 @@ def create_customers(**kwargs):
                         response_data=update_result,
                         message=f"Customer {customer_code_dms} updated successfully."
                     )
-
-                    create_partner_log(
-                        id=id_log_dms,
-                        status=True,
-                        title="Customer updated successfully.",
-                        message=f"Customer {customer_code_dms} updated successfully."
-                    )
+                    
+                    if id_log_dms:
+                        create_partner_log(
+                            id_log_dms=id_log_dms,
+                            status=True,
+                            title="Customer updated successfully.",
+                            message=f"Customer {customer_code_dms} updated successfully."
+                        )
 
                     results.append({"customer_code_dms": customer_code_dms, "status": "Updated"})
                     continue  # Tiếp tục với khách hàng khác
@@ -423,7 +423,7 @@ def create_customers(**kwargs):
                         required = validate_not_none(value)
                         new_customer.set(key, required)
                     elif key in date_fields:
-                        custom_birthday = validate_date(value/1000)
+                        custom_birthday = validate_date(float(value)/1000)
                         new_customer.set(key, custom_birthday)
                     elif key in choice_fields:
                         customer_type = validate_choice(configs.customer_type)(value)
@@ -482,13 +482,14 @@ def create_customers(**kwargs):
                     response_data={"customer": new_customer.name},
                     message=f"Customer {new_customer.name} created successfully."
                 )
-
-                create_partner_log(
-                    id_log_dms=id_log_dms,
-                    status=True,
-                    title="Customer create successfully.",
-                    message=f"Customer {customer_code_dms} create successfully."
-                )
+                
+                if id_log_dms:
+                    create_partner_log(
+                        id_log_dms=id_log_dms,
+                        status=True,
+                        title="Customer create successfully.",
+                        message=f"Customer {customer_code_dms} create successfully."
+                    )
                 
                 results.append({"customer_code_dms": customer_data.get("customer_code"), "status": "Success"})
 
@@ -502,13 +503,14 @@ def create_customers(**kwargs):
                     request_data=customer_data,
                     message=error_message
                 )
-
-                create_partner_log(
-                    id_log_dms=id_log_dms,
-                    status=False,
-                    title="Customer create failed.",
-                    message=error_message
-                )
+                
+                if id_log_dms:
+                    create_partner_log(
+                        id_log_dms=id_log_dms,
+                        status=False,
+                        title="Customer create failed.",
+                        message=error_message
+                    )
 
                 # Xóa bản ghi nếu đã tạo trước đó
                 try:
@@ -574,7 +576,6 @@ def update_customer(**kwargs):
             update_customer_contacts(customer, kwargs.get("contacts"), name)
 
         customer.save()
-        frappe.db.commit()
 
         # Ghi log thành công
         create_dms_log(

@@ -4,7 +4,7 @@
 MODULE_NAME = "MBW Integration DMS"
 SETTING_DOCTYPE = "MBW Integration Settings"
 
-API_VERSION = "2025-01"
+API_VERSION = "2025-02"
 
 WEBHOOK_EVENTS = []
 
