@@ -131,3 +131,15 @@ def update_stt_so_cancel(doc):
 
     except Exception as e:
         frappe.logger().error(f"Failed to update DMS order for SO {doc.name}: {str(e)}")
+
+
+def publish(key, message, synced=False, error=False, done=False, br=True):
+    frappe.publish_realtime(
+		key,
+		{
+			"synced": synced,
+			"error": error,
+			"message": message + ("<br /><br />" if br else ""),
+			"done": done,
+		},
+	)

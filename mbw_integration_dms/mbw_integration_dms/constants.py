@@ -13,3 +13,9 @@ EVENT_MAPPER = {
     "sales_order_create": "mbw_integration_dms.mbw_integration_dms.sales_order.create_sale_order",
     "employee_create": "mbw_integration_dms.mbw_integration_dms.employee.create_employee_and_sales_person",
 }
+
+KEY_REALTIME = {
+    "key_realtime_categories": "dms.key.sync.all.categories",
+    "key_realtime_product": "dms.key.sync.all.products",
+    "key_realtime_customer": "dms.key.sync.all.customers"
+}
