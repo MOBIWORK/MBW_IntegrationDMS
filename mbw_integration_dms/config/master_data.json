@@ -1,0 +1,681 @@
+{
+  "Brand": [
+    {
+      "Mã": "US",
+      "Tên": "USA"
+    },
+    {
+      "Mã": "KR",
+      "Tên": "KOREA"
+    },
+    {
+      "Mã": "VN",
+      "Tên": "VIETNAM"
+    },
+    {
+      "Mã": "AU",
+      "Tên": "AUSTRALIA"
+    },
+    {
+      "Mã": "FR",
+      "Tên": "FRANCE"
+    },
+    {
+      "Mã": "TW",
+      "Tên": "TAIWAIN"
+    },
+    {
+      "Mã": "ITALY",
+      "Tên": "ITALY"
+    }
+  ],
+  "Industry": [
+    {
+      "Mã": "XD",
+      "Tên": "Xăng dầu"
+    },
+    {
+      "Mã": "TC",
+      "Tên": "Trái cây"
+    },
+    {
+      "Mã": "TC_NK",
+      "Tên": "Trái cây nhập khẩu"
+    },
+    {
+      "Mã": "TL_TN",
+      "Tên": "Trái cây trong nước"
+    },
+    {
+      "Mã": "HDD",
+      "Tên": "HẠT DINH DƯỠNG"
+    },
+    {
+      "Mã": "HDD_NK",
+      "Tên": "Hạt dinh dưỡng và trái cây khô nhập khẩu"
+    },
+    {
+      "Mã": "HDD_TN",
+      "Tên": "Hạt dinh dưỡng và trái cây khô trong nước"
+    },
+    {
+      "Mã": "TP",
+      "Tên": "Thực phẩm"
+    },
+    {
+      "Mã": "TP_ĐL",
+      "Tên": "Hải sản đông lạnh"
+    },
+    {
+      "Mã": "TP_TS",
+      "Tên": "Hải sản tươi sống"
+    },
+    {
+      "Mã": "TP_HK",
+      "Tên": "Hàng khô"
+    },
+    {
+      "Mã": "TP_TPCQCB",
+      "Tên": "Thực phẩm chín, qua chế biến"
+    },
+    {
+      "Mã": "NC_SP",
+      "Tên": "Ngũ cốc, sản phẩm từ ngũ cốc"
+    },
+    {
+      "Mã": "ĐS",
+      "Tên": "Đặc sản"
+    },
+    {
+      "Mã": "NH-GV",
+      "Tên": "Gia vị"
+    }
+  ],
+  "Provider": [
+    {
+      "Mã": "NCC01",
+      "Tên": "Công ty Trần Phú"
+    },
+    {
+      "Mã": "01",
+      "Tên": "Nông sản Tân Việt",
+      "Địa chỉ": "Hà Nội"
+    },
+    {
+      "Mã": "NSTV",
+      "Tên": "Nông sản Tân Việt",
+      "Địa chỉ": "Hà Nội"
+    },
+    {
+      "Mã": "MBW",
+      "Tên": "Mobiwork.DMS",
+      "Địa chỉ": "Tầng 25, tháp B, toà nhà Sông Đà, đường Phạm Hùng, quận Nam Từ Liêm, TP.Hà Nội",
+      "SĐT": "1900-400-008",
+      "Mã số thuế": "0107042644"
+    },
+    {
+      "Mã": "NCC_EXPVN",
+      "Tên": "Công Ty Cổ Phần Đầu Tư Exp Việt Nam",
+      "Địa chỉ": "D21, Dãy D, Khu TT Sư Đoàn 361, P. Xuân Đỉnh, Q. Bắc Từ Liêm, Hà Nội",
+      "SĐT": "(04) 37502946",
+      "Mã số thuế": "1126272839237"
+    },
+    {
+      "Mã": "NCC_TPHĐ",
+      "Tên": "Công Ty TNHH Thực Phẩm Hoàng Đông",
+      "Địa chỉ": "Phòng 201, Nhà C6 Mai Động, Q. Hoàng Mai, Hà Nội",
+      "SĐT": "(04) 22182181"
+    },
+    {
+      "Mã": "NCC_BSF",
+      "Tên": "Công Ty TNHH Sản Xuất Thực Phẩm BaSao Food",
+      "Địa chỉ": "368/4 Tỉnh Lộ 15, Ấp Bến Cỏ, Xã Phú Hòa Đông, Huyện Củ Chi, Tp. Hồ Chí Minh (TPHCM)",
+      "SĐT": "(08) 35845399"
+    },
+    {
+      "Mã": "NCC_TPDA",
+      "Tên": "Công Ty TNHH Xuất Nhập Khẩu Thực Phẩm Duy Anh",
+      "Địa chỉ": "368/4 Tỉnh Lộ 15, Ấp Bến Cỏ, Xã Phú Hòa Đông, Huyện Củ Chi, Tp. Hồ Chí Minh (TPHCM)",
+      "SĐT": "(08) 35845399"
+    },
+    {
+      "Mã": "NCC_TPVPT",
+      "Tên": "Công Ty TNHH Cung Cấp Thực Phẩm Vạn Phúc Thịnh",
+      "Địa chỉ": "78A4 Cao Văn Lầu, P. 2, Q. 6, Tp. Hồ Chí Minh (TPHCM)",
+      "SĐT": "903059946"
+    },
+    {
+      "Mã": "NCC_TPVL",
+      "Tên": "Công Ty TNHH Thực Phẩm Vương Liên",
+      "Địa chỉ": "268 Hà Huy Tập, Hòa Khê, Thanh Khê, Đà Nẵng",
+      "SĐT": "0932.577.376"
+    },
+    {
+      "Mã": "NCC_LTT",
+      "Tên": "Công Ty Cổ Phần Long Trọng Tiến",
+      "Địa chỉ": "Số 35 Đường Huyền Quang, Phường Ninh Xá, Thành Phố Bắc Ninh, Bắc Ninh",
+      "SĐT": "987826969"
+    },
+    {
+      "Mã": "NCC_CT",
+      "Tên": "Công Ty TNHH Chân Thành",
+      "Địa chỉ": "141/10 đường số 11, P. Bình Hưng Hòa, Q. Bình Tân, Tp. Hồ Chí Minh (TPHCM)",
+      "SĐT": "(08) 54084059"
+    },
+    {
+      "Mã": "HVX-HCM",
+      "Tên": "Công ty Hương Việt Xưa",
+      "Địa chỉ": "Hà Nội"
+    }
+  ],
+  "Unit": [
+    {
+      "Mã": "LIT",
+      "Tên": "Lít"
+    },
+    {
+      "Mã": "Ngan",
+      "Tên": "Ngăn"
+    },
+    {
+      "Mã": "1",
+      "Tên": "Chiếc"
+    },
+    {
+      "Mã": "2",
+      "Tên": "Cái"
+    },
+    {
+      "Mã": "THUNG",
+      "Tên": "Thùng"
+    },
+    {
+      "Mã": "HOP",
+      "Tên": "Hộp"
+    },
+    {
+      "Mã": "GOI",
+      "Tên": "Gói"
+    },
+    {
+      "Mã": "CHAI",
+      "Tên": "Chai"
+    },
+    {
+      "Mã": "BAO",
+      "Tên": "Bao"
+    },
+    {
+      "Mã": "CAI",
+      "Tên": "Cái"
+    },
+    {
+      "Mã": "LON",
+      "Tên": "Lon"
+    },
+    {
+      "Mã": "TUI",
+      "Tên": "Túi"
+    },
+    {
+      "Mã": "TUYP",
+      "Tên": "Tuýp"
+    },
+    {
+      "Mã": "GOI 50ML",
+      "Tên": "GÓI 50ML"
+    },
+    {
+      "Mã": "LO",
+      "Tên": "Lọ"
+    },
+    {
+      "Mã": "TA",
+      "Tên": "Tạ"
+    },
+    {
+      "Mã": "TAN",
+      "Tên": "Tấn"
+    },
+    {
+      "Mã": "kg",
+      "Tên": "kg"
+    },
+    {
+      "Mã": "quả",
+      "Tên": "quả"
+    },
+    {
+      "Mã": "MET",
+      "Tên": "MET"
+    },
+    {
+      "Mã": "TẤM",
+      "Tên": "TẤM"
+    },
+    {
+      "Mã": "C20S",
+      "Tên": "Bao"
+    }
+  ],
+  "CustomerType": [
+    {
+      "Mã": "Dự Án",
+      "Tên": "Dự Án"
+    },
+    {
+      "Mã": "KH-TN",
+      "Tên": "Tiềm năng"
+    },
+    {
+      "Mã": "KH-TT",
+      "Tên": "Thân thiết"
+    },
+    {
+      "Mã": "KH-VL",
+      "Tên": "Vãng lai"
+    },
+    {
+      "Mã": "KH dừng hoạt động",
+      "Tên": "KH dừng hoạt động"
+    },
+    {
+      "Mã": "Khách Lẻ",
+      "Tên": "Khách lẻ"
+    },
+    {
+      "Mã": "khách vip",
+      "Tên": "khách vip"
+    }
+  ],
+  "CustomerGroup": [
+    {
+      "Ưu Tiên": "KHMB",
+      "Bán Buôn": "Khách hàng mua buôn"
+    },
+    {
+      "Ưu Tiên": "HTST",
+      "Bán Buôn": "Hệ thống siêu thị"
+    },
+    {
+      "Ưu Tiên": "CHTH",
+      "Bán Buôn": "Cửa hàng thực phẩm sạch"
+    },
+    {
+      "Ưu Tiên": "KHKG",
+      "Bán Buôn": "Khách hàng ký gửi"
+    }
+  ],
+  "Region": [
+    {
+      "Mã": "1",
+      "Tên": "Miền Bắc",
+      "Mã cha": "Tất cả khu vực",
+      "is_group": 1
+    },
+    {
+      "Mã": "01",
+      "Tên": "Thành phố Hà Nội",
+      "Mã cha": "1"
+    },
+    {
+      "Mã": "02",
+      "Tên": "Tỉnh Hà Giang",
+      "Mã cha": "1"
+    },
+    {
+      "Mã": "04",
+      "Tên": "Tỉnh Cao Bằng",
+      "Mã cha": "1"
+    },
+    {
+      "Mã": "06",
+      "Tên": "Tỉnh Bắc Kạn",
+      "Mã cha": "1"
+    },
+    {
+      "Mã": "08",
+      "Tên": "Tỉnh Tuyên Quang",
+      "Mã cha": "1"
+    },
+    {
+      "Mã": "10",
+      "Tên": "Tỉnh Lào Cai",
+      "Mã cha": "1"
+    },
+    {
+      "Mã": "11",
+      "Tên": "Tỉnh Điện Biên",
+      "Mã cha": "1"
+    },
+    {
+      "Mã": "12",
+      "Tên": "Tỉnh Lai Châu",
+      "Mã cha": "1"
+    },
+    {
+      "Mã": "14",
+      "Tên": "Tỉnh Sơn La",
+      "Mã cha": "1"
+    },
+    {
+      "Mã": "15",
+      "Tên": "Tỉnh Yên Bái",
+      "Mã cha": "1"
+    },
+    {
+      "Mã": "17",
+      "Tên": "Tỉnh Hoà Bình",
+      "Mã cha": "1"
+    },
+    {
+      "Mã": "19",
+      "Tên": "Tỉnh Thái Nguyên",
+      "Mã cha": "1"
+    },
+    {
+      "Mã": "20",
+      "Tên": "Tỉnh Lạng Sơn",
+      "Mã cha": "1"
+    },
+    {
+      "Mã": "22",
+      "Tên": "Tỉnh Quảng Ninh",
+      "Mã cha": "1"
+    },
+    {
+      "Mã": "24",
+      "Tên": "Tỉnh Bắc Giang",
+      "Mã cha": "1"
+    },
+    {
+      "Mã": "25",
+      "Tên": "Tỉnh Phú Thọ",
+      "Mã cha": "1"
+    },
+    {
+      "Mã": "26",
+      "Tên": "Tỉnh Vĩnh Phúc",
+      "Mã cha": "1"
+    },
+    {
+      "Mã": "27",
+      "Tên": "Tỉnh Bắc Ninh",
+      "Mã cha": "1"
+    },
+    {
+      "Mã": "30",
+      "Tên": "Tỉnh Hải Dương",
+      "Mã cha": "1"
+    },
+    {
+      "Mã": "31",
+      "Tên": "Thành phố Hải Phòng",
+      "Mã cha": "1"
+    },
+    {
+      "Mã": "33",
+      "Tên": "Tỉnh Hưng Yên",
+      "Mã cha": "1"
+    },
+    {
+      "Mã": "34",
+      "Tên": "Tỉnh Thái Bình",
+      "Mã cha": "1"
+    },
+    {
+      "Mã": "35",
+      "Tên": "Tỉnh Hà Nam",
+      "Mã cha": "1"
+    },
+    {
+      "Mã": "36",
+      "Tên": "Tỉnh Nam Định",
+      "Mã cha": "1"
+    },
+    {
+      "Mã": "37",
+      "Tên": "Tỉnh Ninh Bình",
+      "Mã cha": "1"
+    },
+    {
+      "Mã": "ĐB",
+      "Tên": "Đông Bắc",
+      "Mã cha": "1"
+    },
+    {
+      "Mã": "2",
+      "Tên": "Miền Trung",
+      "Mã cha": "Tất cả khu vực",
+      "is_group": 1
+    },
+    {
+      "Mã": "38",
+      "Tên": "Tỉnh Thanh Hóa",
+      "Mã cha": "2"
+    },
+    {
+      "Mã": "40",
+      "Tên": "Tỉnh Nghệ An",
+      "Mã cha": "2"
+    },
+    {
+      "Mã": "42",
+      "Tên": "Tỉnh Hà Tĩnh",
+      "Mã cha": "2"
+    },
+    {
+      "Mã": "44",
+      "Tên": "Tỉnh Quảng Bình",
+      "Mã cha": "2"
+    },
+    {
+      "Mã": "45",
+      "Tên": "Tỉnh Quảng Trị",
+      "Mã cha": "2"
+    },
+    {
+      "Mã": "46",
+      "Tên": "Tỉnh Thừa Thiên Huế",
+      "Mã cha": "2"
+    },
+    {
+      "Mã": "48",
+      "Tên": "Thành phố Đà Nẵng",
+      "Mã cha": "2"
+    },
+    {
+      "Mã": "49",
+      "Tên": "Tỉnh Quảng Nam",
+      "Mã cha": "2"
+    },
+    {
+      "Mã": "51",
+      "Tên": "Tỉnh Quảng Ngãi",
+      "Mã cha": "2"
+    },
+    {
+      "Mã": "52",
+      "Tên": "Tỉnh Bình Định",
+      "Mã cha": "2"
+    },
+    {
+      "Mã": "54",
+      "Tên": "Tỉnh Phú Yên",
+      "Mã cha": "2"
+    },
+    {
+      "Mã": "56",
+      "Tên": "Tỉnh Khánh Hòa",
+      "Mã cha": "2"
+    },
+    {
+      "Mã": "62",
+      "Tên": "Tỉnh Kon Tum",
+      "Mã cha": "2"
+    },
+    {
+      "Mã": "64",
+      "Tên": "Tỉnh Gia Lai",
+      "Mã cha": "2"
+    },
+    {
+      "Mã": "66",
+      "Tên": "Tỉnh Đắk Lắk",
+      "Mã cha": "2"
+    },
+    {
+      "Mã": "67",
+      "Tên": "Tỉnh Đắk Nông",
+      "Mã cha": "2"
+    },
+    {
+      "Mã": "3",
+      "Tên": "Miền Nam",
+      "Mã cha": "Tất cả khu vực",
+      "is_group": 1
+    },
+    {
+      "Mã": "58",
+      "Tên": "Tỉnh Ninh Thuận",
+      "Mã cha": "3"
+    },
+    {
+      "Mã": "60",
+      "Tên": "Tỉnh Bình Thuận",
+      "Mã cha": "3"
+    },
+    {
+      "Mã": "68",
+      "Tên": "Tỉnh Lâm Đồng",
+      "Mã cha": "3"
+    },
+    {
+      "Mã": "70",
+      "Tên": "Tỉnh Bình Phước",
+      "Mã cha": "3"
+    },
+    {
+      "Mã": "72",
+      "Tên": "Tỉnh Tây Ninh",
+      "Mã cha": "3"
+    },
+    {
+      "Mã": "74",
+      "Tên": "Tỉnh Bình Dương",
+      "Mã cha": "3"
+    },
+    {
+      "Mã": "75",
+      "Tên": "Tỉnh Đồng Nai",
+      "Mã cha": "3"
+    },
+    {
+      "Mã": "77",
+      "Tên": "Tỉnh Bà Rịa - Vũng Tàu",
+      "Mã cha": "3"
+    },
+    {
+      "Mã": "79",
+      "Tên": "Thành phố Hồ Chí Minh",
+      "Mã cha": "3"
+    },
+    {
+      "Mã": "80",
+      "Tên": "Tỉnh Long An",
+      "Mã cha": "3"
+    },
+    {
+      "Mã": "82",
+      "Tên": "Tỉnh Tiền Giang",
+      "Mã cha": "3"
+    },
+    {
+      "Mã": "83",
+      "Tên": "Tỉnh Bến Tre",
+      "Mã cha": "3"
+    },
+    {
+      "Mã": "84",
+      "Tên": "Tỉnh Trà Vinh",
+      "Mã cha": "3"
+    },
+    {
+      "Mã": "86",
+      "Tên": "Tỉnh Vĩnh Long",
+      "Mã cha": "3"
+    },
+    {
+      "Mã": "87",
+      "Tên": "Tỉnh Đồng Tháp",
+      "Mã cha": "3"
+    },
+    {
+      "Mã": "89",
+      "Tên": "Tỉnh An Giang",
+      "Mã cha": "3"
+    },
+    {
+      "Mã": "91",
+      "Tên": "Tỉnh Kiên Giang",
+      "Mã cha": "3"
+    },
+    {
+      "Mã": "92",
+      "Tên": "Thành phố Cần Thơ",
+      "Mã cha": "3"
+    },
+    {
+      "Mã": "93",
+      "Tên": "Tỉnh Hậu Giang",
+      "Mã cha": "3"
+    },
+    {
+      "Mã": "94",
+      "Tên": "Tỉnh Sóc Trăng",
+      "Mã cha": "3"
+    },
+    {
+      "Mã": "95",
+      "Tên": "Tỉnh Bạc Liêu",
+      "Mã cha": "3"
+    },
+    {
+      "Mã": "96",
+      "Tên": "Tỉnh Cà Mau",
+      "Mã cha": "3"
+    }
+  ],
+  "Channel": [
+    {
+      "Mã": "MT",
+      "Tên": "MT"
+    },
+    {
+      "Mã": "ON",
+      "Tên": "ON"
+    },
+    {
+      "Mã": "OFF",
+      "Tên": "OFF"
+    },
+    {
+      "Mã": "GT",
+      "Tên": "Truyền thống"
+    }
+  ],
+  "Warehouse": [
+    {
+      "Mã": "KHN",
+      "Tên": "Kho Hà Nội"
+    },
+    {
+      "Mã": "KHCM",
+      "Tên": "Kho TP HCM"
+    },
+    {
+      "Mã": "KDN",
+      "Tên": "Kho Đà Nẵng"
+    }
+  ]
+}

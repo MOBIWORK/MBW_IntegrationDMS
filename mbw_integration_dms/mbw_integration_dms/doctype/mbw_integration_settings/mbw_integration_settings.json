@@ -23,7 +23,9 @@
   "order_sync_frequency",
   "inventory_sync",
   "enable_inventory_sync",
-  "inventory_sync_frequency"
+  "inventory_sync_frequency",
+  "thêm_danh_mục_theo_tiêu_chuẩn_phân_phối_việt_nam_section",
+  "auto_add_category"
  ],
  "fields": [
   {
@@ -116,6 +118,16 @@
    "fieldtype": "Select",
    "label": "T\u1ea7n su\u1ea5t \u0111\u1ed3ng b\u1ed9 t\u1ed3n kho (ph\u00fat)",
    "options": "5\n10\n15\n30\n60"
+  },
+  {
+   "fieldname": "th\u00eam_danh_m\u1ee5c_theo_ti\u00eau_chu\u1ea9n_ph\u00e2n_ph\u1ed1i_vi\u1ec7t_nam_section",
+   "fieldtype": "Section Break",
+   "label": "Th\u00eam danh m\u1ee5c theo ti\u00eau chu\u1ea9n ph\u00e2n ph\u1ed1i Vi\u1ec7t Nam"
+  },
+  {
+   "fieldname": "auto_add_category",
+   "fieldtype": "Button",
+   "label": "T\u1ef1 \u0111\u1ed9ng th\u00eam danh m\u1ee5c"
   }
  ],
  "index_web_pages_for_search": 1,
