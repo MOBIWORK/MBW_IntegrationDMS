@@ -12,8 +12,17 @@ frappe.ui.form.on("MBW Integration Settings", {
                     fieldname: 'confirmation',
                     fieldtype: 'HTML',
                     options: '<p>Dữ liệu hiện tại của các Doctype: </p>' +
-                        '<p>Brand, Industry Type, UOM, ' +
-                        'Customer Type, DMS Customer Group, Territory, Channel, Warehouse, Supplier</p>' +
+                        '<ul>'+
+                        '<li>Nhãn hiệu (Brand)</li>' +
+                        '<li>Ngành hàng (Industry Type)</li>' +
+                        '<li>Đơn vị tính (UOM)</li>' +
+                        '<li>Loại khách hàng (Customer Type)</li>' +
+                        '<li>Nhóm khách hàng (DMS Customer Group)</li>' +
+                        '<li>Khu vực (Territory)</li>' +
+                        '<li>Kênh (Channel)</li>' +
+                        '<li>Kho (Warehouse)</li>' +
+                        '<li>Nhà cung cấp (Supplier)</li>' +
+                        '</ul>'+
                         '<p>Sẽ bị <b>Thay Thế</b> bởi dữ liệu mẫu theo tiêu chuẩn phân phối Việt Nam. </p>' +
 						'<p>Bạn có muốn tiếp tục thực hiện?</p>'
                 }
