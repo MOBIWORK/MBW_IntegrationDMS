@@ -66,6 +66,7 @@ def create_employee_and_sales_person(**kwargs):
                         "doctype": "Sales Person",
                         "sales_person_name": employee.employee_name,
                         "employee": employee.name,
+                        "email": email,
                         "parent_sales_person": "",
                         "enabled": 1
                     })
