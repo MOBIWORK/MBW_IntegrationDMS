@@ -141,12 +141,16 @@ def import_master_data():
                     element['name'] = d["Mã"]
                     element['warehouse_name'] = d["Tên"]
                     element['parent_warehouse'] = "All Warehouses - M"
+                    element['lft'] = 12
+                    element['rgt'] = 12
+                    doc_all = frappe.get_doc("Warehouse", "All Warehouses - M").as_dict()
+                    element['company'] = doc_all.company
                     try:
                         frappe.db.sql("""
                                     INSERT INTO `tabWarehouse` (`name`, `warehouse_name`,`parent_warehouse`, `owner`, `creation`, `modified`, 
-                                    `modified_by`, `docstatus`, `is_sync`)
+                                    `modified_by`, `docstatus`, `is_sync`, `lft`, `rgt`, `company`)
                                     VALUES (%(name)s, %(warehouse_name)s,  %(parent_warehouse)s, %(owner)s, %(creation)s, %(modified)s, 
-                                    %(modified_by)s, %(docstatus)s, %(is_sync)s)
+                                    %(modified_by)s, %(docstatus)s, %(is_sync)s, %(lft)s, %(rgt)s, %(company)s)
                                 """, element)
                     except Exception as ex:
                         frappe.log_error(f"Error inserting warehouse {d}: {ex}")
@@ -155,12 +159,14 @@ def import_master_data():
                     element['territory_name'] = d["Tên"]
                     element['parent_territory'] = d["Mã cha"]
                     element["is_group"] = d["is_group"] if "is_group" in d else 0
+                    element['lft'] = 12
+                    element['rgt'] = 12
                     try:
                         frappe.db.sql("""
                                     INSERT INTO `tabTerritory` (`name`, `territory_name`,`parent_territory`, `owner`, `creation`, `modified`, 
-                                    `modified_by`, `docstatus`, `is_sync`,`is_group`)
+                                    `modified_by`, `docstatus`, `is_sync`,`is_group`, `lft`, `rgt`)
                                     VALUES (%(name)s, %(territory_name)s,  %(parent_territory)s, %(owner)s, %(creation)s, %(modified)s, 
-                                    %(modified_by)s, %(docstatus)s, %(is_sync)s, %(is_group)s)
+                                    %(modified_by)s, %(docstatus)s, %(is_sync)s, %(is_group)s, %(lft)s, %(rgt)s)
                                 """, element)
                     except Exception as ex:
                         frappe.log_error(f"Error inserting Territory {d}: {ex}")
@@ -180,5 +186,7 @@ def import_master_data():
                                 """, element)
                     except Exception as ex:
                         frappe.log_error(f"Error inserting Territory {d}: {ex}")
+    frappe.utils.nestedset.rebuild_tree("Warehouse")
+    frappe.utils.nestedset.rebuild_tree('Territory')
     frappe.db.commit()
     return True
