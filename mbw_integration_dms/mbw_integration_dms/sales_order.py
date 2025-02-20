@@ -25,8 +25,12 @@ def create_sale_order(data=None, **kwargs):
     id_log_dms = kwargs.get("id_log", None)
 
     try:
+        cus_name = None
         customer_code_dms = kwargs.get("customer")
         customer_name = frappe.get_value("Customer", {"customer_code_dms": customer_code_dms}, "name")
+        customer_data = kwargs.get("customer_data", {})
+        if customer_data:
+            cus_name = customer_data.get("customer_name")
 
         # Ghi log bắt đầu xử lý đơn hàng
         create_dms_log(
@@ -40,7 +44,6 @@ def create_sale_order(data=None, **kwargs):
         existing_customer = frappe.db.exists("Customer", {"customer_code_dms": customer_code_dms})
 
         if not existing_customer:
-            customer_data = kwargs.get("customer_data", {})
             if not customer_data:
                 frappe.throw(f"Khách hàng {customer_code_dms} chưa tồn tại và không có dữ liệu để tạo mới.")
 
@@ -58,10 +61,9 @@ def create_sale_order(data=None, **kwargs):
         promotions = kwargs.get("promotion_dms", [])
 
         user_mail = kwargs.get("email_employee")
-        user_name = frappe.get_value("Employee", {"company_email": user_mail}, "name")
-        sales_person = frappe.get_value("Sales Person", {"employee": user_name}, "name")
+        sales_person = frappe.get_value("Sales Person", {"email": user_mail}, "name")
 
-        new_order.customer = validate_not_none(customer_name)
+        new_order.customer = validate_not_none(customer_name) if customer_name else validate_not_none(cus_name)
         new_order.dms_so_code = kwargs.get("dms_so_code")
         new_order.delivery_date = validate_date(kwargs.get("delivery_date") / 1000)
         new_order.set_warehouse = validate_not_none(kwargs.get("set_warehouse"))
