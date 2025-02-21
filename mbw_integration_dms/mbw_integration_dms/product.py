@@ -188,8 +188,9 @@ def delete_product(doc, method):
 def check_uom_dms(doc, method):
     if doc.is_sale_dms:
         uoms_item = doc.uoms
-
-        for i in uoms_item:
-            uom_detail = frappe.get_value("UOM", {"name": i.uom}, "is_sale_dms")
-            if uom_detail == 0:
-                frappe.throw(f"Đơn vị tính {i.uom} không phải đơn vị bên DMS. Vui lòng chọn đơn vị tính của DMS để đồng bộ")
+        
+        if uoms_item:
+            for i in uoms_item:
+                uom_detail = frappe.get_value("UOM", {"name": i.uom}, "is_sale_dms")
+                if uom_detail == 0:
+                    frappe.throw(f"Đơn vị tính {i.uom} không phải đơn vị bên DMS. Vui lòng chọn đơn vị tính của DMS để đồng bộ")
