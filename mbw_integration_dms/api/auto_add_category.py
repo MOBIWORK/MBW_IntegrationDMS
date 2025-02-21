@@ -28,16 +28,16 @@ def import_master_data():
                 frappe.db.commit()
             except Exception as ex:
                 return False
-        elif category == "Warehouse":
-            try:
-                frappe.db.sql("""
-                        DELETE FROM `tabWarehouse`
-                        WHERE name != 'All Warehouses - M'
-                    """)
-                frappe.db.commit()
-            except Exception as ex:
-                frappe.log_error(f"Error deleting warehouses: {ex}")
-                return False
+        # elif category == "Warehouse":
+        #     try:
+        #         frappe.db.sql("""
+        #                 DELETE FROM `tabWarehouse`
+        #                 WHERE name != 'All Warehouses - M'
+        #             """)
+        #         frappe.db.commit()
+        #     except Exception as ex:
+        #         frappe.log_error(f"Error deleting warehouses: {ex}")
+        #         return False
         elif category == "Territory":
             try:
                 frappe.db.sql("""
