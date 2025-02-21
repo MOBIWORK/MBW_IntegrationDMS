@@ -306,7 +306,7 @@ def sync_customer_group_job(*args, **kwargs):
 
         # Gửi dữ liệu qua API DMS
         response, success = dms_client.request(
-            endpoint="/CategorySync",
+            endpoint="/PublicAPI/CategorySync",
             method="POST",
             body=request_payload
         )
