@@ -34,7 +34,7 @@ def sync_customer_job(*args, **kwargs):
         customers = frappe.get_all(
             "Customer",
             filters={"is_sync": False, "is_sales_dms": True},
-            fileds=["customer_code_dms", "customer_name", "is_sales_dms", "email_id", "mobile_no", "tax_id", "customer_group",
+            fields=["customer_code_dms", "customer_name", "is_sales_dms", "email_id", "mobile_no", "tax_id", "customer_group",
                     "dms_customer_type", "sfa_sale_channel", "territory", "customer_primary_contact", "customer_primary_address"]
         )
 
