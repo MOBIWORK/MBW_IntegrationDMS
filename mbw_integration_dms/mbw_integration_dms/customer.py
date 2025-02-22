@@ -26,6 +26,7 @@ def sync_customer():
     frappe.enqueue("mbw_integration_dms.mbw_integration_dms.customer.sync_customer_job", queue="long", timeout=300, key=KEY_REALTIME["key_realtime_customer"])
     return {"message": "Customer Sync job has been queued."}
 
+@frappe.whitelist(allow_guest=True)
 def sync_customer_job(*args, **kwargs):
     try:
         create_dms_log(status="Queued", message="Customer sync job started.")
@@ -405,7 +406,7 @@ def create_customers(**kwargs):
 
                 # Tạo mới khách hàng
                 new_customer = frappe.new_doc("Customer")
-                required_fields = [ "customer_name", "customer_code_dms"]
+                required_fields = ["customer_name", "customer_code_dms"]
                 normal_fields = [
                     "customer_details", "website", "customer_group", "territory", 
                     "dms_customer_type", "sfa_sale_channel", "mobile_no", "tax_id", 
@@ -427,6 +428,7 @@ def create_customers(**kwargs):
                         customer_type = validate_choice(configs.customer_type)(value)
                         new_customer.set(key, customer_type)
 
+                new_customer.is_sync = 1
                 new_customer.insert()
 
                 # Xử lý địa chỉ khách hàng
