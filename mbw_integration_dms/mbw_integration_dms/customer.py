@@ -79,7 +79,7 @@ def sync_customer_job(*args, **kwargs):
         )
 
         # Gửi dữ liệu qua API DMS
-        response = dms_client.request(
+        response, success = dms_client.request(
             endpoint="/PublicAPI/CustomerSync",
             method="POST",
             body=request_payload
@@ -88,7 +88,7 @@ def sync_customer_job(*args, **kwargs):
         # Nếu thành công, cập nhật is_sync = True
         if response.get("status"):
             for i in customers:
-                frappe.db.set_value("Customer", {"customer_code": i["customer_code"]}, "is_sync", True)
+                frappe.db.set_value("Customer", {"customer_code_dms": i["customer_code_dms"]}, "is_sync", True)
             frappe.db.commit()
 
             create_dms_log(
@@ -314,7 +314,7 @@ def sync_customer_group_job(*args, **kwargs):
         # Nếu thành công, cập nhật is_sync = True
         if response.get("status"):
             for ct in customer_groups:
-                frappe.db.set_value("DMS Customer Group", {"customer_groupct": ["customer_group"]}, "is_sync", True)
+                frappe.db.set_value("DMS Customer Group", {"customer_group": ["customer_group"]}, "is_sync", True)
             frappe.db.commit()
 
             create_dms_log(
