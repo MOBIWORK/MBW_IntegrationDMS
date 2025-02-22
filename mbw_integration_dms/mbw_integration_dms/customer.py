@@ -26,7 +26,6 @@ def sync_customer():
     frappe.enqueue("mbw_integration_dms.mbw_integration_dms.customer.sync_customer_job", queue="long", timeout=300, key=KEY_REALTIME["key_realtime_customer"])
     return {"message": "Customer Sync job has been queued."}
 
-@frappe.whitelist(allow_guest=True)
 def sync_customer_job(*args, **kwargs):
     try:
         create_dms_log(status="Queued", message="Customer sync job started.")
@@ -263,6 +262,7 @@ def sync_customer_group():
     frappe.enqueue("mbw_integration_dms.mbw_integration_dms.customer.sync_customer_group_job", queue="long", timeout=300, key=KEY_REALTIME["key_realtime_categories"])
     return {"message": "Customer Group Sync job has been queued."}
 
+@frappe.whitelist(allow_guest=True)
 def sync_customer_group_job(*args, **kwargs):
     try:
         create_dms_log(status="Queued", message="Customer Type sync job started.")
@@ -315,7 +315,7 @@ def sync_customer_group_job(*args, **kwargs):
         # Nếu thành công, cập nhật is_sync = True
         if response.get("status"):
             for ct in customer_groups:
-                frappe.db.set_value("DMS Customer Group", {"customer_group": ["customer_group"]}, "is_sync", True)
+                frappe.db.set_value("DMS Customer Group", {"customer_group": ct["customer_group"]}, "is_sync", True)
             frappe.db.commit()
 
             create_dms_log(

@@ -20,8 +20,8 @@ def sync_warehouse_job(*args, **kwargs):
         # Lấy danh sách warehouse chưa đồng bộ
         warehouses = frappe.get_all(
             "Warehouse",
-            filters={"is_sync": False},
-            fields=["warehouse_name", "name", "disabled", "is_sync"]
+            filters={"is_sync": False, "is_sale_dms": True, "disabled": False},
+            fields=["warehouse_name", "name", "is_sync"]
         )
 
         if not warehouses:
@@ -36,7 +36,7 @@ def sync_warehouse_job(*args, **kwargs):
             {
                 "code": ct["name"],  # Mã danh mục
                 "name": ct["warehouse_name"],  # Tên danh mục
-                "isActive": ct["disabled"]  # Trạng thái danh mục
+                "isActive": 1  # Trạng thái danh mục
             }
             for ct in warehouses
         ]

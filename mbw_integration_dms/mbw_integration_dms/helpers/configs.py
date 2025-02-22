@@ -19,3 +19,8 @@ status_order = {
     "Cancelled": "Đã hủy",
     "All": ""
 }
+
+gender = {
+    "Male": "Male",
+    "Female": "Female"
+}
