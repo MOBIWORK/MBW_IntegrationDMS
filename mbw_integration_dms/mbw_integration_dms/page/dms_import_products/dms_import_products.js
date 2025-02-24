@@ -339,6 +339,7 @@ ProductImporter = class {
 					frappe.realtime.off("dms.key.sync.all.products");
 					this.toggleSyncAllButton(false);
 					this.fetchProductCount();
+					this.fetchdmsProducts();
 					this.syncRunning = false;
 				}
 			}
@@ -715,6 +716,7 @@ CategoryImporter = class {
 					frappe.realtime.off("dms.key.sync.all.categories");
 					this.toggleSyncAllButton(false);
 					this.fetchCategoryCount();
+					this.fetchdmsCategories();
 					this.syncRunning = false;
 				}
 			}
@@ -1088,7 +1090,8 @@ CustomerImporter = class {
 				if (done) {
 					frappe.realtime.off("dms.key.sync.all.customers");
 					this.toggleSyncAllButton(false);
-					this.fetchCategoryCount();
+					this.fetchCustomerCount();
+					this.fetchdmsCustomers();
 					this.syncRunning = false;
 				}
 			}
