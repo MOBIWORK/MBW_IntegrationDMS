@@ -35,7 +35,7 @@ def sync_unit_job(*args, **kwargs):
         formatted_data = [
             {
                 "code": ct["name"],  # Mã danh mục
-                "name": ct["unit_name"],  # Tên danh mục
+                "name": ct["uom_name"],  # Tên danh mục
                 "isActive": ct["enabled"]  # Trạng thái danh mục
             }
             for ct in units

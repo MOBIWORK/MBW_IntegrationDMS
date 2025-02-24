@@ -34,7 +34,7 @@ def sync_customer_job(*args, **kwargs):
         customers = frappe.get_all(
             "Customer",
             filters={"is_sync": False, "is_sales_dms": True},
-            fileds=["customer_code_dms", "customer_name", "is_sales_dms", "email_id", "mobile_no", "tax_id", "customer_group",
+            fields=["customer_code_dms", "customer_name", "is_sales_dms", "email_id", "mobile_no", "tax_id", "customer_group",
                     "dms_customer_type", "sfa_sale_channel", "territory", "customer_primary_contact", "customer_primary_address"]
         )
 
@@ -79,7 +79,7 @@ def sync_customer_job(*args, **kwargs):
         )
 
         # Gửi dữ liệu qua API DMS
-        response = dms_client.request(
+        response, success = dms_client.request(
             endpoint="/PublicAPI/CustomerSync",
             method="POST",
             body=request_payload
@@ -88,7 +88,7 @@ def sync_customer_job(*args, **kwargs):
         # Nếu thành công, cập nhật is_sync = True
         if response.get("status"):
             for i in customers:
-                frappe.db.set_value("Customer", {"customer_code": i["customer_code"]}, "is_sync", True)
+                frappe.db.set_value("Customer", {"customer_code_dms": i["customer_code_dms"]}, "is_sync", True)
             frappe.db.commit()
 
             create_dms_log(
@@ -262,6 +262,7 @@ def sync_customer_group():
     frappe.enqueue("mbw_integration_dms.mbw_integration_dms.customer.sync_customer_group_job", queue="long", timeout=300, key=KEY_REALTIME["key_realtime_categories"])
     return {"message": "Customer Group Sync job has been queued."}
 
+@frappe.whitelist(allow_guest=True)
 def sync_customer_group_job(*args, **kwargs):
     try:
         create_dms_log(status="Queued", message="Customer Type sync job started.")
@@ -306,7 +307,7 @@ def sync_customer_group_job(*args, **kwargs):
 
         # Gửi dữ liệu qua API DMS
         response, success = dms_client.request(
-            endpoint="/CategorySync",
+            endpoint="/PublicAPI/CategorySync",
             method="POST",
             body=request_payload
         )
@@ -314,7 +315,7 @@ def sync_customer_group_job(*args, **kwargs):
         # Nếu thành công, cập nhật is_sync = True
         if response.get("status"):
             for ct in customer_groups:
-                frappe.db.set_value("DMS Customer Group", {"customer_groupct": ["customer_group"]}, "is_sync", True)
+                frappe.db.set_value("DMS Customer Group", {"customer_group": ct["customer_group"]}, "is_sync", True)
             frappe.db.commit()
 
             create_dms_log(
@@ -405,7 +406,7 @@ def create_customers(**kwargs):
 
                 # Tạo mới khách hàng
                 new_customer = frappe.new_doc("Customer")
-                required_fields = [ "customer_name", "customer_code_dms"]
+                required_fields = ["customer_name", "customer_code_dms"]
                 normal_fields = [
                     "customer_details", "website", "customer_group", "territory", 
                     "dms_customer_type", "sfa_sale_channel", "mobile_no", "tax_id", 
@@ -427,6 +428,7 @@ def create_customers(**kwargs):
                         customer_type = validate_choice(configs.customer_type)(value)
                         new_customer.set(key, customer_type)
 
+                new_customer.is_sync = 1
                 new_customer.insert()
 
                 # Xử lý địa chỉ khách hàng

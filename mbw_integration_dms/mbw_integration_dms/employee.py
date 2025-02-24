@@ -9,8 +9,10 @@ from mbw_integration_dms.mbw_integration_dms.helpers.helpers import (
 )
 from mbw_integration_dms.mbw_integration_dms.helpers.validators import (
     validate_not_none,
-    validate_date
+    validate_date,
+    validate_choice
 )
+from mbw_integration_dms.mbw_integration_dms.helpers import configs
 
 @frappe.whitelist()
 def create_employee_and_sales_person(**kwargs):
@@ -18,8 +20,9 @@ def create_employee_and_sales_person(**kwargs):
     try:
         request_data = kwargs.get("data", {})
         employee_list = request_data.get("employees", [])  # Danh sách nhân viên
-        id_log_dms = request_data.get("id_log", "")  # ID log
+        id_log_dms = request_data.get("id_log", "")  # ID log chung
         results = []  # Danh sách kết quả trả về
+        failed_records = []  # Danh sách lỗi
 
         # Ghi log bắt đầu request
         create_dms_log(
@@ -30,6 +33,7 @@ def create_employee_and_sales_person(**kwargs):
 
         for employee_data in employee_list:
             email = employee_data.get("email")
+            gender_data = employee_data.get("gender")
 
             try:
                 # Kiểm tra nếu Employee đã tồn tại theo company_email
@@ -40,20 +44,18 @@ def create_employee_and_sales_person(**kwargs):
                     employee = frappe.get_doc("Employee", existing_employee[0]["name"])
                     employee.first_name = validate_not_none(employee_data.get("employee_name"), "Employee Name")
                     employee.date_of_birth = validate_date(float(employee_data.get("date_of_birth")) / 1000)
-                    employee.gender = validate_not_none(employee_data.get("gender"), "Gender")
+                    employee.gender = validate_choice(configs.gender)(gender_data)
                     employee.status = "Active"
                     employee.save(ignore_permissions=True)
                     is_new = False
-
-                    # Không tạo mới Sales Person nếu Employee đã tồn tại
-                    sales_person_name = None
+                    sales_person_name = None  # Không tạo mới Sales Person
                 else:
                     # Nếu không tồn tại, tạo mới Employee
                     employee = frappe.get_doc({
                         "doctype": "Employee",
                         "first_name": validate_not_none(employee_data.get("employee_name")),
                         "date_of_birth": validate_date(float(employee_data.get("date_of_birth")) / 1000),
-                        "gender": validate_not_none(employee_data.get("gender")),
+                        "gender": validate_choice(configs.gender)(gender_data),
                         "company_email": email,
                         "date_of_joining": nowdate(),
                         "status": "Active"
@@ -82,46 +84,57 @@ def create_employee_and_sales_person(**kwargs):
                 })
 
             except Exception as e:
-                # Ghi log lỗi nếu có lỗi khi tạo hoặc cập nhật Employee
-                create_dms_log(
-                    status="Failed",
-                    request_data=employee_data,
-                    exception=e,
-                    rollback=True,
-                    message="Error occurred while processing Employee and Sales Person"
-                )
-
-                if id_log_dms:
-                    create_partner_log(
-                        id_log_dms=id_log_dms,
-                        status=True,
-                        title="Error occurred while processing Employee and Sales Person.",
-                        message="Error occurred while processing Employee and Sales Person."
-                    )
-
-                results.append({
+                failed_records.append({
                     "status": "error",
                     "message": str(e),
                     "employee_data": employee_data
                 })
 
-        # Ghi log kết thúc request
-        create_dms_log(
-            status="Completed",
-            request_data=kwargs,
-            response_data=results,
-            message="Finished processing Employee and Sales Person"
-        )
-
-        if id_log_dms:
-            create_partner_log(
-                id_log_dms=id_log_dms,
-                status=True,
-                title="Employee processing completed.",
-                message="Employee creation and updates have been processed."
+        # Ghi log kết thúc request (chỉ log thành công hoặc thất bại)
+        if failed_records:
+            create_dms_log(
+                status="Failed",
+                request_data=kwargs,
+                response_data=failed_records,
+                message="Some Employees failed to process"
             )
 
-        return results
+            if id_log_dms:
+                create_partner_log(
+                    id_log_dms=id_log_dms,
+                    status=False,
+                    title="Some Employee creations failed.",
+                    message="Some Employees could not be processed."
+                )
+
+            return failed_records
+
+        else:
+            create_dms_log(
+                status="Completed",
+                request_data=kwargs,
+                response_data=results,
+                message="Finished processing Employee and Sales Person"
+            )
+
+            if id_log_dms:
+                create_partner_log(
+                    id_log_dms=id_log_dms,
+                    status=True,
+                    title="Employee processing completed.",
+                    message="Employee creation and updates have been processed."
+                )
+
+            return results
 
     except Exception as e:
+        # Ghi log thất bại toàn bộ request nếu có lỗi lớn
+        create_dms_log(
+            status="Error",
+            request_data=kwargs,
+            exception=e,
+            rollback=True,
+            message="Critical error occurred while processing Employee and Sales Person"
+        )
+
         frappe.throw(f"Lỗi xử lý danh sách nhân viên: {str(e)}")
