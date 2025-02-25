@@ -105,32 +105,32 @@ def update_dms_order_status(doc):
     except Exception as e:
         frappe.logger().error(f"Failed to update DMS order for SO {doc.name}: {str(e)}")
 
-def on_sales_order_update(doc, event):
+def on_sales_order_update(doc, method):
     """Kiểm tra nếu trạng thái thay đổi thành 'Delivered' thì gọi API cập nhật DMS."""
 
-    if "status" in doc.get_dirty_fields() and doc.status == "Delivered" :
+    if doc.is_sale_dms and doc.get("status") != doc.get_db_value("status") and doc.status == "Delivered":
         update_dms_order_status(doc)
 
-def update_stt_so_cancel(doc):
+def update_stt_so_cancel(doc, method):
     dms_client = DMSApiClient()
-    
-    payload = {
-        "id": doc.dms_so_id,
-        "ma_don": doc.name,
-        "orgid": dms_client.orgid,
-        "status": "Từ chối",
-    }
+    if doc.is_sale_dms:
+        payload = {
+            "id": doc.dms_so_id,
+            "ma_don": doc.name,
+            "orgid": dms_client.orgid,
+            "status": "Từ chối",
+        }
 
-    try:
-        response = dms_client.request(
-            endpoint="/PublicAPI/postOrderStatus",
-            method="POST",
-            body=payload
-        )
-        return response.json()
+        try:
+            response = dms_client.request(
+                endpoint="/PublicAPI/postOrderStatus",
+                method="POST",
+                body=payload
+            )
+            return response.json()
 
-    except Exception as e:
-        frappe.logger().error(f"Failed to update DMS order for SO {doc.name}: {str(e)}")
+        except Exception as e:
+            frappe.logger().error(f"Failed to update DMS order for SO {doc.name}: {str(e)}")
 
 
 def publish(key, message, synced=False, error=False, done=False, br=True):
