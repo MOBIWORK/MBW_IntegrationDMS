@@ -1,0 +1,67 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2025-02-27 11:06:10.502763",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "dms_timesheets",
+  "employee",
+  "month",
+  "year",
+  "timesheets_detail"
+ ],
+ "fields": [
+  {
+   "fieldname": "dms_timesheets",
+   "fieldtype": "Data",
+   "label": "DMS timesheets"
+  },
+  {
+   "fieldname": "employee",
+   "fieldtype": "Link",
+   "label": "Employee",
+   "options": "Sales Person"
+  },
+  {
+   "fieldname": "month",
+   "fieldtype": "Int",
+   "label": "Month"
+  },
+  {
+   "fieldname": "year",
+   "fieldtype": "Int",
+   "label": "Year"
+  },
+  {
+   "fieldname": "timesheets_detail",
+   "fieldtype": "Table",
+   "label": "Timesheets detail",
+   "options": "Employee timesheets detail"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2025-02-27 16:33:44.435744",
+ "modified_by": "Administrator",
+ "module": "MBW Integration DMS",
+ "name": "DMS Timesheets",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

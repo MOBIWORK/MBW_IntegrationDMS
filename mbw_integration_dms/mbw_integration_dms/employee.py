@@ -104,7 +104,7 @@ def create_employee_and_sales_person(**kwargs):
                     id_log_dms=id_log_dms,
                     status=False,
                     title="Some Employee creations failed.",
-                    message="Some Employees could not be processed."
+                    message=f"Some Employees could not be processed: {failed_records[0]["message"]}."
                 )
 
             return failed_records

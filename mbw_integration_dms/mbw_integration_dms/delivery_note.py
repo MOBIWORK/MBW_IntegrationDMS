@@ -48,7 +48,7 @@ def create_delivery_note(doc, method):
         )
 
         # Gửi dữ liệu qua API DMS
-        response = dms_client.request(
+        response, success = dms_client.request(
             endpoint="/PublicAPI/sync_postWarehouse",
             method="POST",
             body=request_payload

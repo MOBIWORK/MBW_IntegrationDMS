@@ -48,7 +48,7 @@ def create_sale_invoice(doc, method):
         )
 
         # Gửi dữ liệu qua API DMS
-        response = dms_client.request(
+        response, success = dms_client.request(
             endpoint="/PublicAPI/sync_postSale",
             method="POST",
             body=request_payload

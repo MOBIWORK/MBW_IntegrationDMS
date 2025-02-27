@@ -21,6 +21,6 @@ status_order = {
 }
 
 gender = {
-    "Male": "Male",
-    "Female": "Female"
+    "Nam": "Male",
+    "Nữ": "Female"
 }

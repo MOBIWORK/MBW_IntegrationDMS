@@ -6,7 +6,6 @@ from frappe.utils import get_datetime
 def get_projected_qty(item_code=None, last_updated=None):
     """
     Lấy số lượng dự báo (Projected Qty) của item trong tất cả các kho hợp lệ.
-    
     - Nếu truyền `item_code`, lấy dữ liệu của item đó.
     - Nếu không truyền `item_code`, lấy tất cả items.
     - Nếu truyền `last_updated`, chỉ lấy dữ liệu từ thời gian đó trở đi.
@@ -30,21 +29,23 @@ def get_projected_qty(item_code=None, last_updated=None):
 
     # Lấy số lượng projected_qty từ bảng Bin, chỉ lấy dữ liệu thuộc kho hợp lệ
     bins = frappe.get_all(
-        "Bin", 
-        filters=filters, 
+        "Bin",
+        filters=filters,
         fields=["item_code", "warehouse", "projected_qty", "stock_uom", "modified"]
     )
 
-    # Tạo dictionary kết quả, chỉ lưu các warehouses hợp lệ
+    # Tạo dictionary kết quả, nhóm theo item_code
     result = {}
     for bin in bins:
+        item_code = bin["item_code"]
         warehouse = bin["warehouse"]
+
         if warehouse in valid_warehouses:
-            if warehouse not in result:
-                result[warehouse] = []
+            if item_code not in result:
+                result[item_code] = []
             
-            result[warehouse].append({
-                "item_code": bin["item_code"],
+            result[item_code].append({
+                "warehouse": warehouse,
                 "projected_qty": int(bin["projected_qty"]) if int(bin["projected_qty"] > 0) else 0,
                 "uom": bin["stock_uom"],
                 "last_updated": bin["modified"]
