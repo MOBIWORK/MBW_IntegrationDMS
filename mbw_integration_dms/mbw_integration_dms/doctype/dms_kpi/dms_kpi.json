@@ -5,9 +5,8 @@
  "doctype": "DocType",
  "engine": "InnoDB",
  "field_order": [
-  "id_dms",
-  "name_dms",
-  "parent_id_dms",
+  "month",
+  "year",
   "ten_nhom",
   "ma_nhom",
   "column_break_d6fz",
@@ -53,21 +52,6 @@
   "so_khach_hang_dat_hang_th"
  ],
  "fields": [
-  {
-   "fieldname": "id_dms",
-   "fieldtype": "Data",
-   "label": "ID DMS"
-  },
-  {
-   "fieldname": "name_dms",
-   "fieldtype": "Data",
-   "label": "Name DMS"
-  },
-  {
-   "fieldname": "parent_id_dms",
-   "fieldtype": "Data",
-   "label": "Parent ID DMS"
-  },
   {
    "fieldname": "column_break_d6fz",
    "fieldtype": "Column Break"
@@ -157,14 +141,14 @@
   },
   {
    "fieldname": "ma_nhan_vien",
-   "fieldtype": "Link",
-   "label": "M\u00e3 nh\u00e2n vi\u00ean",
-   "options": "Sales Person"
+   "fieldtype": "Data",
+   "label": "M\u00e3 nh\u00e2n vi\u00ean"
   },
   {
    "fieldname": "ten_nhan_vien",
-   "fieldtype": "Data",
-   "label": "T\u00ean nh\u00e2n vi\u00ean"
+   "fieldtype": "Link",
+   "label": "T\u00ean nh\u00e2n vi\u00ean",
+   "options": "Sales Person"
   },
   {
    "fieldname": "doanh_so",
@@ -269,7 +253,7 @@
   {
    "fieldname": "vt_khong_don_hang_ngoai_tuyen",
    "fieldtype": "Float",
-   "label": "vt kh\u00f4ng \u0111\u01a1n h\u00e0ng ngo\u1ea1i tuy\u1ebfn"
+   "label": "Vt kh\u00f4ng \u0111\u01a1n h\u00e0ng ngo\u1ea1i tuy\u1ebfn"
   },
   {
    "fieldname": "khach_hang_vt_duy_nhat",
@@ -280,11 +264,21 @@
    "fieldname": "so_khach_hang_dat_hang_th",
    "fieldtype": "Int",
    "label": "S\u1ed1 kh\u00e1ch h\u00e0ng \u0111\u1eb7t h\u00e0ng TH"
+  },
+  {
+   "fieldname": "month",
+   "fieldtype": "Int",
+   "label": "Th\u00e1ng"
+  },
+  {
+   "fieldname": "year",
+   "fieldtype": "Int",
+   "label": "N\u0103m"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-02-27 10:57:33.254854",
+ "modified": "2025-02-28 10:44:38.849428",
  "modified_by": "Administrator",
  "module": "MBW Integration DMS",
  "name": "DMS KPI",

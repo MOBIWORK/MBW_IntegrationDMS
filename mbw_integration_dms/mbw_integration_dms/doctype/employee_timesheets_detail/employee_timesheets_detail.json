@@ -6,6 +6,7 @@
  "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
+  "date",
   "gio_vao",
   "gio_ra",
   "tong_gio",
@@ -55,12 +56,17 @@
    "fieldname": "dia_chi_ra",
    "fieldtype": "Data",
    "label": "\u0110\u1ecba ch\u1ec9 ra"
+  },
+  {
+   "fieldname": "date",
+   "fieldtype": "Int",
+   "label": "Ng\u00e0y"
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2025-02-27 16:31:49.183464",
+ "modified": "2025-02-28 13:52:01.672557",
  "modified_by": "Administrator",
  "module": "MBW Integration DMS",
  "name": "Employee timesheets detail",

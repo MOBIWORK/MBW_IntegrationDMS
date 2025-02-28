@@ -5,22 +5,23 @@
  "doctype": "DocType",
  "engine": "InnoDB",
  "field_order": [
-  "dms_timesheets",
   "employee",
+  "employee_code",
+  "email",
   "month",
   "year",
-  "timesheets_detail"
+  "timesheets_detail",
+  "total_days",
+  "total_ls",
+  "total_lm",
+  "total_t",
+  "total_nc"
  ],
  "fields": [
   {
-   "fieldname": "dms_timesheets",
-   "fieldtype": "Data",
-   "label": "DMS timesheets"
-  },
-  {
    "fieldname": "employee",
    "fieldtype": "Link",
-   "label": "Employee",
+   "label": "Employee name",
    "options": "Sales Person"
   },
   {
@@ -38,11 +39,46 @@
    "fieldtype": "Table",
    "label": "Timesheets detail",
    "options": "Employee timesheets detail"
+  },
+  {
+   "fieldname": "email",
+   "fieldtype": "Data",
+   "label": "Email"
+  },
+  {
+   "fieldname": "total_days",
+   "fieldtype": "Int",
+   "label": "Total days"
+  },
+  {
+   "fieldname": "total_ls",
+   "fieldtype": "Float",
+   "label": "Total LS"
+  },
+  {
+   "fieldname": "total_lm",
+   "fieldtype": "Float",
+   "label": "Total LM"
+  },
+  {
+   "fieldname": "total_t",
+   "fieldtype": "Float",
+   "label": "Total T"
+  },
+  {
+   "fieldname": "total_nc",
+   "fieldtype": "Float",
+   "label": "Total NC"
+  },
+  {
+   "fieldname": "employee_code",
+   "fieldtype": "Data",
+   "label": "Employee code"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-02-27 16:33:44.435744",
+ "modified": "2025-02-28 11:45:00.379108",
  "modified_by": "Administrator",
  "module": "MBW Integration DMS",
  "name": "DMS Timesheets",

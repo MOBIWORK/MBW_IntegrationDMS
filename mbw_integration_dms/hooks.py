@@ -145,23 +145,17 @@ doc_events = {
 # Scheduled Tasks
 # ---------------
 
-# scheduler_events = {
-# 	"all": [
-# 		"mbw_integration_dms.tasks.all"
-# 	],
-# 	"daily": [
-# 		"mbw_integration_dms.tasks.daily"
-# 	],
-# 	"hourly": [
-# 		"mbw_integration_dms.tasks.hourly"
-# 	],
-# 	"weekly": [
-# 		"mbw_integration_dms.tasks.weekly"
-# 	],
-# 	"monthly": [
-# 		"mbw_integration_dms.tasks.monthly"
-# 	],
-# }
+scheduler_events = {
+    "cron": {
+        "*/2 * * * *": [
+            "mbw_integration_dms.mbw_integration_dms.timesheets.get_timesheet_dms",
+            "mbw_integration_dms.mbw_integration_dms.kpi.get_kpi_dms"
+        ],
+        # "0 */6 * * *": [
+        #     "mbw_integration_dms.mbw_integration_dms.kpi.get_kpi_dms"
+        # ]
+    }
+}
 
 # Testing
 # -------
