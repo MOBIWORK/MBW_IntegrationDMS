@@ -45,6 +45,7 @@ def get_kpi_dms(**kwargs):
             )
 
             data = {
+                "doctype": "DMS KPI",
                 "ten_nhom": i.get("ten_nhom"),
                 "ma_nhom": i.get("ma_nhom"),
                 "parent_id": i.get("parentID"),
@@ -93,7 +94,7 @@ def get_kpi_dms(**kwargs):
                 "so_khach_hang_dat_hang_th": i["TH"].get("so_kh_dat_hang", 0),
 
                 "month": month,
-                "year": year
+                "year": year,
             }
 
             if existing_kpi:

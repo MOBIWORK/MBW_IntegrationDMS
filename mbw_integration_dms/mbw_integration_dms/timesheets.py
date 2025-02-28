@@ -64,7 +64,7 @@ def get_timesheet_dms(**kwargs):
                 existing_kpi = frappe.db.exists(
                     "DMS Timesheets", 
                     {
-                        "employee_code": employee_code,
+                        "employee": employee_name,
                         "month": date.month,
                         "year": date.year
                     }
