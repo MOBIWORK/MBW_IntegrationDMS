@@ -24,6 +24,7 @@ def get_kpi_dms(**kwargs):
         create_dms_log(
             status="Processing",
             method="POST",
+            message="Sync KPI DMS",
             request_data=request_payload
         )
 
@@ -92,8 +93,7 @@ def get_kpi_dms(**kwargs):
                 "so_khach_hang_dat_hang_th": i["TH"].get("so_kh_dat_hang", 0),
 
                 "month": month,
-                "year": year,
-                "doctype": "DMS KPI"
+                "year": year
             }
 
             if existing_kpi:

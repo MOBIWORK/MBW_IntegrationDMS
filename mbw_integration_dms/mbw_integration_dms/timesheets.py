@@ -24,6 +24,7 @@ def get_timesheet_dms(**kwargs):
         create_dms_log(
             status="Processing",
             method="POST",
+            message="Sync Timesheets DMS",
             request_data=request_payload
         )
 

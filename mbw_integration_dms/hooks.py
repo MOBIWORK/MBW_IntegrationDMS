@@ -147,13 +147,10 @@ doc_events = {
 
 scheduler_events = {
     "cron": {
-        "*/2 * * * *": [
+        "0 */6 * * *": [
+            "mbw_integration_dms.mbw_integration_dms.kpi.get_kpi_dms",
             "mbw_integration_dms.mbw_integration_dms.timesheets.get_timesheet_dms",
-            "mbw_integration_dms.mbw_integration_dms.kpi.get_kpi_dms"
-        ],
-        # "0 */6 * * *": [
-        #     "mbw_integration_dms.mbw_integration_dms.kpi.get_kpi_dms"
-        # ]
+        ]
     }
 }
 
