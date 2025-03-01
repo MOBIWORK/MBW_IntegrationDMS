@@ -422,7 +422,7 @@ def create_customers(**kwargs):
                         required = validate_not_none(value)
                         new_customer.set(key, required)
                     elif key in date_fields:
-                        custom_birthday = validate_date(float(value)/1000)
+                        custom_birthday = validate_date(float(value) / 1000) if value is not None else None
                         new_customer.set(key, custom_birthday)
                     elif key in choice_fields:
                         customer_type = validate_choice(configs.customer_type)(value)
