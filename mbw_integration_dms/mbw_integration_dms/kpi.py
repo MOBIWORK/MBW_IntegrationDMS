@@ -99,6 +99,7 @@ def get_kpi_dms(**kwargs):
 
             if existing_kpi:
                 # Nếu đã tồn tại, cập nhật bản ghi
+                data.pop("doctype", None)  # Loại bỏ doctype nếu tồn tại
                 frappe.db.set_value("DMS KPI", existing_kpi, data)
             else:
                 # Nếu chưa tồn tại, tạo mới bản ghi
