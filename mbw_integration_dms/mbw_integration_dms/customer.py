@@ -352,13 +352,11 @@ def sync_customer_group_job(*args, **kwargs):
 def create_customers(**kwargs):
     results = []
     try:
-        customers = kwargs.get("data", [])
+        data = kwargs.get("data", {})
+        customer_list = data.get("customers", [])  # Danh sách nhân viên
+        id_log_dms = data.get("id_log", "")  # ID log chung
 
-        if not isinstance(customers, list):
-            frappe.throw("Dữ liệu đầu vào không hợp lệ. Phải là danh sách khách hàng.")
-
-        for customer_data in customers:
-            id_log_dms = customer_data.get("id_log", "")
+        for customer_data in customer_list:
             try:
                 customer_data = frappe._dict(customer_data)
                 customer_code_dms = customer_data.get("customer_code_dms")
@@ -495,7 +493,6 @@ def create_customers(**kwargs):
 
             except Exception as e:
                 error_message = f"Error creating/updating customer {customer_data.get('customer_code_dms')}: {str(e)}"
-                frappe.logger().error(error_message)
 
                 # Ghi log thất bại
                 create_dms_log(

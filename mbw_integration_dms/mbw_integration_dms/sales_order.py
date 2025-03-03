@@ -159,9 +159,3 @@ def create_sale_order(data=None, **kwargs):
             )
 
         return {"error": str(e)}
-
-
-def prevent_edit_dms_sales_order(doc, event):
-    """Chặn chỉnh sửa Sales Order nếu is_sale_dms = True"""
-    if doc.docstatus == 0 and doc.is_sale_dms:
-        frappe.throw(_("Bạn không thể chỉnh sửa đơn hàng từ DMS"))
