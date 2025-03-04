@@ -1,6 +1,7 @@
 {
  "actions": [],
  "allow_rename": 1,
+ "autoname": "field:customer_group",
  "creation": "2025-02-06 18:28:01.486701",
  "doctype": "DocType",
  "engine": "InnoDB",
@@ -13,7 +14,8 @@
   {
    "fieldname": "customer_group",
    "fieldtype": "Data",
-   "label": "Customer Group"
+   "label": "Customer Group",
+   "unique": 1
   },
   {
    "fieldname": "name_customer_group",
@@ -29,10 +31,11 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-02-06 18:29:11.585757",
+ "modified": "2025-03-04 12:02:17.130015",
  "modified_by": "Administrator",
  "module": "MBW Integration DMS",
  "name": "DMS Customer Group",
+ "naming_rule": "By fieldname",
  "owner": "Administrator",
  "permissions": [
   {
@@ -50,5 +53,6 @@
  ],
  "sort_field": "modified",
  "sort_order": "DESC",
- "states": []
+ "states": [],
+ "title_field": "customer_group"
 }

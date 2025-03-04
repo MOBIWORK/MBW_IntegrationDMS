@@ -88,14 +88,14 @@ def create_sale_order(data=None, **kwargs):
             frappe.throw("Danh sách sản phẩm (items) không hợp lệ hoặc trống.")
 
         for item_data in items:
-            discount_percentage = float(item_data.get("discount_amount", 0))
+            discount_amount = float(item_data.get("discount_amount", 0))
 
             new_order.append("items", {
                 "item_code": item_data.get("item_code"),
                 "qty": item_data.get("qty"),
                 "uom": item_data.get("uom"),
                 "rate": item_data.get("rate"),
-                "discount_amount": discount_percentage,
+                "discount_amount": discount_amount,
                 "additional_notes": item_data.get("additional_notes"),
                 "is_free_item": item_data.get("is_free_item")
             })

@@ -131,10 +131,12 @@ doc_events = {
         "on_trash": "mbw_integration_dms.mbw_integration_dms.customer.delete_customer"
     },
     "Sales Invoice": {
-        "on_submit": "mbw_integration_dms.mbw_integration_dms.sales_invoice.create_sale_invoice"
+        "on_submit": "mbw_integration_dms.mbw_integration_dms.sales_invoice.create_sale_invoice",
+        "before_insert": "mbw_integration_dms.mbw_integration_dms.sales_invoice.add_sales_order"
     },
     "Delivery Note": {
-        "on_submit": "mbw_integration_dms.mbw_integration_dms.delivery_note.create_delivery_note"
+        "on_submit": "mbw_integration_dms.mbw_integration_dms.delivery_note.create_delivery_note",
+        "before_insert": "mbw_integration_dms.mbw_integration_dms.delivery_note.add_sales_order"
     },
     "Sales Order": {
         "on_cancel": "mbw_integration_dms.mbw_integration_dms.helpers.helpers.update_stt_so_cancel",

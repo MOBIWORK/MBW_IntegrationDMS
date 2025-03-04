@@ -79,3 +79,16 @@ def create_sale_invoice(doc, method):
         )
         frappe.logger().error(f"Sync Error: {str(e)}")
         return {"error": str(e)}
+    
+
+def add_sales_order(doc, method):
+    items = doc.items
+    so_name = None
+
+    for i in items:
+        so_name = i.sales_order
+
+    if so_name:
+        doc.sales_order = so_name
+        so_id = frappe.get_value("Sales Order", so_name, "dms_so_id")
+        doc.id_dms = so_id

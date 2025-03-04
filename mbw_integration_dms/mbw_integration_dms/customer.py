@@ -34,7 +34,7 @@ def sync_customer_job(*args, **kwargs):
         customers = frappe.get_all(
             "Customer",
             filters={"is_sync": False, "is_sales_dms": True},
-            fields=["customer_code_dms", "customer_name", "is_sales_dms", "email_id", "mobile_no", "tax_id", "customer_group",
+            fields=["customer_code_dms", "customer_name", "is_sales_dms", "email_id", "mobile_no", "tax_id", "dms_customer_group",
                     "dms_customer_type", "sfa_sale_channel", "territory", "customer_primary_contact", "customer_primary_address"]
         )
 
@@ -53,7 +53,7 @@ def sync_customer_job(*args, **kwargs):
                 "trang_thai": True,
                 "email": i["email_id"],
                 "mst": i["tax_id"],
-                "nhom_khach_hang": i["customer_group"],
+                "nhom_khach_hang": i["dms_customer_group"],
                 "loai_khach_hang": i["dms_customer_type"],
                 "kenh": i["sfa_sale_channel"],
                 "khu_vuc": i["territory"],
@@ -406,7 +406,7 @@ def create_customers(**kwargs):
                 new_customer = frappe.new_doc("Customer")
                 required_fields = ["customer_name", "customer_code_dms"]
                 normal_fields = [
-                    "customer_details", "website", "customer_group", "territory", 
+                    "customer_details", "website", "dms_customer_group", "territory", 
                     "dms_customer_type", "sfa_sale_channel", "mobile_no", "tax_id", 
                     "email_id", "is_sales_dms"
                 ]
@@ -552,7 +552,7 @@ def update_customer(**kwargs):
 
         # Cập nhật các trường cơ bản của khách hàng
         fields = [
-            "customer_name", "customer_group", "territory",
+            "customer_name", "dms_customer_group", "territory",
             "website", "customer_type", "dms_customer_type", "sfa_sale_channel",
             "customer_code_dms", "tax_id", "email_id", "mobile_no"
         ]
