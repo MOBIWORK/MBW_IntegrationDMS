@@ -49,10 +49,7 @@ def create_sale_order(data=None, **kwargs):
 
             # Gọi hàm tạo khách hàng
             customers_list = [customer_data]
-            create_customer_result = create_customers(data={"customers": customers_list})
-
-            if create_customer_result.get("results", [{}])[0].get("status") != "Success":
-                frappe.throw(f"Không thể tạo khách hàng {customer_code_dms}: {create_customer_result}")
+            create_customers(data={"customers": customers_list})
 
         new_order = frappe.new_doc("Sales Order")
 

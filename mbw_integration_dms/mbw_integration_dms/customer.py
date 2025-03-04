@@ -370,7 +370,7 @@ def create_customers(**kwargs):
 
                     create_dms_log(
                         status="Updated",
-                        request_data=customer_data,
+                        request_data=data,
                         response_data=update_result,
                         message=f"Customer {customer_code_dms} updated successfully."
                     )
@@ -398,7 +398,7 @@ def create_customers(**kwargs):
                 create_dms_log(
                     status="Processing",
                     method="POST",
-                    request_data=customer_data,
+                    request_data=data,
                     message=f"Creating customer {customer_data.get('customer_name')}"
                 )
 
@@ -497,7 +497,7 @@ def create_customers(**kwargs):
                 # Ghi log thất bại
                 create_dms_log(
                     status="Failed",
-                    request_data=customer_data,
+                    request_data=data,
                     message=error_message
                 )
                 

@@ -59,10 +59,10 @@ def store_request_data() -> None:
 
 def process_request(data, event):
 	# Create log
-	log = create_dms_log(method=EVENT_MAPPER[event], request_data=data)
+    log = create_dms_log(method=EVENT_MAPPER[event], request_data=data) 
 
 	# Enqueue backround job
-	frappe.enqueue(
+    frappe.enqueue(
 		method=EVENT_MAPPER[event],
 		queue="short",
 		timeout=30,
