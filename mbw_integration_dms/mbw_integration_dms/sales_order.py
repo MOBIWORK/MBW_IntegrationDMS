@@ -48,7 +48,8 @@ def create_sale_order(data=None, **kwargs):
                 frappe.throw(f"Khách hàng {customer_code_dms} chưa tồn tại và không có dữ liệu để tạo mới.")
 
             # Gọi hàm tạo khách hàng
-            create_customer_result = create_customers(data=[customer_data])
+            customers_list = [customer_data]
+            create_customer_result = create_customers(data={"customers": customers_list})
 
             if create_customer_result.get("results", [{}])[0].get("status") != "Success":
                 frappe.throw(f"Không thể tạo khách hàng {customer_code_dms}: {create_customer_result}")
