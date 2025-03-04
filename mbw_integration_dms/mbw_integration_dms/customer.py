@@ -123,7 +123,7 @@ def sync_customer_job(*args, **kwargs):
 def delete_customer(doc, method):
     dms_client = DMSApiClient()
 
-    customer_codes = [doc.customer_code] if isinstance(doc, frappe.model.document.Document) else doc
+    customer_codes = [doc.customer_code_dms] if isinstance(doc, frappe.model.document.Document) else doc
 
     request_payload = {
         "orgid": dms_client.orgid,
@@ -535,20 +535,20 @@ def create_customers(**kwargs):
 @frappe.whitelist(methods="PUT")
 def update_customer(**kwargs):
     try:
-        name = kwargs.get("name")
+        customer_code_dms = kwargs.get("customer_code_dms")
 
         # Ghi log khi API bắt đầu chạy
         create_dms_log(
             status="Processing",
             method="PUT",
             request_data=kwargs,
-            message=f"Đang cập nhật khách hàng: {name}"
+            message=f"Đang cập nhật khách hàng: {customer_code_dms}"
         )
 
-        if not frappe.db.exists("Customer", name, cache=True):
-            frappe.throw(f"Không tồn tại khách hàng {name}")
+        if not frappe.db.exists("Customer", {"customer_code_dms": customer_code_dms}, cache=True):
+            frappe.throw(f"Không tồn tại khách hàng {customer_code_dms}")
 
-        customer = frappe.get_doc("Customer", name)
+        customer = frappe.get_doc("Customer", {"customer_code_dms": customer_code_dms})
 
         # Cập nhật các trường cơ bản của khách hàng
         fields = [
@@ -566,11 +566,11 @@ def update_customer(**kwargs):
 
         # Cập nhật hoặc thêm mới địa chỉ
         if kwargs.get("address"):
-            update_customer_addresses(customer, kwargs.get("address"), name)
+            update_customer_addresses(customer, kwargs.get("address"), customer.name)
 
         # Cập nhật hoặc thêm mới liên hệ
         if kwargs.get("contacts"):
-            update_customer_contacts(customer, kwargs.get("contacts"), name)
+            update_customer_contacts(customer, kwargs.get("contacts"), customer.name)
 
         customer.save()
 
@@ -578,7 +578,7 @@ def update_customer(**kwargs):
         create_dms_log(
             status="Success",
             response_data={"message": "Cập nhật thông tin khách hàng thành công"},
-            message=f"Khách hàng {name} đã được cập nhật thành công"
+            message=f"Khách hàng {customer.name} đã được cập nhật thành công"
         )
 
         return "Cập nhật thông tin khách hàng thành công"
@@ -588,9 +588,9 @@ def update_customer(**kwargs):
         create_dms_log(
             status="Error",
             request_data=kwargs,
-            message=f"Lỗi khi cập nhật khách hàng {name}: {str(e)}"
+            message=f"Lỗi khi cập nhật khách hàng {customer_code_dms}: {str(e)}"
         )
-        frappe.throw(f"Lỗi cập nhật khách hàng {name}: {str(e)}")
+        frappe.throw(f"Lỗi cập nhật khách hàng {customer_code_dms}: {str(e)}")
 
 
 def update_customer_addresses(customer, addresses, customer_name):

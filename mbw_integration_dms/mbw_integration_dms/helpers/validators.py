@@ -81,15 +81,18 @@ def validate_length(name="Giá trị", min=None, max=None):
 
 # Kiểm tra giá trị truyền lên có nằm trong các giá trị config không
 def validate_choice(choice):
+    mapping = None
     if isinstance(choice, dict):
-        choice = tuple(choice.keys())
+        mapping = choice  # Lưu lại dict để ánh xạ
+        choice = tuple(choice.keys())  # Lấy danh sách keys để kiểm tra hợp lệ
     elif not isinstance(choice, tuple):
         choice = (choice,)
 
     def validate(value):
         if value not in choice:
             raise ValueError("Lựa chọn '%s' không hợp lệ. Giá trị hợp lệ: %s" % (value, choice))
-        return value
+        return mapping[value] if mapping else value  # Ánh xạ giá trị nếu có dict
+
     return validate
 
 

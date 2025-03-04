@@ -99,12 +99,13 @@ def create_employee_and_sales_person(**kwargs):
                 message="Some Employees failed to process"
             )
 
+            failed_records_message = failed_records[0]["message"]
             if id_log_dms:
                 create_partner_log(
                     id_log_dms=id_log_dms,
                     status=False,
                     title="Some Employee creations failed.",
-                    message=f"Some Employees could not be processed: {failed_records[0]["message"]}."
+                    message=f"Some Employees could not be processed: {failed_records_message}."
                 )
 
             return failed_records
