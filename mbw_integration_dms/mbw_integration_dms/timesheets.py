@@ -5,6 +5,8 @@ import frappe
 from mbw_integration_dms.mbw_integration_dms.utils import create_dms_log
 from mbw_integration_dms.mbw_integration_dms.apiclient import DMSApiClient
 from frappe.utils import getdate, today, get_last_day, get_first_day
+from mbw_integration_dms.mbw_integration_dms.helpers.helpers import publish
+from mbw_integration_dms.mbw_integration_dms.constants import KEY_REALTIME
 
 def get_timesheet_dms(**kwargs):
     try:
@@ -124,6 +126,7 @@ def get_timesheet_dms(**kwargs):
                 response_data=response,
                 message="Timesheet synced successfully."
             )
+            publish(KEY_REALTIME["dms.key.sync.all.timesheet"], "Timesheet synced successfully.", done=True)
             return {"message": "Timesheet synced successfully."}
         
         else:
@@ -133,6 +136,7 @@ def get_timesheet_dms(**kwargs):
                 message="Failed to sync Timesheet DMS."
             )
             frappe.logger().error(f"Failed to sync: {response}")
+            publish(KEY_REALTIME["dms.key.sync.all.timesheet"], f"Failed to sync: {response}", error=True)
             return {"error": response}
 
     except Exception as e:

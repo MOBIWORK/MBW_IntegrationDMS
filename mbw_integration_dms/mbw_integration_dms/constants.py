@@ -18,5 +18,7 @@ EVENT_MAPPER = {
 KEY_REALTIME = {
     "key_realtime_categories": "dms.key.sync.all.categories",
     "key_realtime_product": "dms.key.sync.all.products",
-    "key_realtime_customer": "dms.key.sync.all.customers"
+    "key_realtime_customer": "dms.key.sync.all.customers",
+    "key_realtime_kpi": "dms.key.sync.all.kpi",
+    "key_realtime_timesheet": "dms.key.sync.all.timesheet",
 }

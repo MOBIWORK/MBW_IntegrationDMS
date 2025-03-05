@@ -1,5 +1,8 @@
 import frappe
+from mbw_integration_dms.mbw_integration_dms.kpi import get_kpi_dms
 from mbw_integration_dms.mbw_integration_dms.product import sync_product
+from mbw_integration_dms.mbw_integration_dms.timesheets import get_timesheet_dms
+
 
 @frappe.whitelist()
 def get_products(page):
@@ -61,3 +64,11 @@ def get_sales_orders(page):
             """
     data = frappe.db.sql(query, as_dict=True)
     return data
+
+@frappe.whitelist()
+def get_dms_kpi():
+    return get_kpi_dms()
+
+@frappe.whitelist()
+def get_dms_timesheet():
+    return get_timesheet_dms()

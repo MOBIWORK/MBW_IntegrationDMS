@@ -6,6 +6,8 @@ import frappe
 from mbw_integration_dms.mbw_integration_dms.utils import create_dms_log
 from mbw_integration_dms.mbw_integration_dms.apiclient import DMSApiClient
 from frappe.utils import nowdate
+from mbw_integration_dms.mbw_integration_dms.helpers.helpers import publish
+from mbw_integration_dms.mbw_integration_dms.constants import KEY_REALTIME
 
 def get_kpi_dms(**kwargs):
     try:
@@ -113,6 +115,7 @@ def get_kpi_dms(**kwargs):
                 response_data=response,
                 message="KPI synced successfully."
             )
+            publish(KEY_REALTIME["key_realtime_kpi"], "KPI synced successfully.", done=True)
             return {"message": "KPI synced successfully."}
         
         else:
@@ -122,6 +125,7 @@ def get_kpi_dms(**kwargs):
                 message="Failed to sync KPI DMS."
             )
             frappe.logger().error(f"Failed to sync: {response}")
+            publish(KEY_REALTIME["key_realtime_kpi"], f"Failed to sync: {response}", error=True)
             return {"error": response}
 
     except Exception as e:

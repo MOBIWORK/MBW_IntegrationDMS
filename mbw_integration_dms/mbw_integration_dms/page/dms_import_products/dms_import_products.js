@@ -8,6 +8,130 @@ frappe.pages['dms-import-products'].on_page_load = function(wrapper) {
 	new CustomerImporter(wrapper)
 	// new SalesOrderImporter(wrapper)
 	new CategoryImporter(wrapper)
+	new KPIImporter(wrapper)
+
+}
+
+KPIImporter = class {
+	constructor(wrapper) {
+		this.wrapper = $(wrapper).find(".layout-main-section");
+		this.page = wrapper.page;
+		this.init();
+		this.syncRunning = false;
+	}
+	init() {
+		frappe.run_serially([
+			() => this.addMarkup(),
+			() => this.listen()])
+	}
+	addMarkup() {
+		const _markup = $(`<div class="card border-0 shadow-sm p-3 mb-3 rounded-sm" style="background-color: var(--card-bg)">
+            <h5 class="border-bottom pb-2">Lấy dữ liệu DMS thủ công</h5>
+			<div class="row">
+				<div class="col-lg-6 d-flex align-items-stretch">
+					<div class="w-100">
+						<div class="py-3 border-bottom">
+							<button type="button" id="btn-get-dms-kpi" class="btn btn-xl btn-primary w-100 font-weight-bold py-3">Lấy dữ liệu KPI</button>
+						</div>
+						<div class="card border-0 shadow-sm p-3 mb-3 rounded-sm" style="background-color: var(--card-bg); display: none;">
+                            <h5 class="border-bottom pb-2">Sync Log</h5>
+                            <div class="control-value like-disabled-input for-description overflow-auto" id="kpi-sync-log" style="max-height: 500px;"></div>
+                    	</div>
+					</div>
+				</div>
+				<div class="col-lg-6 d-flex align-items-stretch">
+					<div class="w-100">
+						<div class="py-3 border-bottom">
+							<button type="button" id="btn-get-dms-timesheet" class="btn btn-xl btn-primary w-100 font-weight-bold py-3">Lấy dữ liệu bảng công</button>
+						</div>
+						<div class="card border-0 shadow-sm p-3 mb-3 rounded-sm" style="background-color: var(--card-bg); display: none;">
+                            <h5 class="border-bottom pb-2">Sync Log</h5>
+                            <div class="control-value like-disabled-input for-description overflow-auto" id="timesheet-sync-log" style="max-height: 500px;"></div>
+                     	</div>
+					</div>
+			</div>`)
+		this.wrapper.append(_markup);
+	}
+
+	listen() {
+		this.wrapper.on("click", "#btn-get-dms-kpi", (e) => this.getKPI(e));
+		this.wrapper.on("click", "#btn-get-dms-timesheet", (e) => this.getTimesheet(e));
+	}
+	getKPI() {
+		this.togglegetKPI()
+		frappe.call({
+				method: "mbw_integration_dms.mbw_integration_dms.page.dms_import_products.dms_import_products.get_dms_kpi",
+			});
+		this.logSynckpi()
+	}
+	getTimesheet() {
+		this.togglegetTimesheet()
+		frappe.call({
+			method: "mbw_integration_dms.mbw_integration_dms.page.dms_import_products.dms_import_products.get_dms_timesheet",
+		});
+
+		this.logSyncTimesheet();
+	}
+
+	logSynckpi() {
+		const _log = $("#kpi-sync-log");
+		_log.parents(".card").show();
+		_log.text(""); // clear logs
+		frappe.realtime.on(
+			"dms.key.sync.all.kpi",
+			({ message, synced, done, error }) => {
+				message = `<pre class="mb-0">${message}</pre>`;
+				_log.append(message);
+				_log.scrollTop(_log[0].scrollHeight);
+				if (done) {
+					frappe.realtime.off("dms.key.sync.all.kpi");
+					this.togglegetKPI(false);
+					this.syncRunning = false;
+				}
+			}
+		);
+	}
+	logSyncTimesheet() {
+		const _log = $("#timesheet-sync-log");
+		_log.parents(".card").show();
+		_log.text(""); // clear logs
+		frappe.realtime.on(
+			"dms.key.sync.all.timesheet",
+			({ message, synced, done, error }) => {
+				message = `<pre class="mb-0">${message}</pre>`;
+				_log.append(message);
+				_log.scrollTop(_log[0].scrollHeight);
+				if (done) {
+					frappe.realtime.off("dms.key.sync.all.timesheet");
+					this.togglegetTimesheet(false);
+					this.syncRunning = false;
+				}
+			}
+		);
+	}
+	togglegetKPI(disable = true) {
+		const btn = $("#btn-get-dms-kpi");
+
+		const _toggleClass = (d) => (d ? "btn-success" : "btn-primary");
+		const _toggleText = () => (disable ? "Syncing..." : "Sync Products");
+
+		btn.prop("disabled", disable)
+			.addClass(_toggleClass(disable))
+			.removeClass(_toggleClass(!disable))
+			.text(_toggleText());
+	}
+
+	togglegetTimesheet(disable = true) {
+		const btn = $("#btn-get-dms-timesheet");
+
+		const _toggleClass = (d) => (d ? "btn-success" : "btn-primary");
+		const _toggleText = () => (disable ? "Syncing..." : "Sync Products");
+
+		btn.prop("disabled", disable)
+			.addClass(_toggleClass(disable))
+			.removeClass(_toggleClass(!disable))
+			.text(_toggleText());
+	}
 
 }
 
