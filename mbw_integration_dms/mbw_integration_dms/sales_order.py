@@ -32,6 +32,28 @@ def create_sale_order(data=None, **kwargs):
         if customer_data:
             cus_name = customer_data.get("customer_name")
 
+        # Kiểm tra nếu đơn hàng đã tồn tại với dms_so_id
+        existing_order = frappe.db.exists("Sales Order", {"dms_so_id": kwargs.get("dms_so_id")})
+        if existing_order:
+            message = f"Sales Order {existing_order} already exists with dms_so_id {kwargs.get('dms_so_id')}"
+    
+            # Ghi log vào DMS
+            create_dms_log(
+                status="Skipped",
+                request_data=kwargs,
+                message=message
+            )
+
+            # Ghi log vào Partner log nếu có id_log_dms
+            if id_log_dms:
+                create_partner_log(
+                    id_log_dms=id_log_dms,
+                    status=True,
+                    title="Sales Order Skipped",
+                    message=message
+                )
+            return
+
         # Ghi log bắt đầu xử lý đơn hàng
         create_dms_log(
             status="Processing",
@@ -87,26 +109,20 @@ def create_sale_order(data=None, **kwargs):
 
         for item_data in items:
             discount_amount = float(item_data.get("discount_amount", 0))
-            is_free_item = item_data.get("is_free_item")
 
             new_order.append("items", {
                 "item_code": item_data.get("item_code"),
                 "qty": item_data.get("qty"),
                 "uom": item_data.get("uom"),
-                "price_list_rate": item_data.get("rate") if is_free_item == 0 else 0,
+                "rate": item_data.get("rate"),
                 "discount_amount": discount_amount,
                 "additional_notes": item_data.get("additional_notes"),
-                "is_free_item": is_free_item
+                "is_free_item": item_data.get("is_free_item")
             })
         
         value_sp = ["SP_ST_SP", "TIEN_SP", "SP_SL_SP", "MUTI_SP_ST_SP", "MUTI_SP_SL_SP", "MUTI_TIEN_SP"]
         for promo in promotions:
-            ptype = promo.get("ptype")
-            # Nếu ptype là chuỗi JSON, thì parse
-            if isinstance(ptype, str):
-                ptype_data = json.loads(ptype)
-            else:
-                ptype_data = ptype
+            ptype_data = json.loads(promo["ptype"])
             ptype_label = ptype_data.get("label")
             ptype_value = ptype_data.get("value")
 

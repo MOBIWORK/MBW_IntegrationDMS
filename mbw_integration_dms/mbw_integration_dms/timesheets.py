@@ -44,6 +44,9 @@ def get_timesheet_dms(**kwargs):
                 employee_code = record.get("code")
                 employee_name = record.get("name")
                 email = record.get("email")
+
+                if not frappe.db.exists("Sales Person", {"name": employee_name}):
+                    continue
                 
                 # Tạo danh sách dữ liệu chấm công theo ngày
                 timesheet_details = []
