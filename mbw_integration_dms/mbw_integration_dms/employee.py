@@ -144,5 +144,3 @@ def create_employee_and_sales_person(**kwargs):
             rollback=True,
             message="Critical error occurred while processing Employee and Sales Person"
         )
-
-        frappe.throw(f"Lỗi xử lý danh sách nhân viên: {str(e)}")

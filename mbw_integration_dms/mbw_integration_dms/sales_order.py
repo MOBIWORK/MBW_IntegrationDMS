@@ -87,20 +87,26 @@ def create_sale_order(data=None, **kwargs):
 
         for item_data in items:
             discount_amount = float(item_data.get("discount_amount", 0))
+            is_free_item = item_data.get("is_free_item")
 
             new_order.append("items", {
                 "item_code": item_data.get("item_code"),
                 "qty": item_data.get("qty"),
                 "uom": item_data.get("uom"),
-                "rate": item_data.get("rate"),
+                "price_list_rate": item_data.get("rate") if is_free_item == 0 else 0,
                 "discount_amount": discount_amount,
                 "additional_notes": item_data.get("additional_notes"),
-                "is_free_item": item_data.get("is_free_item")
+                "is_free_item": is_free_item
             })
         
         value_sp = ["SP_ST_SP", "TIEN_SP", "SP_SL_SP", "MUTI_SP_ST_SP", "MUTI_SP_SL_SP", "MUTI_TIEN_SP"]
         for promo in promotions:
-            ptype_data = json.loads(promo["ptype"])
+            ptype = promo.get("ptype")
+            # Nếu ptype là chuỗi JSON, thì parse
+            if isinstance(ptype, str):
+                ptype_data = json.loads(ptype)
+            else:
+                ptype_data = ptype
             ptype_label = ptype_data.get("label")
             ptype_value = ptype_data.get("value")
 
