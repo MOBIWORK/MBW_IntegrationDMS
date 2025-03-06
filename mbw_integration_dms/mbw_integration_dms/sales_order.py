@@ -48,7 +48,7 @@ def create_sale_order(data=None, **kwargs):
             if id_log_dms:
                 create_partner_log(
                     id_log_dms=id_log_dms,
-                    status=True,
+                    status=False,
                     title="Sales Order Skipped",
                     message=message
                 )

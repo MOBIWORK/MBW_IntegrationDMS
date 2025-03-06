@@ -129,7 +129,7 @@ def get_timesheet_dms(**kwargs):
                 response_data=response,
                 message="Timesheet synced successfully."
             )
-            publish(KEY_REALTIME["dms.key.sync.all.timesheet"], "Timesheet synced successfully.", done=True)
+            publish(KEY_REALTIME["key_realtime_timesheet"], "Timesheet synced successfully.", done=True)
             return {"message": "Timesheet synced successfully."}
         
         else:
@@ -139,7 +139,7 @@ def get_timesheet_dms(**kwargs):
                 message="Failed to sync Timesheet DMS."
             )
             frappe.logger().error(f"Failed to sync: {response}")
-            publish(KEY_REALTIME["dms.key.sync.all.timesheet"], f"Failed to sync: {response}", error=True)
+            publish(KEY_REALTIME["key_realtime_timesheet"], f"Failed to sync: {response}", error=True)
             return {"error": response}
 
     except Exception as e:

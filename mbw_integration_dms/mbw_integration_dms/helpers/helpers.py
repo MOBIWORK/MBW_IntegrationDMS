@@ -10,8 +10,7 @@ from mbw_integration_dms.mbw_integration_dms.apiclient import DMSApiClient
 def create_address_customer(address_info, link_to_customer):
     try:
         key_info = {
-            "address_title", "address_type", "address_line1"
-            "is_primary_address", "is_shipping_address"
+            "address_title", "address_type", "address_line1", "city", "is_primary_address", "is_shipping_address"
         }
         address_info = frappe._dict(address_info)
         id_address = address_info.get("name") or False
@@ -54,6 +53,7 @@ def update_address(doc, info, keys, link_to_doctype=None):
     for key, value in info.items():
         if key in keys:
             doc.set(key, value)
+            
     if link_to_doctype:
         links = pydash.filter_(doc.get("links"), lambda x: x.get("link_doctype") != link_to_doctype.get("link_doctype") and x.get("link_name") != link_to_doctype.get("link_name"))
         doc.set("links", links)

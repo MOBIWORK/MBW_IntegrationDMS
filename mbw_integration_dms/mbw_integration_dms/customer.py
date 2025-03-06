@@ -352,9 +352,10 @@ def sync_customer_group_job(*args, **kwargs):
 def create_customers(**kwargs):
     results = []
     try:
-        data = kwargs.get("data", {})
-        customer_list = data.get("customers", [])  # Danh sách nhân viên
-        id_log_dms = data.get("id_log", "")  # ID log chung
+        # data = kwargs.get("data", {})
+        data = kwargs
+        customer_list = kwargs.get("customers", [])  # Danh sách nhân viên
+        id_log_dms = kwargs.get("id_log", "")  # ID log chung
 
         for customer_data in customer_list:
             try:
@@ -562,7 +563,7 @@ def update_customer(**kwargs):
             if key in fields:
                 customer.set(key, value)
             elif key in date_fields and value is not None:
-                customer.set(key, validate_date(value))
+                customer.set(key, validate_date(float(value)/1000))
 
         # Cập nhật hoặc thêm mới địa chỉ
         if kwargs.get("address"):
@@ -595,10 +596,9 @@ def update_customer(**kwargs):
 
 def update_customer_addresses(customer, addresses, customer_name):
     link_cs_address = {"link_doctype": "Customer", "link_name": customer_name}
-    for address_data in addresses:
-        create_address_customer(address_data, link_cs_address)
+    create_address_customer(addresses, link_cs_address)
 
-    primary_address = pydash.find(addresses, lambda x: x.get("primary") == 1)
+    primary_address = pydash.find(addresses, lambda x: isinstance(x, dict) and x.get("primary") == 1)
     if primary_address:
         set_primary_address(customer, primary_address)
 

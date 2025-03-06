@@ -54,6 +54,7 @@ def create_employee_and_sales_person(**kwargs):
                     # Nếu không tồn tại, tạo mới Employee
                     employee = frappe.get_doc({
                         "doctype": "Employee",
+                        "name": employee_data.get("employee_code"),
                         "first_name": validate_not_none(employee_data.get("employee_name")),
                         "date_of_birth": validate_date(float(employee_data.get("date_of_birth")) / 1000),
                         "gender": validate_choice(configs.gender)(gender_data),
