@@ -54,7 +54,6 @@ def create_employee_and_sales_person(**kwargs):
                     # Nếu không tồn tại, tạo mới Employee
                     employee = frappe.get_doc({
                         "doctype": "Employee",
-                        "name": employee_data.get("employee_code"),
                         "first_name": validate_not_none(employee_data.get("employee_name")),
                         "date_of_birth": validate_date(float(employee_data.get("date_of_birth")) / 1000),
                         "gender": validate_choice(configs.gender)(gender_data),
@@ -64,6 +63,11 @@ def create_employee_and_sales_person(**kwargs):
                     })
                     employee.insert(ignore_permissions=True)
                     is_new = True
+
+                    new_name = employee_data.get("employee_code")
+                    if new_name and new_name != employee.name:
+                        frappe.rename_doc("Employee", employee.name, new_name, force=True)
+                        frappe.db.commit()
 
                     # Kiểm tra xem đã có Sales Person trùng tên chưa
                     existing_sales_persons = frappe.get_all("Sales Person", filters={"sales_person_name": emp_name}, fields=["name"])
@@ -76,7 +80,7 @@ def create_employee_and_sales_person(**kwargs):
                     sales_person = frappe.get_doc({
                         "doctype": "Sales Person",
                         "sales_person_name": emp_name,
-                        "employee": employee.name,
+                        "employee": new_name,
                         "email": email,
                         "parent_sales_person": "",
                         "enabled": 1
