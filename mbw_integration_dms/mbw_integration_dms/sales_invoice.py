@@ -92,3 +92,46 @@ def add_sales_order(doc, method):
         doc.sales_order = so_name
         so_id = frappe.get_value("Sales Order", so_name, "dms_so_id")
         doc.id_dms = so_id
+
+
+@frappe.whitelist()
+def get_remaining_qty(sales_order):
+    so = frappe.get_doc("Sales Order", sales_order)
+    remaining_items = []
+    
+    # Kiểm tra xem có sản phẩm khuyến mại nào không
+    has_free_item = any(item.is_free_item for item in so.items)
+    
+    if not has_free_item:
+        return []  # Không có sản phẩm khuyến mại, trả về danh sách rỗng
+
+    for item in so.items:
+        # Truy vấn số lượng đã lập hóa đơn
+        billed_qty = frappe.db.sql("""
+            SELECT SUM(qty) FROM `tabSales Invoice Item`
+            WHERE sales_order = %s AND item_code = %s AND is_free_item = %s
+        """, (sales_order, item.item_code, item.is_free_item))[0][0] or 0
+        
+        remaining_qty = item.qty - billed_qty
+
+        if remaining_qty > 0:
+            income_account = frappe.db.get_value(
+                "Item Default", 
+                {"parent": item.item_code, "company": so.company}, 
+                "income_account"
+            ) or frappe.get_value("Item Group", frappe.get_value("Item", item.item_code, "item_group"), "income_account") or \
+            frappe.get_value("Company", so.company, "default_income_account")
+
+            remaining_items.append({
+                "item_code": item.item_code,
+                "item_name": item.item_name,
+                "uom": item.uom,
+                "stock_uom": item.stock_uom,
+                "remaining_qty": remaining_qty,
+                "rate": item.rate,
+                "is_free_item": item.is_free_item,
+                "income_account": income_account,
+                "sales_order": sales_order
+            })
+    
+    return remaining_items
