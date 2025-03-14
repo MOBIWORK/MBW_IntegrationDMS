@@ -128,14 +128,14 @@ doc_events = {
         "before_save": "mbw_integration_dms.mbw_integration_dms.product.check_uom_dms"
 	},
     "Customer": {
-        # "on_trash": "mbw_integration_dms.mbw_integration_dms.customer.delete_customer"
+        "on_trash": "mbw_integration_dms.mbw_integration_dms.customer.delete_customer"
     },
     "Sales Invoice": {
-        # "on_submit": "mbw_integration_dms.mbw_integration_dms.sales_invoice.create_sale_invoice",
+        "on_submit": "mbw_integration_dms.mbw_integration_dms.sales_invoice.create_sale_invoice",
         "before_insert": "mbw_integration_dms.mbw_integration_dms.sales_invoice.add_sales_order"
     },
     "Delivery Note": {
-        # "on_submit": "mbw_integration_dms.mbw_integration_dms.delivery_note.create_delivery_note",
+        "on_submit": "mbw_integration_dms.mbw_integration_dms.delivery_note.create_delivery_note",
         "before_insert": "mbw_integration_dms.mbw_integration_dms.delivery_note.add_sales_order"
     },
     "Sales Order": {

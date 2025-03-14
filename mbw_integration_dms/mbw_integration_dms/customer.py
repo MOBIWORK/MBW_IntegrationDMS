@@ -10,7 +10,8 @@ from mbw_integration_dms.mbw_integration_dms.apiclient import DMSApiClient
 from mbw_integration_dms.mbw_integration_dms.helpers import configs
 from mbw_integration_dms.mbw_integration_dms.helpers.helpers import (
     create_address_customer,
-    create_partner_log
+    create_partner_log,
+    publish
 )
 from mbw_integration_dms.mbw_integration_dms.helpers.validators import (
     validate_date, 
@@ -19,7 +20,6 @@ from mbw_integration_dms.mbw_integration_dms.helpers.validators import (
     validate_not_none,
 )
 
-from mbw_integration_dms.mbw_integration_dms.helpers.helpers import publish
 from mbw_integration_dms.mbw_integration_dms.constants import KEY_REALTIME
 
 def sync_customer():
@@ -119,52 +119,6 @@ def sync_customer_job(*args, **kwargs):
         frappe.logger().error(f"Sync Error: {str(e)}")
         return {"error": str(e)}
     
-# Xóa khách hàng
-def delete_customer(doc, method):
-    dms_client = DMSApiClient()
-
-    customer_codes = [doc.customer_code_dms] if isinstance(doc, frappe.model.document.Document) else doc
-
-    request_payload = {
-        "orgid": dms_client.orgid,
-        "data": customer_codes
-    }
-
-    # Ghi log request
-    create_dms_log(
-        status="Processing",
-        method="POST",
-        request_data=request_payload,
-        message=f"Sending delete request for customers: {', '.join(customer_codes)}"
-    )
-
-    try:
-        # Gửi request xóa kh đến API DMS
-        response, success = dms_client.request(
-            endpoint="/CustomerDel",
-            method="POST",
-            body=request_payload
-        )
-
-        # Nếu API đối tác trả về lỗi, không xóa kh bên ERPNext
-        if not success or not response.get("status"):
-            frappe.throw(f"Không thể xóa khách hàng bên DMS: {response.get('message', 'Lỗi không xác định')}")
-
-        # Nếu thành công, xóa khách hàng trong ERPNext
-        frappe.db.sql("DELETE FROM `tabCustomer` WHERE customer_code IN %s", (customer_codes,))
-        frappe.db.commit()
-
-        # Ghi log thành công
-        create_dms_log(
-            status="Success",
-            response_data=response,
-            message=f"Customers deleted successfully from both ERPNext and DMS: {', '.join(customer_codes)}"
-        )
-
-    except Exception as e:
-        frappe.db.rollback()
-        frappe.log_error(f"Lỗi khi xóa khách hàng: {str(e)}", "Customer Deletion")
-        frappe.throw(f"Lỗi khi xóa khách hàng: {str(e)}")
 
 # Đồng bộ danh sách loại khách hàng
 def sync_customer_type():
@@ -262,7 +216,6 @@ def sync_customer_group():
     frappe.enqueue("mbw_integration_dms.mbw_integration_dms.customer.sync_customer_group_job", queue="long", timeout=300, key=KEY_REALTIME["key_realtime_categories"])
     return {"message": "Customer Group Sync job has been queued."}
 
-@frappe.whitelist(allow_guest=True)
 def sync_customer_group_job(*args, **kwargs):
     try:
         create_dms_log(status="Queued", message="Customer Type sync job started.")
@@ -593,7 +546,7 @@ def update_customer(**kwargs):
         )
         frappe.throw(f"Lỗi cập nhật khách hàng {customer_code_dms}: {str(e)}")
 
-
+# Cập nhật địa chỉ khách hàng
 def update_customer_addresses(customer, addresses, customer_name):
     link_cs_address = {"link_doctype": "Customer", "link_name": customer_name}
     create_address_customer(addresses, link_cs_address)
@@ -610,6 +563,7 @@ def set_primary_address(customer, address_data):
         customer.customer_primary_address = address_id
         customer.save()
 
+# Cập nhật liên hệ khách hàng
 def update_customer_contacts(customer, contacts, customer_name):
     for contact_data in contacts:
         contact = frappe.get_doc("Contact", contact_data.get("name")) if frappe.db.exists("Contact", contact_data.get("name")) else None
@@ -634,6 +588,7 @@ def unlink_and_delete_contact(contact, customer_name):
     if contact.name:
         frappe.db.delete("Contact", contact.name)
 
+# Tạo mới liên hệ khách hàng
 def create_new_contact(contact_data, customer_name, address_data):
     new_contact = frappe.new_doc("Contact")
     new_contact.update({
@@ -642,6 +597,7 @@ def create_new_contact(contact_data, customer_name, address_data):
         "is_primary_contact": contact_data.get("is_primary_contact", 0),
         "is_billing_contact": contact_data.get("is_billing_contact", 0)
     })
+    
     if contact_data.get("phone"):
         new_contact.append("phone_nos", {"phone": contact_data["phone"], "is_primary_mobile_no": 1})
 
@@ -649,3 +605,51 @@ def create_new_contact(contact_data, customer_name, address_data):
     new_contact.insert()
 
     return new_contact
+
+
+# Xóa khách hàng
+def delete_customer(doc, method):
+    dms_client = DMSApiClient()
+
+    customer_codes = [doc.customer_code_dms] if isinstance(doc, frappe.model.document.Document) else doc
+
+    request_payload = {
+        "orgid": dms_client.orgid,
+        "data": customer_codes
+    }
+
+    # Ghi log request
+    create_dms_log(
+        status="Processing",
+        method="POST",
+        request_data=request_payload,
+        message=f"Sending delete request for customers: {', '.join(customer_codes)}"
+    )
+
+    try:
+        # Gửi request xóa kh đến API DMS
+        response, success = dms_client.request(
+            endpoint="/CustomerDel",
+            method="POST",
+            body=request_payload
+        )
+
+        # Nếu API đối tác trả về lỗi, không xóa kh bên ERPNext
+        if not success or not response.get("status"):
+            frappe.throw(f"Không thể xóa khách hàng bên DMS: {response.get('message', 'Lỗi không xác định')}")
+
+        # Nếu thành công, xóa khách hàng trong ERPNext
+        frappe.db.sql("DELETE FROM `tabCustomer` WHERE customer_code_dms IN %s", (customer_codes,))
+        frappe.db.commit()
+
+        # Ghi log thành công
+        create_dms_log(
+            status="Success",
+            response_data=response,
+            message=f"Customers deleted successfully from both ERPNext and DMS: {', '.join(customer_codes)}"
+        )
+
+    except Exception as e:
+        frappe.db.rollback()
+        frappe.log_error(f"Lỗi khi xóa khách hàng: {str(e)}", "Customer Deletion")
+        frappe.throw(f"Lỗi khi xóa khách hàng: {str(e)}")
