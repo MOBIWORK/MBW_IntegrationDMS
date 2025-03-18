@@ -7,6 +7,8 @@ from mbw_integration_dms.mbw_integration_dms.apiclient import DMSApiClient
 from mbw_integration_dms.mbw_integration_dms.utils import check_enable_integration_dms
 
 
+enable_dms = check_enable_integration_dms()
+
 # Xử lý thêm mới/cập nhật địa chỉ
 def create_address_customer(address_info, link_to_customer):
     try:
@@ -108,12 +110,10 @@ def update_dms_order_status(doc):
 
 def on_sales_order_update(doc, method):
     """Kiểm tra nếu trạng thái thay đổi thành 'Delivered' thì gọi API cập nhật DMS."""
-    enable_dms = check_enable_integration_dms()
     if enable_dms and doc.is_sale_dms and doc.get("status") != doc.get_db_value("status") and doc.status == "Delivered":
         update_dms_order_status(doc)
 
 def update_stt_so_cancel(doc, method):
-    enable_dms = check_enable_integration_dms()
     if enable_dms:
         dms_client = DMSApiClient()
         if doc.is_sale_dms:

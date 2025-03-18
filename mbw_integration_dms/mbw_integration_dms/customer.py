@@ -4,8 +4,8 @@
 import frappe
 import pydash
 
-from mbw_integration_dms.mbw_integration_dms.utils import create_dms_log
 from mbw_integration_dms.mbw_integration_dms.apiclient import DMSApiClient
+from mbw_integration_dms.mbw_integration_dms.utils import create_dms_log, check_enable_integration_dms
 
 from mbw_integration_dms.mbw_integration_dms.helpers import configs
 from mbw_integration_dms.mbw_integration_dms.helpers.helpers import (
@@ -22,9 +22,12 @@ from mbw_integration_dms.mbw_integration_dms.helpers.validators import (
 
 from mbw_integration_dms.mbw_integration_dms.constants import KEY_REALTIME
 
+enable_dms = check_enable_integration_dms()
+
 def sync_customer():
-    frappe.enqueue("mbw_integration_dms.mbw_integration_dms.customer.sync_customer_job", queue="long", timeout=300, key=KEY_REALTIME["key_realtime_customer"])
-    return {"message": "Customer Sync job has been queued."}
+    if enable_dms:
+        frappe.enqueue("mbw_integration_dms.mbw_integration_dms.customer.sync_customer_job", queue="long", timeout=300, key=KEY_REALTIME["key_realtime_customer"])
+        return {"message": "Customer Sync job has been queued."}
 
 def sync_customer_job(*args, **kwargs):
     try:
@@ -122,11 +125,10 @@ def sync_customer_job(*args, **kwargs):
 
 # Đồng bộ danh sách loại khách hàng
 def sync_customer_type():
-    """
-    Đưa job vào hàng đợi để đồng bộ Customer Type
-    """
-    frappe.enqueue("mbw_integration_dms.mbw_integration_dms.customer.sync_customer_type_job", queue="long", timeout=300, key=KEY_REALTIME["key_realtime_categories"])
-    return {"message": "Customer Type Sync job has been queued."}
+    """ Đưa job vào hàng đợi để đồng bộ Customer Type """
+    if enable_dms:
+        frappe.enqueue("mbw_integration_dms.mbw_integration_dms.customer.sync_customer_type_job", queue="long", timeout=300, key=KEY_REALTIME["key_realtime_categories"])
+        return {"message": "Customer Type Sync job has been queued."}
 
 def sync_customer_type_job(*args, **kwargs):
     try:
@@ -213,8 +215,9 @@ def sync_customer_type_job(*args, **kwargs):
     
 # Đồng bộ danh sách nhóm khách hàng
 def sync_customer_group():
-    frappe.enqueue("mbw_integration_dms.mbw_integration_dms.customer.sync_customer_group_job", queue="long", timeout=300, key=KEY_REALTIME["key_realtime_categories"])
-    return {"message": "Customer Group Sync job has been queued."}
+    if enable_dms:
+        frappe.enqueue("mbw_integration_dms.mbw_integration_dms.customer.sync_customer_group_job", queue="long", timeout=300, key=KEY_REALTIME["key_realtime_categories"])
+        return {"message": "Customer Group Sync job has been queued."}
 
 def sync_customer_group_job(*args, **kwargs):
     try:

@@ -8,10 +8,13 @@ from mbw_integration_dms.mbw_integration_dms.utils import create_dms_log, check_
 from mbw_integration_dms.mbw_integration_dms.helpers.helpers import publish
 from mbw_integration_dms.mbw_integration_dms.constants import KEY_REALTIME
 
+enable_dms = check_enable_integration_dms()
+
 # Đồng bộ danh sách nhãn hiệu 
 def sync_brand():
-    frappe.enqueue("mbw_integration_dms.mbw_integration_dms.brand.sync_brand_job", queue="long", timeout=300, key=KEY_REALTIME["key_realtime_categories"])
-    return {"message": "Brand Sync job has been queued."}
+    if enable_dms:
+        frappe.enqueue("mbw_integration_dms.mbw_integration_dms.brand.sync_brand_job", queue="long", timeout=300, key=KEY_REALTIME["key_realtime_categories"])
+        return {"message": "Brand Sync job has been queued."}
 
 def sync_brand_job(*args, **kwargs):
     try:
