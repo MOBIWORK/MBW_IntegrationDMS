@@ -113,7 +113,7 @@ KPIImporter = class {
 		const btn = $("#btn-get-dms-kpi");
 
 		const _toggleClass = (d) => (d ? "btn-success" : "btn-primary");
-		const _toggleText = () => (disable ? "Syncing..." : "Sync Products");
+		const _toggleText = () => (disable ? "Syncing..." : "Lấy dữ liệu KPI");
 
 		btn.prop("disabled", disable)
 			.addClass(_toggleClass(disable))
@@ -125,7 +125,7 @@ KPIImporter = class {
 		const btn = $("#btn-get-dms-timesheet");
 
 		const _toggleClass = (d) => (d ? "btn-success" : "btn-primary");
-		const _toggleText = () => (disable ? "Syncing..." : "Sync Products");
+		const _toggleText = () => (disable ? "Syncing..." : "Lấy dữ liệu bảng công");
 
 		btn.prop("disabled", disable)
 			.addClass(_toggleClass(disable))
