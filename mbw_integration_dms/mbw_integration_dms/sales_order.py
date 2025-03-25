@@ -139,16 +139,18 @@ def create_sale_order(data=None, **kwargs):
 
             product = promo.get("product")
             for item in product:
-                new_order.append("promotion_result", {
-                    "promotion_id": promo.get("id"),
-                    "promotion_code": ptype_value,
-                    "promotions_name": ptype_label,
-                    "promotion_item_id": item.get("_id"),
-                    "promotion_item_code": item.get("ma_san_pham"),
-                    "promotional_item_name": item.get("ten_san_pham"),
-                    "promotional_quantity": item.get("so_luong") if ptype_value in value_sp else 0,
-                    "promotional_amount": item.get("so_luong") if ptype_value not in value_sp else 0
-                })
+                if item.get("so_luong") > 0:
+                    new_order.append("promotion_result", {
+                        "promotion_id": promo.get("id"),
+                        "promotion_name": promo.get("ten_khuyen_mai"),
+                        "promotion_code": ptype_value,
+                        "promotion_type": ptype_label,
+                        "promotion_item_id": item.get("_id"),
+                        "promotion_item_code": item.get("ma_san_pham"),
+                        "promotional_item_name": item.get("ten_san_pham"),
+                        "promotional_quantity": item.get("so_luong") if ptype_value in value_sp else 0,
+                        "promotional_amount": item.get("so_luong") if ptype_value not in value_sp else 0
+                    })
 
         new_order.insert()
 
