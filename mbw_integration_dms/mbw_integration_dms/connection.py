@@ -7,7 +7,8 @@ import base64
 from frappe import _
 
 from mbw_integration_dms.mbw_integration_dms.constants import (
-	EVENT_MAPPER
+	EVENT_MAPPER,
+    SETTING_DOCTYPE
 )
 
 from mbw_integration_dms.mbw_integration_dms.utils import create_dms_log
@@ -51,7 +52,9 @@ def store_request_data() -> None:
         _validate_request(api_key, api_secret, frappe.request)
 
         # Xử lý dữ liệu từ request
-        data = json.loads(frappe.request.data)
+        raw_data = frappe.request.data
+        json_string = raw_data.decode("utf-8") if isinstance(raw_data, bytes) else raw_data
+        data = json.loads(json_string)
         event = frappe.request.headers.get("X-ERP-Topic")
 
         return process_request(data, event)
@@ -85,12 +88,13 @@ def _extract_basic_auth(auth_header):
 
 def _validate_request(api_key, api_secret, req):
     """Xác thực API key và secret với dữ liệu trong MBW Integration Settings"""
-    settings = frappe.get_single("MBW Integration Settings")
-
-    if settings.erp_api_key != api_key or settings.erp_api_secret != api_secret:
-        create_dms_log(
-            status="Error",
-            request_data=req.data,
-            message="Unauthorized API access attempt"
-        )
-        frappe.throw(_("Unauthorized API access"))
+    company = frappe.defaults.get_user_default("company")
+    if frappe.db.exists(SETTING_DOCTYPE, {"name": company}):
+        company_settings = frappe.get_doc(SETTING_DOCTYPE, {"name": company})
+        if company_settings.erp_api_key != api_key or company_settings.erp_api_secret != api_secret:
+            create_dms_log(
+                status="Error",
+                request_data=req.data,
+                message="Unauthorized API access attempt"
+            )
+            frappe.throw(_("Unauthorized API access"))

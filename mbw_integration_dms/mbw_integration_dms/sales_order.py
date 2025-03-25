@@ -32,6 +32,28 @@ def create_sale_order(data=None, **kwargs):
         if customer_data:
             cus_name = customer_data.get("customer_name")
 
+        # Kiểm tra nếu đơn hàng đã tồn tại với dms_so_id
+        existing_order = frappe.db.exists("Sales Order", {"dms_so_id": kwargs.get("dms_so_id")})
+        if existing_order:
+            message = f"Sales Order {existing_order} already exists with dms_so_id {kwargs.get('dms_so_id')}"
+    
+            # Ghi log vào DMS
+            create_dms_log(
+                status="Skipped",
+                request_data=kwargs,
+                message=message
+            )
+
+            # Ghi log vào Partner log nếu có id_log_dms
+            if id_log_dms:
+                create_partner_log(
+                    id_log_dms=id_log_dms,
+                    status=False,
+                    title="Sales Order Skipped",
+                    message=message
+                )
+            return
+
         # Ghi log bắt đầu xử lý đơn hàng
         create_dms_log(
             status="Processing",
@@ -54,7 +76,7 @@ def create_sale_order(data=None, **kwargs):
         new_order = frappe.new_doc("Sales Order")
 
         # Dữ liệu bắn lên để tạo sale order mới
-        discount_amount = float(kwargs.get("discount_amount", 0))
+        discount_amount_so = float(kwargs.get("discount_amount", 0))
         apply_discount_on = kwargs.get("apply_discount_on")
         promotions = kwargs.get("promotion_dms", [])
 
@@ -74,10 +96,6 @@ def create_sale_order(data=None, **kwargs):
             "allocated_percentage": 100,
         })
 
-        if apply_discount_on is not None:
-            new_order.apply_discount_on = validate_choice(configs.discount_type)(apply_discount_on)
-            new_order.discount_amount = discount_amount
-
         new_order.ignore_pricing_rule = 1
 
         # Thêm mới items trong đơn hàng
@@ -85,37 +103,54 @@ def create_sale_order(data=None, **kwargs):
         if not items or not isinstance(items, list):
             frappe.throw("Danh sách sản phẩm (items) không hợp lệ hoặc trống.")
 
+        discount_amount_item = 0
         for item_data in items:
-            discount_amount = float(item_data.get("discount_amount", 0))
+            is_free_item = item_data.get("is_free_item")
+            discount_item = item_data.get("discount_amount", 0)
+            discount_amount_item += discount_item
 
             new_order.append("items", {
                 "item_code": item_data.get("item_code"),
                 "qty": item_data.get("qty"),
                 "uom": item_data.get("uom"),
-                "rate": item_data.get("rate"),
-                "discount_amount": discount_amount,
+                "custom_item_discount": discount_item,
+                "price_list_rate": item_data.get("rate") if is_free_item == 0 else 0,
                 "additional_notes": item_data.get("additional_notes"),
-                "is_free_item": item_data.get("is_free_item")
+                "is_free_item": is_free_item
             })
+
+        if apply_discount_on is not None:
+            new_order.apply_discount_on = validate_choice(configs.discount_type)(apply_discount_on)
+            new_order.discount_amount = discount_amount_so + discount_amount_item
+        
+        new_order.custom_order_discount = discount_amount_so
+        new_order.custom_product_discount = discount_amount_item
         
         value_sp = ["SP_ST_SP", "TIEN_SP", "SP_SL_SP", "MUTI_SP_ST_SP", "MUTI_SP_SL_SP", "MUTI_TIEN_SP"]
         for promo in promotions:
-            ptype_data = json.loads(promo["ptype"])
+            ptype = promo.get("ptype")
+            # Nếu ptype là chuỗi JSON, thì parse
+            if isinstance(ptype, str):
+                ptype_data = json.loads(ptype)
+            else:
+                ptype_data = ptype
             ptype_label = ptype_data.get("label")
             ptype_value = ptype_data.get("value")
 
             product = promo.get("product")
             for item in product:
-                new_order.append("promotion_result", {
-                    "promotion_id": promo.get("id"),
-                    "promotion_code": ptype_value,
-                    "promotions_name": ptype_label,
-                    "promotion_item_id": item.get("_id"),
-                    "promotion_item_code": item.get("ma_san_pham"),
-                    "promotional_item_name": item.get("ten_san_pham"),
-                    "promotional_quantity": item.get("so_luong") if ptype_value in value_sp else 0,
-                    "promotional_amount": item.get("so_luong") if ptype_value not in value_sp else 0
-                })
+                if item.get("so_luong") > 0:
+                    new_order.append("promotion_result", {
+                        "promotion_id": promo.get("id"),
+                        "promotion_name": promo.get("ten_khuyen_mai"),
+                        "promotion_code": ptype_value,
+                        "promotion_type": ptype_label,
+                        "promotion_item_id": item.get("_id"),
+                        "promotion_item_code": item.get("ma_san_pham"),
+                        "promotional_item_name": item.get("ten_san_pham"),
+                        "promotional_quantity": item.get("so_luong") if ptype_value in value_sp else 0,
+                        "promotional_amount": item.get("so_luong") if ptype_value not in value_sp else 0
+                    })
 
         new_order.insert()
 

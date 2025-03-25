@@ -34,6 +34,7 @@ def create_employee_and_sales_person(**kwargs):
         for employee_data in employee_list:
             email = employee_data.get("email")
             gender_data = employee_data.get("gender")
+            emp_name = employee_data.get("employee_name")
 
             try:
                 # Kiểm tra nếu Employee đã tồn tại theo company_email
@@ -63,17 +64,28 @@ def create_employee_and_sales_person(**kwargs):
                     employee.insert(ignore_permissions=True)
                     is_new = True
 
+                    new_name = employee_data.get("employee_code")
+                    if new_name and new_name != employee.name:
+                        frappe.rename_doc("Employee", employee.name, new_name, force=True)
+                        frappe.db.commit()
+
+                    # Kiểm tra xem đã có Sales Person trùng tên chưa
+                    existing_sales_persons = frappe.get_all("Sales Person", filters={"sales_person_name": emp_name}, fields=["name"])
+                    if existing_sales_persons:
+                        sales_person_name = f"{emp_name}-{len(existing_sales_persons) + 1}"
+                    else:
+                        sales_person_name = emp_name
+
                     # Chỉ tạo mới Sales Person nếu Employee mới được tạo
                     sales_person = frappe.get_doc({
                         "doctype": "Sales Person",
-                        "sales_person_name": employee.employee_name,
-                        "employee": employee.name,
+                        "sales_person_name": emp_name,
+                        "employee": new_name,
                         "email": email,
                         "parent_sales_person": "",
                         "enabled": 1
                     })
                     sales_person.insert(ignore_permissions=True)
-                    sales_person_name = sales_person.name
 
                 results.append({
                     "status": "success",
@@ -137,5 +149,3 @@ def create_employee_and_sales_person(**kwargs):
             rollback=True,
             message="Critical error occurred while processing Employee and Sales Person"
         )
-
-        frappe.throw(f"Lỗi xử lý danh sách nhân viên: {str(e)}")

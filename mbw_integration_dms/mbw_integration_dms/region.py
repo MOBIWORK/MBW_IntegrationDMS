@@ -3,15 +3,18 @@
 
 import frappe
 
-from mbw_integration_dms.mbw_integration_dms.utils import create_dms_log
 from mbw_integration_dms.mbw_integration_dms.apiclient import DMSApiClient
+from mbw_integration_dms.mbw_integration_dms.utils import create_dms_log, check_enable_integration_dms
 from mbw_integration_dms.mbw_integration_dms.helpers.helpers import publish
 from mbw_integration_dms.mbw_integration_dms.constants import KEY_REALTIME
 
+enable_dms = check_enable_integration_dms()
+
 # Đồng bộ danh sách khu vực
 def sync_region():
-    frappe.enqueue("mbw_integration_dms.mbw_integration_dms.region.sync_region_job", queue="long", timeout=300, key = KEY_REALTIME["key_realtime_categories"])
-    return {"message": "Region Sync job has been queued."}
+    if enable_dms:
+        frappe.enqueue("mbw_integration_dms.mbw_integration_dms.region.sync_region_job", queue="long", timeout=300, key = KEY_REALTIME["key_realtime_categories"])
+        return {"message": "Region Sync job has been queued."}
 
 def sync_region_job(*args, **kwargs):
     try:

@@ -24,7 +24,7 @@
   "inventory_sync",
   "enable_inventory_sync",
   "inventory_sync_frequency",
-  "thêm_danh_mục_theo_tiêu_chuẩn_phân_phối_việt_nam_section",
+  "th\u00eam_danh_m\u1ee5c_theo_ti\u00eau_chu\u1ea9n_ph\u00e2n_ph\u1ed1i_vi\u1ec7t_nam_section",
   "auto_add_category"
  ],
  "fields": [
@@ -71,8 +71,9 @@
   },
   {
    "fieldname": "company",
-   "fieldtype": "Data",
+   "fieldtype": "Link",
    "label": "C\u00f4ng ty",
+   "options": "Company",
    "unique": 1
   },
   {
@@ -132,7 +133,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-02-17 16:57:23.294386",
+ "modified": "2025-03-06 08:49:57.183532",
  "modified_by": "Administrator",
  "module": "MBW Integration DMS",
  "name": "MBW Integration Settings",

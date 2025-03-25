@@ -28,7 +28,9 @@ app_license = "mit"
 # page_js = {"page" : "public/js/file.js"}
 
 # include js in doctype views
-# doctype_js = {"doctype" : "public/js/doctype.js"}
+doctype_js = {
+    "Sales Invoice" : "mbw_integration_dms/js/sales_invoice.js",
+}
 # doctype_list_js = {"doctype" : "public/js/doctype_list.js"}
 # doctype_tree_js = {"doctype" : "public/js/doctype_tree.js"}
 # doctype_calendar_js = {"doctype" : "public/js/doctype_calendar.js"}
@@ -128,7 +130,7 @@ doc_events = {
         "before_save": "mbw_integration_dms.mbw_integration_dms.product.check_uom_dms"
 	},
     "Customer": {
-        # "on_trash": "mbw_integration_dms.mbw_integration_dms.customer.delete_customer"
+        "on_trash": "mbw_integration_dms.mbw_integration_dms.customer.delete_customer"
     },
     "Sales Invoice": {
         "on_submit": "mbw_integration_dms.mbw_integration_dms.sales_invoice.create_sale_invoice",

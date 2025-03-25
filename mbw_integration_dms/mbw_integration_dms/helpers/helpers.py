@@ -4,14 +4,16 @@
 import frappe
 import pydash
 from mbw_integration_dms.mbw_integration_dms.apiclient import DMSApiClient
+from mbw_integration_dms.mbw_integration_dms.utils import check_enable_integration_dms
 
+
+enable_dms = check_enable_integration_dms()
 
 # Xử lý thêm mới/cập nhật địa chỉ
 def create_address_customer(address_info, link_to_customer):
     try:
         key_info = {
-            "address_title", "address_type", "address_line1"
-            "is_primary_address", "is_shipping_address"
+            "address_title", "address_type", "address_line1", "city", "is_primary_address", "is_shipping_address"
         }
         address_info = frappe._dict(address_info)
         id_address = address_info.get("name") or False
@@ -54,6 +56,7 @@ def update_address(doc, info, keys, link_to_doctype=None):
     for key, value in info.items():
         if key in keys:
             doc.set(key, value)
+            
     if link_to_doctype:
         links = pydash.filter_(doc.get("links"), lambda x: x.get("link_doctype") != link_to_doctype.get("link_doctype") and x.get("link_name") != link_to_doctype.get("link_name"))
         doc.set("links", links)
@@ -107,30 +110,30 @@ def update_dms_order_status(doc):
 
 def on_sales_order_update(doc, method):
     """Kiểm tra nếu trạng thái thay đổi thành 'Delivered' thì gọi API cập nhật DMS."""
-
-    if doc.is_sale_dms and doc.get("status") != doc.get_db_value("status") and doc.status == "Delivered":
+    if enable_dms and doc.is_sale_dms and doc.get("status") != doc.get_db_value("status") and doc.status == "Delivered":
         update_dms_order_status(doc)
 
 def update_stt_so_cancel(doc, method):
-    dms_client = DMSApiClient()
-    if doc.is_sale_dms:
-        payload = {
-            "id": doc.dms_so_id,
-            "ma_don": doc.name,
-            "orgid": dms_client.orgid,
-            "status": "Từ chối",
-        }
+    if enable_dms:
+        dms_client = DMSApiClient()
+        if doc.is_sale_dms:
+            payload = {
+                "id": doc.dms_so_id,
+                "ma_don": doc.name,
+                "orgid": dms_client.orgid,
+                "status": "Từ chối",
+            }
 
-        try:
-            response = dms_client.request(
-                endpoint="/PublicAPI/postOrderStatus",
-                method="POST",
-                body=payload
-            )
-            return response.json()
+            try:
+                response = dms_client.request(
+                    endpoint="/PublicAPI/postOrderStatus",
+                    method="POST",
+                    body=payload
+                )
+                return response.json()
 
-        except Exception as e:
-            frappe.logger().error(f"Failed to update DMS order for SO {doc.name}: {str(e)}")
+            except Exception as e:
+                frappe.logger().error(f"Failed to update DMS order for SO {doc.name}: {str(e)}")
 
 
 def publish(key, message, synced=False, error=False, done=False, br=True):
