@@ -76,7 +76,7 @@ def create_sale_order(data=None, **kwargs):
         new_order = frappe.new_doc("Sales Order")
 
         # Dữ liệu bắn lên để tạo sale order mới
-        discount_amount = float(kwargs.get("discount_amount", 0))
+        discount_amount_so = float(kwargs.get("discount_amount", 0))
         apply_discount_on = kwargs.get("apply_discount_on")
         promotions = kwargs.get("promotion_dms", [])
 
@@ -96,10 +96,6 @@ def create_sale_order(data=None, **kwargs):
             "allocated_percentage": 100,
         })
 
-        if apply_discount_on is not None:
-            new_order.apply_discount_on = validate_choice(configs.discount_type)(apply_discount_on)
-            new_order.discount_amount = discount_amount
-
         new_order.ignore_pricing_rule = 1
 
         # Thêm mới items trong đơn hàng
@@ -107,19 +103,28 @@ def create_sale_order(data=None, **kwargs):
         if not items or not isinstance(items, list):
             frappe.throw("Danh sách sản phẩm (items) không hợp lệ hoặc trống.")
 
+        discount_amount_item = 0
         for item_data in items:
-            discount_amount = float(item_data.get("discount_amount", 0))
             is_free_item = item_data.get("is_free_item")
+            discount_item = item_data.get("discount_amount", 0)
+            discount_amount_item += discount_item
 
             new_order.append("items", {
                 "item_code": item_data.get("item_code"),
                 "qty": item_data.get("qty"),
                 "uom": item_data.get("uom"),
+                "custom_item_discount": discount_item,
                 "price_list_rate": item_data.get("rate") if is_free_item == 0 else 0,
-                "discount_amount": discount_amount,
                 "additional_notes": item_data.get("additional_notes"),
                 "is_free_item": is_free_item
             })
+
+        if apply_discount_on is not None:
+            new_order.apply_discount_on = validate_choice(configs.discount_type)(apply_discount_on)
+            new_order.discount_amount = discount_amount_so + discount_amount_item
+        
+        new_order.custom_order_discount = discount_amount_so
+        new_order.custom_product_discount = discount_amount_item
         
         value_sp = ["SP_ST_SP", "TIEN_SP", "SP_SL_SP", "MUTI_SP_ST_SP", "MUTI_SP_SL_SP", "MUTI_TIEN_SP"]
         for promo in promotions:
