@@ -52,7 +52,12 @@ def store_request_data() -> None:
         _validate_request(api_key, api_secret, frappe.request)
 
         # Xử lý dữ liệu từ request
-        data = json.loads(frappe.request.data)
+        raw_data = frappe.request.data
+        json_string = raw_data.decode("utf-8") if isinstance(raw_data, bytes) else raw_data
+        print('========================= request_data: ', frappe.request.data, flush=True)
+        print('========================= json_string: ', json_string, flush=True)
+        data = json.loads(json_string)
+        print('========================= data: ', data, flush=True)
         event = frappe.request.headers.get("X-ERP-Topic")
 
         return process_request(data, event)
