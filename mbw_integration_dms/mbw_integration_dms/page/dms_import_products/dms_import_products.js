@@ -258,7 +258,7 @@ ProductImporter = class {
 					align: "left",
 					editable: false,
 					focusable: false,
-					width: 200,
+					width: 250,
 				},
 				{
 					name: "Item Name",
@@ -269,13 +269,6 @@ ProductImporter = class {
 				},
 				{
 					name: "Status",
-					align: "center",
-					editable: false,
-					focusable: false,
-					width: 150,
-				},
-				{
-					name: "Action",
 					align: "center",
 					editable: false,
 					focusable: false,
@@ -308,9 +301,6 @@ ProductImporter = class {
 				"Item Code": product.item_code,
 				"Item Name": product.item_name,
 				Status: this.getProductSyncStatus(product.is_sync),
-				Action: !product.is_sync
-					? `<button type="button" class="btn btn-default btn-xs btn-sync mx-2" data-product="${product.id}"> Sync </button>`
-					: `<button type="button" class="btn btn-default btn-xs btn-resync mx-2" data-product="${product.id}"> Re-sync </button>`,
 			}));
 
 			return dmsProducts;
@@ -628,34 +618,27 @@ CategoryImporter = class {
 					name: "Name",
 					editable: false,
 					focusable: false,
-					width: 200,
+					width: 250,
 				},
 				{
 					name: "Category",
 					editable: false,
 					focusable: false,
-					width: 130,
+					width: 150,
 				},
 				{
 					name: "Doctype",
 					align: "center",
 					editable: false,
 					focusable: false,
-					width: 130,
+					width: 150,
 				},
 				{
 					name: "Status",
 					align: "center",
 					editable: false,
 					focusable: false,
-					width: 130,
-				},
-				{
-					name: "Action",
-					align: "center",
-					editable: false,
-					focusable: false,
-					width: 130,
+					width: 150,
 				},
 			],
 			data: await this.fetchdmsCategories(),
@@ -684,10 +667,7 @@ CategoryImporter = class {
 				Name: category.name,
 				Category: category.category,
 				Doctype: category.doctype,
-				Status: this.getCategoriesyncStatus(category.is_sync),
-				Action: !category.is_sync
-					? `<button type="button" class="btn btn-default btn-xs btn-sync mx-2" data-category="${category.name}"> Sync </button>`
-					: `<button type="button" class="btn btn-default btn-xs btn-resync mx-2" data-category="${category.name}"> Re-sync </button>`,
+				Status: this.getCategoriesyncStatus(category.is_sync)
 			}));
 
 			return dmsCategories;
@@ -1005,21 +985,14 @@ CustomerImporter = class {
 					align: "left",
 					editable: false,
 					focusable: false,
-					width: 150,
+					width: 200,
 				},
 				{
 					name: "Status",
 					align: "center",
 					editable: false,
 					focusable: false,
-					width: 120,
-				},
-				{
-					name: "Action",
-					align: "center",
-					editable: false,
-					focusable: false,
-					width: 100,
+					width: 150,
 				},
 			],
 			data: await this.fetchdmsCustomers(),
@@ -1049,9 +1022,6 @@ CustomerImporter = class {
 				"Customer Name": customer.customer_name,
 				"Email ID": customer.email_id,
 				Status: this.getCustomerSyncStatus(customer.is_sync),
-				Action: !customer.is_sync
-					? `<button type="button" class="btn btn-default btn-xs btn-sync mx-2" data-product="${customer.customer_code}"> Sync </button>`
-					: `<button type="button" class="btn btn-default btn-xs btn-resync mx-2" data-product="${customer.customer_code}"> Re-sync </button>`,
 			}));
 
 			return dmsCustomers;
@@ -1363,13 +1333,6 @@ SalesOrderImporter = class {
 					focusable: false,
 					width: 120,
 				},
-				{
-					name: "Action",
-					align: "center",
-					editable: false,
-					focusable: false,
-					width: 100,
-				},
 			],
 			data: await this.fetchdmsSalesOrders(),
 			layout: "fixed",
@@ -1392,9 +1355,6 @@ SalesOrderImporter = class {
 				// 'Image': product.image && product.image.src && `<img style="height: 50px" src="${product.image.src}">`,
 				"Sales Order": sales_order.name,
 				Status: this.getSalesOrderSyncStatus(sales_order.is_sync),
-				Action: !sales_order.is_sync
-					? `<button type="button" class="btn btn-default btn-xs btn-sync mx-2" data-product="${sales_order.customer_code}"> Sync </button>`
-					: `<button type="button" class="btn btn-default btn-xs btn-resync mx-2" data-product="${sales_order.customer_code}"> Re-sync </button>`,
 			}));
 
 			return dmsSalesOrders;

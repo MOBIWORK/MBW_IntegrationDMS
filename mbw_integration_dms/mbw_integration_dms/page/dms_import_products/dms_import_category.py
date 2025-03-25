@@ -20,12 +20,20 @@ def get_categories(page):
     data = []
 
     for idx, category in enumerate(CATEGORY_DOCTYPE):
-        query = f"""
-            SELECT name, is_sync
-            FROM `tab{category}`
-            WHERE is_sync = 0
-            LIMIT {start_idx}, {page_size}
-        """
+        if category != "UOM" and category != "Warehouse":
+            query = f"""
+                SELECT name, is_sync
+                FROM `tab{category}`
+                WHERE is_sync = 0
+                LIMIT {start_idx}, {page_size}
+            """
+        else:
+            query = f"""
+                            SELECT name, is_sync
+                            FROM `tab{category}`
+                            WHERE is_sync = 0 AND is_sale_dms = 1
+                            LIMIT {start_idx}, {page_size}
+                        """
         data_category = frappe.db.sql(query, as_dict=True)
         for d in data_category:
             d['doctype'] = category
@@ -42,10 +50,23 @@ def get_count_categories():
         all_category = frappe.db.count(
             category
         )
-        synced_category = frappe.db.count(
-            category,
-            filters={"is_sync": True},
-        )
+        if category != "UOM" and category != "Warehouse":
+            all_category = frappe.db.count(
+                category
+            )
+            synced_category = frappe.db.count(
+                category,
+                filters={"is_sync": True},
+            )
+        else:
+            all_category = frappe.db.count(
+                category,
+                filters={"is_sale_dms": True},
+            )
+            synced_category = frappe.db.count(
+                category,
+                filters={"is_sync": True, "is_sale_dms": True},
+            )
         erpnextCount += all_category
         syncedCount += synced_category
         pendingCount += all_category - synced_category
