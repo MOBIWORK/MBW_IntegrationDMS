@@ -26,12 +26,13 @@
    "default": "0",
    "fieldname": "is_sync",
    "fieldtype": "Check",
-   "label": "Is Sync"
+   "label": "Is Synced",
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-03-04 12:02:17.130015",
+ "modified": "2025-03-26 16:47:05.573815",
  "modified_by": "Administrator",
  "module": "MBW Integration DMS",
  "name": "DMS Customer Group",

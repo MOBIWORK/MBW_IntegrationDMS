@@ -26,12 +26,13 @@
    "default": "0",
    "fieldname": "is_sync",
    "fieldtype": "Check",
-   "label": "Is Sync"
+   "label": "Is Synced",
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-02-12 16:57:21.882779",
+ "modified": "2025-03-26 16:46:38.700999",
  "modified_by": "Administrator",
  "module": "MBW Integration DMS",
  "name": "Channel",
