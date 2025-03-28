@@ -1,28 +1,26 @@
 {
  "actions": [],
  "allow_rename": 1,
- "autoname": "field:channel_name",
- "creation": "2025-02-06 19:19:10.300294",
+ "creation": "2025-03-28 16:01:00.634619",
  "doctype": "DocType",
  "engine": "InnoDB",
  "field_order": [
-  "channel_name",
-  "channel_code",
+  "industry_code",
+  "industry_name",
   "is_sync"
  ],
  "fields": [
   {
-   "fieldname": "channel_name",
-   "fieldtype": "Data",
-   "label": "Channel Name",
-   "unique": 1
-  },
-  {
-   "fieldname": "channel_code",
+   "fieldname": "industry_code",
    "fieldtype": "Data",
    "in_list_view": 1,
-   "label": "Channel Code",
+   "label": "Industry Code",
    "reqd": 1
+  },
+  {
+   "fieldname": "industry_name",
+   "fieldtype": "Data",
+   "label": "Industry Name"
   },
   {
    "default": "0",
@@ -34,11 +32,10 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-03-28 15:50:29.099097",
+ "modified": "2025-03-28 16:02:15.666651",
  "modified_by": "Administrator",
  "module": "MBW Integration DMS",
- "name": "Channel",
- "naming_rule": "By fieldname",
+ "name": "DMS Industry",
  "owner": "Administrator",
  "permissions": [
   {
@@ -54,10 +51,7 @@
    "write": 1
   }
  ],
- "show_title_field_in_link": 1,
  "sort_field": "modified",
  "sort_order": "DESC",
- "states": [],
- "title_field": "channel_name",
- "translated_doctype": 1
+ "states": []
 }

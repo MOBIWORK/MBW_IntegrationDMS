@@ -23,9 +23,9 @@ def sync_industry_job(*args, **kwargs):
 
         # Lấy danh sách Industry chưa đồng bộ
         industrys = frappe.get_all(
-            "Industry Type",
+            "DMS Industry",
             filters={"is_sync": False},
-            fields=["name", "industry", "is_sync"]
+            fields=["industry_name", "industry_code", "is_sync"]
         )
 
         if not industrys:
@@ -38,8 +38,8 @@ def sync_industry_job(*args, **kwargs):
 
         formatted_data = [
             {
-                "code": ct["name"],  # Mã danh mục
-                "name": ct["industry"],  # Tên danh mục
+                "code": ct["industry_code"],  # Mã danh mục
+                "name": ct["industry_name"],  # Tên danh mục
                 "isActive": True  # Trạng thái danh mục (mặc định True)
             }
             for ct in industrys
@@ -69,7 +69,7 @@ def sync_industry_job(*args, **kwargs):
         # Nếu thành công, cập nhật is_sync = True
         if response.get("status"):
             for ct in industrys:
-                frappe.db.set_value("Industry Type", {"name": ct["name"]}, "is_sync", True)
+                frappe.db.set_value("DMS Industry", {"name": ct["industry_name"]}, "is_sync", True)
             frappe.db.commit()
 
             create_dms_log(
