@@ -15,10 +15,11 @@ def create_sale_invoice(doc, method):
             dms_client = DMSApiClient()
 
             id_dms = doc.id_dms
-            ma_don = doc.sales_order
+            ma_don_erp = doc.sales_order
             kho_hang = doc.set_warehouse
             ck_don = doc.discount_amount
             items = doc.items
+            ma_don_dms = frappe.get_value("Sales Order", {"name": ma_don_erp}, "dms_so_code")
             san_pham = []
 
             for i in items:
@@ -37,7 +38,8 @@ def create_sale_invoice(doc, method):
             request_payload = {
                 "orgid": dms_client.orgid,
                 "id_dms": id_dms,
-                "ma_don": ma_don,
+                "ma_don": ma_don_dms,
+                "ma_don_erp": ma_don_erp,
                 "ck_don": ck_don,
                 "kho_hang": kho_hang,
                 "san_pham": san_pham
