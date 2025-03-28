@@ -195,6 +195,7 @@ def delete_product(doc, method):
 # Check UOM DMS
 def check_uom_dms(doc, method):
     if enable_dms and check_sync_product and doc.is_sale_dms:
+        doc.is_sync = 0
         uoms_item = doc.uoms
         
         if uoms_item:
