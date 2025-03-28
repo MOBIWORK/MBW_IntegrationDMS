@@ -656,3 +656,8 @@ def delete_customer(doc, method):
         frappe.db.rollback()
         frappe.log_error(f"Lỗi khi xóa khách hàng: {str(e)}", "Customer Deletion")
         frappe.throw(f"Lỗi khi xóa khách hàng: {str(e)}")
+
+
+def update_status_after_change(doc, method):
+    if doc.is_sales_dms == 1:
+        doc.is_sync = 0

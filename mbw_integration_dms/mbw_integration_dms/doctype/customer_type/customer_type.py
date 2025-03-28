@@ -6,4 +6,5 @@ from frappe.model.document import Document
 
 
 class CustomerType(Document):
-	pass
+	def before_save(self):
+		self.is_sync = 0

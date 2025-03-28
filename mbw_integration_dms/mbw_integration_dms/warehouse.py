@@ -98,3 +98,7 @@ def sync_warehouse_job(*args, **kwargs):
         frappe.logger().error(f"Sync Error: {str(e)}")
         publish(KEY_REALTIME["key_realtime_categories"], f"Sync Error: {str(e)}", error=True)
         return {"error": str(e)}
+    
+def update_status_after_change(doc, method):
+    if doc.is_sale_dms == 1:
+        doc.is_sync = 0

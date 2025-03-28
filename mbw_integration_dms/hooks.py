@@ -130,7 +130,8 @@ doc_events = {
         "before_save": "mbw_integration_dms.mbw_integration_dms.product.check_uom_dms"
 	},
     "Customer": {
-        "on_trash": "mbw_integration_dms.mbw_integration_dms.customer.delete_customer"
+        "on_trash": "mbw_integration_dms.mbw_integration_dms.customer.delete_customer",
+        "before_save": "mbw_integration_dms.mbw_integration_dms.customer.update_status_after_change"
     },
     "Sales Invoice": {
         "on_submit": "mbw_integration_dms.mbw_integration_dms.sales_invoice.create_sale_invoice",
@@ -143,6 +144,21 @@ doc_events = {
     "Sales Order": {
         "on_cancel": "mbw_integration_dms.mbw_integration_dms.helpers.helpers.update_stt_so_cancel",
         "on_update_after_submit": "mbw_integration_dms.mbw_integration_dms.helpers.helpers.on_sales_order_update",
+    },
+    "UOM": {
+        "before_save": "mbw_integration_dms.mbw_integration_dms.unit.update_status_after_change"
+    },
+    "Warehouse": {
+        "before_save": "mbw_integration_dms.mbw_integration_dms.warehouse.update_status_after_change"
+    },
+    "Brand": {
+        "before_save": "mbw_integration_dms.mbw_integration_dms.brand.update_status_after_change"
+    },
+    "Territory": {
+        "before_save": "mbw_integration_dms.mbw_integration_dms.region.update_status_after_change"
+    },
+    "Supplier": {
+        "before_save": "mbw_integration_dms.mbw_integration_dms.provider.update_status_after_change"
     }
 }
 
