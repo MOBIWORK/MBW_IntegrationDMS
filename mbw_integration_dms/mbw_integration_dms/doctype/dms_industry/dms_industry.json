@@ -1,7 +1,7 @@
 {
  "actions": [],
  "allow_rename": 1,
- "autoname": "field:industry_name",
+ "autoname": "field:industry_code",
  "creation": "2025-03-28 16:01:00.634619",
  "doctype": "DocType",
  "engine": "InnoDB",
@@ -16,7 +16,8 @@
    "fieldtype": "Data",
    "in_list_view": 1,
    "label": "Industry Code",
-   "reqd": 1
+   "reqd": 1,
+   "unique": 1
   },
   {
    "fieldname": "industry_name",
@@ -32,9 +33,10 @@
    "read_only": 1
   }
  ],
+ "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-03-28 16:17:23.208605",
+ "modified": "2025-03-31 09:08:39.748765",
  "modified_by": "Administrator",
  "module": "MBW Integration DMS",
  "name": "DMS Industry",
