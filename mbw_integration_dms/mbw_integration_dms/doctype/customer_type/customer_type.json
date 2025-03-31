@@ -1,7 +1,7 @@
 {
  "actions": [],
  "allow_rename": 1,
- "autoname": "field:customer_type_name",
+ "autoname": "field:customer_type_id",
  "creation": "2025-02-06 17:06:53.574680",
  "doctype": "DocType",
  "engine": "InnoDB",
@@ -14,7 +14,8 @@
   {
    "fieldname": "customer_type_id",
    "fieldtype": "Data",
-   "label": "Customer Type ID"
+   "label": "Customer Type ID",
+   "unique": 1
   },
   {
    "fieldname": "customer_type_name",
@@ -32,7 +33,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-03-26 16:46:24.991162",
+ "modified": "2025-03-31 08:41:12.918281",
  "modified_by": "Administrator",
  "module": "MBW Integration DMS",
  "name": "Customer Type",
