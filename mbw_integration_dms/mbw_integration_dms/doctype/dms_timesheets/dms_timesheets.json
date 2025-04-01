@@ -96,7 +96,8 @@
    "fieldtype": "Select",
    "in_list_view": 1,
    "label": "Series",
-   "options": "TS-.YYYY.-",
+   "no_copy": 1,
+   "options": "TS-.MM.-.YYYY.-",
    "reqd": 1,
    "set_only_once": 1
   }
@@ -105,7 +106,7 @@
  "icon": "fa fa-clock-o",
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-04-01 09:44:40.593775",
+ "modified": "2025-04-01 14:30:09.141190",
  "modified_by": "Administrator",
  "module": "MBW Integration DMS",
  "name": "DMS Timesheets",

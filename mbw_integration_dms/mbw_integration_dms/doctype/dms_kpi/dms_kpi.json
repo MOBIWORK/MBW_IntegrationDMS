@@ -230,6 +230,7 @@
   {
    "fieldname": "so_khach_hang_vieng_tham_th",
    "fieldtype": "Int",
+   "in_list_view": 1,
    "label": "S\u1ed1 kh\u00e1ch h\u00e0ng vi\u1ebfng th\u0103m TH"
   },
   {
@@ -299,7 +300,8 @@
    "fieldtype": "Select",
    "in_list_view": 1,
    "label": "Series",
-   "options": "KPI-.YYYY.-",
+   "no_copy": 1,
+   "options": "TS-.MM.-.YYYY.",
    "reqd": 1,
    "set_only_once": 1
   }
@@ -308,7 +310,7 @@
  "icon": "fa fa-clock-o",
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-04-01 11:17:29.545798",
+ "modified": "2025-04-01 14:30:20.920817",
  "modified_by": "Administrator",
  "module": "MBW Integration DMS",
  "name": "DMS KPI",
