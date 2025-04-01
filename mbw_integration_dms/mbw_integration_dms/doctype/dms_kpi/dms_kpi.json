@@ -1,10 +1,14 @@
 {
  "actions": [],
  "allow_rename": 1,
+ "autoname": "naming_series:",
  "creation": "2025-02-27 10:00:24.413285",
  "doctype": "DocType",
+ "document_type": "Document",
  "engine": "InnoDB",
  "field_order": [
+  "title",
+  "naming_series",
   "month",
   "year",
   "ten_nhom",
@@ -274,14 +278,35 @@
    "fieldname": "year",
    "fieldtype": "Int",
    "label": "N\u0103m"
+  },
+  {
+   "default": "{ten_nhan_vien}",
+   "fieldname": "title",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Title",
+   "no_copy": 1,
+   "print_hide": 1
+  },
+  {
+   "fieldname": "naming_series",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Series",
+   "options": "KPI-.YYYY.-",
+   "reqd": 1,
+   "set_only_once": 1
   }
  ],
+ "grid_page_length": 50,
+ "icon": "fa fa-clock-o",
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-02-28 10:44:38.849428",
+ "modified": "2025-04-01 09:09:32.966908",
  "modified_by": "Administrator",
  "module": "MBW Integration DMS",
  "name": "DMS KPI",
+ "naming_rule": "By \"Naming Series\" field",
  "owner": "Administrator",
  "permissions": [
   {
@@ -298,6 +323,7 @@
   }
  ],
  "sort_field": "modified",
- "sort_order": "DESC",
- "states": []
+ "sort_order": "ASC",
+ "states": [],
+ "title_field": "title"
 }

@@ -34,10 +34,12 @@
   },
   {
    "fieldname": "promotion_item_code",
-   "fieldtype": "Data",
-   "label": "Promotion Item Code"
+   "fieldtype": "Link",
+   "label": "Promotion Item Code",
+   "options": "Item"
   },
   {
+   "fetch_from": "promotion_item_code.item_name",
    "fieldname": "promotional_item_name",
    "fieldtype": "Data",
    "label": "Promotional Item Name"
@@ -66,7 +68,7 @@
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2025-03-25 15:29:48.058503",
+ "modified": "2025-04-01 08:43:39.329832",
  "modified_by": "Administrator",
  "module": "MBW Integration DMS",
  "name": "DMS Promotions Result",

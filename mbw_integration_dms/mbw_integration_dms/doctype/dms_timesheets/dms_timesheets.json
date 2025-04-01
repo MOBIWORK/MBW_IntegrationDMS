@@ -1,10 +1,14 @@
 {
  "actions": [],
  "allow_rename": 1,
+ "autoname": "naming_series:",
  "creation": "2025-02-27 11:06:10.502763",
  "doctype": "DocType",
+ "document_type": "Document",
  "engine": "InnoDB",
  "field_order": [
+  "title",
+  "naming_series",
   "employee",
   "employee_code",
   "email",
@@ -74,14 +78,35 @@
    "fieldname": "employee_code",
    "fieldtype": "Data",
    "label": "Employee code"
+  },
+  {
+   "default": "{employee}",
+   "fieldname": "title",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Title",
+   "no_copy": 1,
+   "print_hide": 1
+  },
+  {
+   "fieldname": "naming_series",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Series",
+   "options": "TS-.YYYY.-",
+   "reqd": 1,
+   "set_only_once": 1
   }
  ],
+ "grid_page_length": 50,
+ "icon": "fa fa-clock-o",
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-02-28 11:45:00.379108",
+ "modified": "2025-04-01 09:05:33.676781",
  "modified_by": "Administrator",
  "module": "MBW Integration DMS",
  "name": "DMS Timesheets",
+ "naming_rule": "By \"Naming Series\" field",
  "owner": "Administrator",
  "permissions": [
   {
@@ -98,6 +123,7 @@
   }
  ],
  "sort_field": "modified",
- "sort_order": "DESC",
- "states": []
+ "sort_order": "ASC",
+ "states": [],
+ "title_field": "title"
 }
