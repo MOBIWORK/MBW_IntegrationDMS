@@ -28,7 +28,7 @@ def sync_product_job(*args, **kwargs):
 
         query = """
             SELECT 
-                i.name, i.item_code, i.item_name, i.industry, i.brand, i.description, i.stock_uom,
+                i.name, i.item_code, i.item_name, i.industry_dms, i.brand, i.description, i.stock_uom,
                 it.item_tax_template, s.supplier as provider,
 
                 (SELECT um.uom FROM `tabUOM Conversion Detail` um 
@@ -68,7 +68,7 @@ def sync_product_job(*args, **kwargs):
             {
                 "code": i["item_code"],
                 "name": i["item_name"],
-                "industry": i["industry"],
+                "industry": i["industry_dms"],
                 "provider": i["provider"],
                 "brand": i["brand"],
                 "unit_even": i["unit_even"],
