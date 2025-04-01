@@ -73,7 +73,7 @@ def get_kpi_dms(**kwargs):
                     # Dữ liệu nhóm & sản phẩm trọng tâm
                     "group_id": i["KH"]["group"].get("groupID"),
                     "name_group": i["KH"]["group"].get("name"),
-                    "san_pham_trong_tam": ", ".join(i["KH"]["sp_trong_tam"].get("san_pham", [])) if isinstance(i["KH"]["sp_trong_tam"].get("san_pham"), list) else "",
+                    "san_pham_trong_tam": ", ".join([sp["tsp"] for sp in i["KH"]["sp_trong_tam"].get("san_pham", []) if isinstance(sp, dict) and "tsp" in sp]) if isinstance(i["KH"]["sp_trong_tam"].get("san_pham"), list) else "",
                     "tong_don_hang": i["KH"]["sp_trong_tam"].get("tong_dh", 0),
                     "tong_khach_hang": i["KH"]["sp_trong_tam"].get("tong_kh", 0),
                     "tong_so_luong": i["KH"]["sp_trong_tam"].get("tong_sl", 0),
