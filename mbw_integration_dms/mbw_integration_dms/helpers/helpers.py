@@ -92,7 +92,7 @@ def update_dms_order_status(doc):
     
     payload = {
         "id": doc.dms_so_id,
-        "ma_don": doc.name,
+        "ma_don": doc.dms_so_code,
         "orgid": dms_client.orgid,
         "status": "Đã giao hàng",
     }
@@ -110,7 +110,7 @@ def update_dms_order_status(doc):
 
 def on_sales_order_update(doc, method):
     """Kiểm tra nếu trạng thái thay đổi thành 'Delivered' thì gọi API cập nhật DMS."""
-    if enable_dms and doc.is_sale_dms and doc.get("status") != doc.get_db_value("status") and doc.status == "Delivered":
+    if enable_dms and doc.is_sale_dms and doc.get("delivery_status") != doc.get_db_value("delivery_status") and doc.delivery_status == "Fully Delivered":
         update_dms_order_status(doc)
 
 def update_stt_so_cancel(doc, method):
@@ -119,7 +119,7 @@ def update_stt_so_cancel(doc, method):
         if doc.is_sale_dms:
             payload = {
                 "id": doc.dms_so_id,
-                "ma_don": doc.name,
+                "ma_don": doc.dms_so_code,
                 "orgid": dms_client.orgid,
                 "status": "Từ chối",
             }

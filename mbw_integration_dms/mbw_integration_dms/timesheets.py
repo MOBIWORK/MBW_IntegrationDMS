@@ -105,6 +105,7 @@ def get_timesheet_dms(**kwargs):
                         # Nếu chưa tồn tại, tạo mới bản ghi
                         new_kpi = frappe.get_doc({
                             "doctype": "DMS Timesheets",
+                            "naming_series": "TS-.MM.-.YYYY.-",
                             "employee_code": employee_code,
                             "employee": employee_name,
                             "email": email,

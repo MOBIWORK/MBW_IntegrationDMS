@@ -51,6 +51,7 @@ def get_kpi_dms(**kwargs):
 
                 data = {
                     "doctype": "DMS KPI",
+                    "naming_series": "KPI-.MM.-.YYYY.-",
                     "ten_nhom": i.get("ten_nhom"),
                     "ma_nhom": i.get("ma_nhom"),
                     "parent_id": i.get("parentID"),
