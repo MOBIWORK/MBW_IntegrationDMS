@@ -117,6 +117,7 @@
   {
    "fieldname": "doanh_thu_th",
    "fieldtype": "Float",
+   "in_list_view": 1,
    "label": "Doanh thu TH"
   },
   {
@@ -212,6 +213,7 @@
   {
    "fieldname": "doanh_so_th",
    "fieldtype": "Float",
+   "in_list_view": 1,
    "label": "Doanh s\u1ed1 TH"
   },
   {
@@ -227,11 +229,13 @@
   {
    "fieldname": "so_khach_hang_vieng_tham_th",
    "fieldtype": "Int",
+   "in_list_view": 1,
    "label": "S\u1ed1 kh\u00e1ch h\u00e0ng vi\u1ebfng th\u0103m TH"
   },
   {
    "fieldname": "so_khach_hang_moi_th",
    "fieldtype": "Int",
+   "in_list_view": 1,
    "label": "S\u1ed1 kh\u00e1ch h\u00e0ng m\u1edbi TH"
   },
   {
@@ -272,11 +276,13 @@
   {
    "fieldname": "month",
    "fieldtype": "Int",
+   "in_list_view": 1,
    "label": "Th\u00e1ng"
   },
   {
    "fieldname": "year",
    "fieldtype": "Int",
+   "in_list_view": 1,
    "label": "N\u0103m"
   },
   {
@@ -302,7 +308,7 @@
  "icon": "fa fa-clock-o",
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-04-01 09:09:32.966908",
+ "modified": "2025-04-01 09:40:23.934347",
  "modified_by": "Administrator",
  "module": "MBW Integration DMS",
  "name": "DMS KPI",

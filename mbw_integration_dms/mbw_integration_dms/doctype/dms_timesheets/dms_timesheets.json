@@ -31,11 +31,13 @@
   {
    "fieldname": "month",
    "fieldtype": "Int",
+   "in_list_view": 1,
    "label": "Month"
   },
   {
    "fieldname": "year",
    "fieldtype": "Int",
+   "in_list_view": 1,
    "label": "Year"
   },
   {
@@ -77,6 +79,7 @@
   {
    "fieldname": "employee_code",
    "fieldtype": "Data",
+   "in_list_view": 1,
    "label": "Employee code"
   },
   {
@@ -102,7 +105,7 @@
  "icon": "fa fa-clock-o",
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-04-01 09:05:33.676781",
+ "modified": "2025-04-01 09:44:40.593775",
  "modified_by": "Administrator",
  "module": "MBW Integration DMS",
  "name": "DMS Timesheets",
