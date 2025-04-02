@@ -308,10 +308,9 @@ def sync_customer_group_job(*args, **kwargs):
 def create_customers(**kwargs):
     results = []
     try:
-        # data = kwargs.get("data", {})
-        data = kwargs
-        customer_list = kwargs.get("customers", [])  # Danh sách nhân viên
-        id_log_dms = kwargs.get("id_log", "")  # ID log chung
+        data = kwargs.get("data", {})
+        customer_list = data.get("customers", [])  # Danh sách nhân viên
+        id_log_dms = data.get("id_log", "")  # ID log chung
 
         for customer_data in customer_list:
             try:
@@ -418,7 +417,8 @@ def create_customers(**kwargs):
                     current_address.append("links", link_cs_address)
                     current_address.save()
 
-                    new_customer.primary_address = current_address.name if frappe.db.exists("Address", current_address.name) else current_address.address_title
+                    new_customer.customer_primary_address = current_address.name if frappe.db.exists("Address", current_address.name) else current_address.address_title
+                    new_customer.primary_address = current_address.address_title
                     new_customer.save()
 
                 # Liên kết contact với khách hàng
@@ -446,7 +446,7 @@ def create_customers(**kwargs):
                         message=f"Customer {customer_code_dms} create successfully."
                     )
                 
-                results.append({"customer_code_dms": customer_data.get("customer_code"), "status": "Success"})
+                results.append({"customer_code_dms": customer_data.get("customer_code_dms"), "status": "Success"})
 
             except Exception as e:
                 error_message = f"Error creating/updating customer {customer_data.get('customer_code_dms')}: {str(e)}"
