@@ -38,7 +38,7 @@ def sync_customer_job(*args, **kwargs):
             "Customer",
             filters={"is_sync": False, "is_sales_dms": True},
             fields=["customer_code_dms", "customer_name", "is_sales_dms", "email_id", "mobile_no", "tax_id", "dms_customer_group",
-                    "dms_customer_type", "sfa_sale_channel", "territory", "customer_primary_contact", "customer_primary_address"]
+                    "dms_customer_type", "sfa_sale_channel", "territory", "customer_primary_contact", "primary_address"]
         )
 
         if not customers:
@@ -62,8 +62,8 @@ def sync_customer_job(*args, **kwargs):
                 "khu_vuc": i["territory"],
                 "sdt": i["mobile_no"],
                 "nguoi_lien_he": i["customer_primary_contact"],
-                "address": i["customer_primary_address"],
-                "address_shipping": i["customer_primary_address"]
+                "address": i["primary_address"].strip().split("\n")[0] if i.get("primary_address") else "",
+                "address_shipping": i["primary_address"].strip().split("\n")[0] if i.get("primary_address") else ""
             }
             for i in customers
         ]
@@ -418,7 +418,7 @@ def create_customers(**kwargs):
                     current_address.append("links", link_cs_address)
                     current_address.save()
 
-                    new_customer.customer_primary_address = current_address.name if frappe.db.exists("Address", current_address.name) else current_address.address_title
+                    new_customer.primary_address = current_address.name if frappe.db.exists("Address", current_address.name) else current_address.address_title
                     new_customer.save()
 
                 # Liên kết contact với khách hàng
