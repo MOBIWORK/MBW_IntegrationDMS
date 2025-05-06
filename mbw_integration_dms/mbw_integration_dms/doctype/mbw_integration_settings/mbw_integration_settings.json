@@ -1,81 +1,162 @@
 {
  "actions": [],
- "creation": "2025-02-05 14:22:18.685020",
+ "allow_rename": 1,
+ "autoname": "field:company",
+ "creation": "2025-02-17 16:37:38.546153",
+ "default_view": "List",
  "doctype": "DocType",
  "engine": "InnoDB",
  "field_order": [
-  "dms_authentication_details_section",
-  "og_name",
-  "dms_password",
-  "dms_api_secret",
-  "erp_authentication_details_section",
+  "enable_dms",
+  "dms_authentication",
+  "orgid",
+  "dms_access_token",
+  "dms_api_url",
+  "erp_authentication",
   "company",
-  "erp_password",
-  "erp_api_secret"
+  "erp_api_key",
+  "erp_api_secret",
+  "sync_product",
+  "auto_sync_product",
+  "item_group",
+  "sync_orders",
+  "order_sync_frequency",
+  "inventory_sync",
+  "enable_inventory_sync",
+  "inventory_sync_frequency",
+  "th\u00eam_danh_m\u1ee5c_theo_ti\u00eau_chu\u1ea9n_ph\u00e2n_ph\u1ed1i_vi\u1ec7t_nam_section",
+  "auto_add_category"
  ],
  "fields": [
   {
-   "fieldname": "dms_authentication_details_section",
-   "fieldtype": "Section Break",
-   "label": "DMS Authentication Details"
-  },
-  {
-   "fieldname": "og_name",
+   "fieldname": "dms_access_token",
    "fieldtype": "Data",
-   "label": "T\u00ean t\u1ed5 ch\u1ee9c"
-  },
-  {
-   "fieldname": "dms_password",
-   "fieldtype": "Password",
    "label": "DMS Access Token"
   },
   {
-   "fieldname": "dms_api_secret",
+   "fieldname": "dms_api_url",
    "fieldtype": "Data",
-   "label": "DMS API Secret"
+   "label": "DMS API URL"
   },
   {
-   "fieldname": "erp_authentication_details_section",
-   "fieldtype": "Section Break",
-   "label": "ERP Authentication Details"
-  },
-  {
-   "fieldname": "company",
+   "fieldname": "erp_api_key",
    "fieldtype": "Data",
-   "label": "C\u00f4ng ty"
-  },
-  {
-   "fieldname": "erp_password",
-   "fieldtype": "Data",
-   "label": "ERP Access Token"
+   "label": "ERP API KEY"
   },
   {
    "fieldname": "erp_api_secret",
    "fieldtype": "Data",
-   "label": "ERP API Secret"
+   "label": "ERP API SECRET"
+  },
+  {
+   "default": "0",
+   "fieldname": "enable_dms",
+   "fieldtype": "Check",
+   "label": "B\u1eadt t\u00ednh n\u0103ng \u0111\u1ed3ng b\u1ed9 MBW.DMS"
+  },
+  {
+   "fieldname": "dms_authentication",
+   "fieldtype": "Section Break",
+   "label": "X\u00e1c th\u1ef1c h\u1ec7 th\u1ed1ng MBW.DMS"
+  },
+  {
+   "fieldname": "orgid",
+   "fieldtype": "Data",
+   "label": "M\u00e3 t\u1ed5 ch\u1ee9c"
+  },
+  {
+   "fieldname": "erp_authentication",
+   "fieldtype": "Section Break",
+   "label": "X\u00e1c th\u1ef1c h\u1ec7 th\u1ed1ng ERPNEXT"
+  },
+  {
+   "fieldname": "company",
+   "fieldtype": "Link",
+   "label": "C\u00f4ng ty",
+   "options": "Company",
+   "unique": 1
+  },
+  {
+   "fieldname": "sync_product",
+   "fieldtype": "Section Break",
+   "label": "\u0110\u1ed3ng b\u1ed9 s\u1ea3n ph\u1ea9m"
+  },
+  {
+   "default": "0",
+   "fieldname": "auto_sync_product",
+   "fieldtype": "Check",
+   "label": "T\u1ef1 \u0111\u1ed9ng \u0111\u1ed3ng b\u1ed9 s\u1ea3n ph\u1ea9m sang MBW.DMS"
+  },
+  {
+   "fieldname": "item_group",
+   "fieldtype": "Data",
+   "label": "Nh\u00f3m s\u1ea3n ph\u1ea9m"
+  },
+  {
+   "fieldname": "sync_orders",
+   "fieldtype": "Section Break",
+   "label": "\u0110\u1ed3ng b\u1ed9 \u0111\u01a1n h\u00e0ng"
+  },
+  {
+   "fieldname": "order_sync_frequency",
+   "fieldtype": "Select",
+   "label": "T\u1ea7n su\u1ea5t \u0111\u1ed3ng b\u1ed9 \u0111\u01a1n h\u00e0ng (ph\u00fat)",
+   "options": "10\n15\n30\n60"
+  },
+  {
+   "fieldname": "inventory_sync",
+   "fieldtype": "Section Break",
+   "label": "\u0110\u1ed3ng b\u1ed9 t\u1ed3n kho"
+  },
+  {
+   "default": "0",
+   "fieldname": "enable_inventory_sync",
+   "fieldtype": "Check",
+   "label": "B\u1eadt \u0111\u1ed3ng b\u1ed9 t\u1ed3n kho"
+  },
+  {
+   "fieldname": "inventory_sync_frequency",
+   "fieldtype": "Select",
+   "label": "T\u1ea7n su\u1ea5t \u0111\u1ed3ng b\u1ed9 t\u1ed3n kho (ph\u00fat)",
+   "options": "5\n10\n15\n30\n60"
+  },
+  {
+   "fieldname": "th\u00eam_danh_m\u1ee5c_theo_ti\u00eau_chu\u1ea9n_ph\u00e2n_ph\u1ed1i_vi\u1ec7t_nam_section",
+   "fieldtype": "Section Break",
+   "label": "Th\u00eam danh m\u1ee5c theo ti\u00eau chu\u1ea9n ph\u00e2n ph\u1ed1i Vi\u1ec7t Nam"
+  },
+  {
+   "fieldname": "auto_add_category",
+   "fieldtype": "Button",
+   "label": "T\u1ef1 \u0111\u1ed9ng th\u00eam danh m\u1ee5c"
   }
  ],
  "index_web_pages_for_search": 1,
- "issingle": 1,
  "links": [],
- "modified": "2025-02-05 14:25:36.753778",
+ "modified": "2025-03-06 08:49:57.183532",
  "modified_by": "Administrator",
  "module": "MBW Integration DMS",
  "name": "MBW Integration Settings",
+ "naming_rule": "By fieldname",
  "owner": "Administrator",
  "permissions": [
   {
    "create": 1,
    "delete": 1,
    "email": 1,
+   "export": 1,
    "print": 1,
    "read": 1,
+   "report": 1,
    "role": "System Manager",
    "share": 1,
    "write": 1
   }
  ],
+ "show_title_field_in_link": 1,
  "sort_field": "modified",
  "sort_order": "DESC",
- "states": []
+ "states": [],
+ "title_field": "company",
+ "translated_doctype": 1
 }

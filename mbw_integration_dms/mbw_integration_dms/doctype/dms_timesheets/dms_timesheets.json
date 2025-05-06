@@ -1,0 +1,133 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "naming_series:",
+ "creation": "2025-02-27 11:06:10.502763",
+ "doctype": "DocType",
+ "document_type": "Document",
+ "engine": "InnoDB",
+ "field_order": [
+  "title",
+  "naming_series",
+  "employee",
+  "employee_code",
+  "email",
+  "month",
+  "year",
+  "timesheets_detail",
+  "total_days",
+  "total_ls",
+  "total_lm",
+  "total_t",
+  "total_nc"
+ ],
+ "fields": [
+  {
+   "fieldname": "employee",
+   "fieldtype": "Link",
+   "label": "Employee name",
+   "options": "Sales Person"
+  },
+  {
+   "fieldname": "month",
+   "fieldtype": "Int",
+   "in_list_view": 1,
+   "label": "Month"
+  },
+  {
+   "fieldname": "year",
+   "fieldtype": "Int",
+   "in_list_view": 1,
+   "label": "Year"
+  },
+  {
+   "fieldname": "timesheets_detail",
+   "fieldtype": "Table",
+   "label": "Timesheets detail",
+   "options": "Employee timesheets detail"
+  },
+  {
+   "fieldname": "email",
+   "fieldtype": "Data",
+   "label": "Email"
+  },
+  {
+   "fieldname": "total_days",
+   "fieldtype": "Int",
+   "label": "Total days"
+  },
+  {
+   "fieldname": "total_ls",
+   "fieldtype": "Float",
+   "label": "Total LS"
+  },
+  {
+   "fieldname": "total_lm",
+   "fieldtype": "Float",
+   "label": "Total LM"
+  },
+  {
+   "fieldname": "total_t",
+   "fieldtype": "Float",
+   "label": "Total T"
+  },
+  {
+   "fieldname": "total_nc",
+   "fieldtype": "Float",
+   "label": "Total NC"
+  },
+  {
+   "fieldname": "employee_code",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Employee code"
+  },
+  {
+   "default": "{employee}",
+   "fieldname": "title",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Title",
+   "no_copy": 1,
+   "print_hide": 1
+  },
+  {
+   "fieldname": "naming_series",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Series",
+   "no_copy": 1,
+   "options": "TS-.MM.-.YYYY.-",
+   "reqd": 1,
+   "set_only_once": 1
+  }
+ ],
+ "grid_page_length": 50,
+ "icon": "fa fa-clock-o",
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2025-04-01 14:30:09.141190",
+ "modified_by": "Administrator",
+ "module": "MBW Integration DMS",
+ "name": "DMS Timesheets",
+ "naming_rule": "By \"Naming Series\" field",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "ASC",
+ "states": [],
+ "title_field": "title"
+}

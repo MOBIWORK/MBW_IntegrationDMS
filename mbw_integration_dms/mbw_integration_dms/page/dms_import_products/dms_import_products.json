@@ -1,0 +1,23 @@
+{
+ "content": null,
+ "creation": "2025-02-07 09:17:08.588898",
+ "docstatus": 0,
+ "doctype": "Page",
+ "idx": 0,
+ "modified": "2025-02-07 09:17:08.588898",
+ "modified_by": "Administrator",
+ "module": "MBW Integration DMS",
+ "name": "dms-import-products",
+ "owner": "Administrator",
+ "page_name": "dms-import-products",
+ "roles": [
+  {
+   "role": "System Manager"
+  }
+ ],
+ "script": null,
+ "standard": "Yes",
+ "style": null,
+ "system_page": 0,
+ "title": "DMS Import Products"
+}

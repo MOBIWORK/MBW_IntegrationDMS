@@ -1,0 +1,86 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2025-02-27 11:06:55.329471",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "date",
+  "gio_vao",
+  "gio_ra",
+  "tong_gio",
+  "ve_som",
+  "ve_muon",
+  "cong",
+  "dia_ch\u1ec9_vao",
+  "dia_chi_ra"
+ ],
+ "fields": [
+  {
+   "fieldname": "gio_vao",
+   "fieldtype": "Time",
+   "in_list_view": 1,
+   "label": "Gi\u1edd v\u00e0o"
+  },
+  {
+   "fieldname": "gio_ra",
+   "fieldtype": "Time",
+   "in_list_view": 1,
+   "label": "Gi\u1edd ra"
+  },
+  {
+   "fieldname": "tong_gio",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "T\u1ed5ng gi\u1edd"
+  },
+  {
+   "fieldname": "ve_som",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "V\u1ec1 s\u1edbm"
+  },
+  {
+   "fieldname": "ve_muon",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "V\u1ec1 mu\u1ed9n"
+  },
+  {
+   "fieldname": "cong",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "C\u00f4ng"
+  },
+  {
+   "fieldname": "dia_ch\u1ec9_vao",
+   "fieldtype": "Data",
+   "label": "\u0110\u1ecba ch\u1ec9 v\u00e0o"
+  },
+  {
+   "fieldname": "dia_chi_ra",
+   "fieldtype": "Data",
+   "label": "\u0110\u1ecba ch\u1ec9 ra"
+  },
+  {
+   "fieldname": "date",
+   "fieldtype": "Int",
+   "in_list_view": 1,
+   "label": "Ng\u00e0y"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2025-04-01 09:45:45.487991",
+ "modified_by": "Administrator",
+ "module": "MBW Integration DMS",
+ "name": "Employee timesheets detail",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

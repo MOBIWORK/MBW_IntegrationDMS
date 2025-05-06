@@ -1,0 +1,337 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "naming_series:",
+ "creation": "2025-02-27 10:00:24.413285",
+ "doctype": "DocType",
+ "document_type": "Document",
+ "engine": "InnoDB",
+ "field_order": [
+  "title",
+  "naming_series",
+  "month",
+  "year",
+  "ten_nhom",
+  "ma_nhom",
+  "column_break_d6fz",
+  "parent_id",
+  "email",
+  "ma_nhan_vien",
+  "ten_nhan_vien",
+  "left_day",
+  "k\u1ebf_ho\u1ea1ch_section",
+  "doanh_so",
+  "doanh_thu",
+  "san_luong",
+  "so_don_hang",
+  "so_khach_hang_vieng_tham",
+  "so_khach_hang_dat_hang",
+  "so_khach_hang_moi",
+  "sku",
+  "gio",
+  "column_break_4vdo",
+  "san_pham_trong_tam",
+  "tong_don_hang",
+  "tong_khach_hang",
+  "tong_so_luong",
+  "tong_so_tien",
+  "group_id",
+  "name_group",
+  "th\u1ef1c_hi\u1ec7n_section",
+  "doanh_so_th",
+  "doanh_thu_th",
+  "san_luong_th",
+  "so_don_hang_th",
+  "so_khach_hang_vieng_tham_th",
+  "so_khach_hang_moi_th",
+  "sku_th",
+  "column_break_omdd",
+  "gio_th",
+  "vt_co_don_hang_trong_tuyen",
+  "vt_khong_don_hang_trong_tuyen",
+  "vt_co_don_hang_ngoai_tuyen",
+  "vt_khong_don_hang_ngoai_tuyen",
+  "khach_hang_vt_duy_nhat",
+  "sku0",
+  "so_khach_hang_dat_hang_th"
+ ],
+ "fields": [
+  {
+   "fieldname": "column_break_d6fz",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "parent_id",
+   "fieldtype": "Data",
+   "label": "Parent ID"
+  },
+  {
+   "fieldname": "email",
+   "fieldtype": "Data",
+   "label": "Email"
+  },
+  {
+   "fieldname": "left_day",
+   "fieldtype": "Int",
+   "label": "Left day"
+  },
+  {
+   "fieldname": "k\u1ebf_ho\u1ea1ch_section",
+   "fieldtype": "Section Break",
+   "label": "K\u1ebf ho\u1ea1ch"
+  },
+  {
+   "fieldname": "doanh_thu",
+   "fieldtype": "Float",
+   "label": "Doanh thu"
+  },
+  {
+   "fieldname": "sku",
+   "fieldtype": "Int",
+   "label": "Sku"
+  },
+  {
+   "fieldname": "gio",
+   "fieldtype": "Int",
+   "label": "Gi\u1edd"
+  },
+  {
+   "fieldname": "column_break_4vdo",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "group_id",
+   "fieldtype": "Data",
+   "label": "Group ID"
+  },
+  {
+   "fieldname": "name_group",
+   "fieldtype": "Data",
+   "label": "Name group"
+  },
+  {
+   "fieldname": "th\u1ef1c_hi\u1ec7n_section",
+   "fieldtype": "Section Break",
+   "label": "Th\u1ef1c hi\u1ec7n"
+  },
+  {
+   "fieldname": "doanh_thu_th",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "Doanh thu TH"
+  },
+  {
+   "fieldname": "sku_th",
+   "fieldtype": "Float",
+   "label": "Sku TH"
+  },
+  {
+   "fieldname": "column_break_omdd",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "sku0",
+   "fieldtype": "Float",
+   "label": "Sku0"
+  },
+  {
+   "fieldname": "ten_nhom",
+   "fieldtype": "Data",
+   "label": "T\u00ean nh\u00f3m"
+  },
+  {
+   "fieldname": "ma_nhom",
+   "fieldtype": "Data",
+   "label": "M\u00e3 nh\u00f3m"
+  },
+  {
+   "fieldname": "ma_nhan_vien",
+   "fieldtype": "Data",
+   "label": "M\u00e3 nh\u00e2n vi\u00ean"
+  },
+  {
+   "fieldname": "ten_nhan_vien",
+   "fieldtype": "Link",
+   "label": "T\u00ean nh\u00e2n vi\u00ean",
+   "options": "Sales Person"
+  },
+  {
+   "fieldname": "doanh_so",
+   "fieldtype": "Float",
+   "label": "Doanh s\u1ed1"
+  },
+  {
+   "fieldname": "san_luong",
+   "fieldtype": "Float",
+   "label": "S\u1ea3n l\u01b0\u1ee3ng"
+  },
+  {
+   "fieldname": "so_don_hang",
+   "fieldtype": "Int",
+   "label": "S\u1ed1 \u0111\u01a1n h\u00e0ng"
+  },
+  {
+   "fieldname": "so_khach_hang_vieng_tham",
+   "fieldtype": "Int",
+   "label": "S\u1ed1 kh\u00e1ch h\u00e0ng vi\u1ebfng th\u0103m"
+  },
+  {
+   "fieldname": "so_khach_hang_dat_hang",
+   "fieldtype": "Int",
+   "label": "S\u1ed1 kh\u00e1ch h\u00e0ng \u0111\u1eb7t h\u00e0ng"
+  },
+  {
+   "fieldname": "so_khach_hang_moi",
+   "fieldtype": "Int",
+   "label": "S\u1ed1 kh\u00e1ch h\u00e0ng m\u1edbi"
+  },
+  {
+   "fieldname": "san_pham_trong_tam",
+   "fieldtype": "Small Text",
+   "label": "S\u1ea3n ph\u1ea9m tr\u1ecdng t\u00e2m"
+  },
+  {
+   "fieldname": "tong_don_hang",
+   "fieldtype": "Int",
+   "label": "T\u1ed5ng \u0111\u01a1n h\u00e0ng"
+  },
+  {
+   "fieldname": "tong_khach_hang",
+   "fieldtype": "Int",
+   "label": "T\u1ed5ng kh\u00e1ch h\u00e0ng"
+  },
+  {
+   "fieldname": "tong_so_luong",
+   "fieldtype": "Int",
+   "label": "T\u1ed5ng s\u1ed1 l\u01b0\u1ee3ng"
+  },
+  {
+   "fieldname": "tong_so_tien",
+   "fieldtype": "Float",
+   "label": "T\u1ed5ng s\u1ed1 ti\u1ec1n"
+  },
+  {
+   "fieldname": "doanh_so_th",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "Doanh s\u1ed1 TH"
+  },
+  {
+   "fieldname": "san_luong_th",
+   "fieldtype": "Float",
+   "label": "S\u1ea3n l\u01b0\u1ee3ng TH"
+  },
+  {
+   "fieldname": "so_don_hang_th",
+   "fieldtype": "Int",
+   "in_list_view": 1,
+   "label": "S\u1ed1 \u0111\u01a1n h\u00e0ng TH"
+  },
+  {
+   "fieldname": "so_khach_hang_vieng_tham_th",
+   "fieldtype": "Int",
+   "in_list_view": 1,
+   "label": "S\u1ed1 kh\u00e1ch h\u00e0ng vi\u1ebfng th\u0103m TH"
+  },
+  {
+   "fieldname": "so_khach_hang_moi_th",
+   "fieldtype": "Int",
+   "in_list_view": 1,
+   "label": "S\u1ed1 kh\u00e1ch h\u00e0ng m\u1edbi TH"
+  },
+  {
+   "fieldname": "gio_th",
+   "fieldtype": "Float",
+   "label": "Gi\u1edd TH"
+  },
+  {
+   "fieldname": "vt_co_don_hang_trong_tuyen",
+   "fieldtype": "Float",
+   "label": "Vt c\u00f3 \u0111\u01a1n h\u00e0ng trong tuy\u1ebfn"
+  },
+  {
+   "fieldname": "vt_khong_don_hang_trong_tuyen",
+   "fieldtype": "Float",
+   "label": "Vt kh\u00f4ng \u0111\u01a1n h\u00e0ng trong tuy\u1ebfn"
+  },
+  {
+   "fieldname": "vt_co_don_hang_ngoai_tuyen",
+   "fieldtype": "Float",
+   "label": "Vt c\u00f3 \u0111\u01a1n h\u00e0ng ngo\u1ea1i tuy\u1ebfn"
+  },
+  {
+   "fieldname": "vt_khong_don_hang_ngoai_tuyen",
+   "fieldtype": "Float",
+   "label": "Vt kh\u00f4ng \u0111\u01a1n h\u00e0ng ngo\u1ea1i tuy\u1ebfn"
+  },
+  {
+   "fieldname": "khach_hang_vt_duy_nhat",
+   "fieldtype": "Float",
+   "label": "Kh\u00e1ch h\u00e0ng vt duy nh\u1ea5t"
+  },
+  {
+   "fieldname": "so_khach_hang_dat_hang_th",
+   "fieldtype": "Int",
+   "label": "S\u1ed1 kh\u00e1ch h\u00e0ng \u0111\u1eb7t h\u00e0ng TH"
+  },
+  {
+   "fieldname": "month",
+   "fieldtype": "Int",
+   "in_list_view": 1,
+   "label": "Th\u00e1ng"
+  },
+  {
+   "fieldname": "year",
+   "fieldtype": "Int",
+   "in_list_view": 1,
+   "label": "N\u0103m"
+  },
+  {
+   "default": "{ten_nhan_vien}",
+   "fieldname": "title",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Title",
+   "no_copy": 1,
+   "print_hide": 1
+  },
+  {
+   "fieldname": "naming_series",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Series",
+   "no_copy": 1,
+   "options": "TS-.MM.-.YYYY.",
+   "reqd": 1,
+   "set_only_once": 1
+  }
+ ],
+ "grid_page_length": 50,
+ "icon": "fa fa-clock-o",
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2025-04-01 14:30:20.920817",
+ "modified_by": "Administrator",
+ "module": "MBW Integration DMS",
+ "name": "DMS KPI",
+ "naming_rule": "By \"Naming Series\" field",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "ASC",
+ "states": [],
+ "title_field": "title"
+}

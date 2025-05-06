@@ -28,7 +28,9 @@ app_license = "mit"
 # page_js = {"page" : "public/js/file.js"}
 
 # include js in doctype views
-# doctype_js = {"doctype" : "public/js/doctype.js"}
+doctype_js = {
+    "Sales Invoice" : "mbw_integration_dms/js/sales_invoice.js",
+}
 # doctype_list_js = {"doctype" : "public/js/doctype_list.js"}
 # doctype_tree_js = {"doctype" : "public/js/doctype_tree.js"}
 # doctype_calendar_js = {"doctype" : "public/js/doctype_calendar.js"}
@@ -122,34 +124,55 @@ app_license = "mit"
 # ---------------
 # Hook on document methods and events
 
-# doc_events = {
-# 	"*": {
-# 		"on_update": "method",
-# 		"on_cancel": "method",
-# 		"on_trash": "method"
-# 	}
-# }
+doc_events = {
+	"Item": {
+		"on_trash": "mbw_integration_dms.mbw_integration_dms.product.delete_product",
+        "before_save": "mbw_integration_dms.mbw_integration_dms.product.check_uom_dms"
+	},
+    "Customer": {
+        "on_trash": "mbw_integration_dms.mbw_integration_dms.customer.delete_customer",
+        "before_save": "mbw_integration_dms.mbw_integration_dms.customer.update_status_after_change"
+    },
+    "Sales Invoice": {
+        "on_submit": "mbw_integration_dms.mbw_integration_dms.sales_invoice.create_sale_invoice",
+        "before_insert": "mbw_integration_dms.mbw_integration_dms.sales_invoice.add_sales_order"
+    },
+    "Delivery Note": {
+        "on_submit": "mbw_integration_dms.mbw_integration_dms.delivery_note.create_delivery_note",
+        "before_insert": "mbw_integration_dms.mbw_integration_dms.delivery_note.add_sales_order"
+    },
+    "Sales Order": {
+        "on_cancel": "mbw_integration_dms.mbw_integration_dms.helpers.helpers.update_stt_so_cancel",
+        "on_update_after_submit": "mbw_integration_dms.mbw_integration_dms.helpers.helpers.on_sales_order_update",
+    },
+    "UOM": {
+        "before_save": "mbw_integration_dms.mbw_integration_dms.unit.update_status_after_change"
+    },
+    "Warehouse": {
+        "before_save": "mbw_integration_dms.mbw_integration_dms.warehouse.update_status_after_change"
+    },
+    "Brand": {
+        "before_save": "mbw_integration_dms.mbw_integration_dms.brand.update_status_after_change"
+    },
+    "Territory": {
+        "before_save": "mbw_integration_dms.mbw_integration_dms.region.update_status_after_change"
+    },
+    "Supplier": {
+        "before_save": "mbw_integration_dms.mbw_integration_dms.provider.update_status_after_change"
+    }
+}
 
 # Scheduled Tasks
 # ---------------
 
-# scheduler_events = {
-# 	"all": [
-# 		"mbw_integration_dms.tasks.all"
-# 	],
-# 	"daily": [
-# 		"mbw_integration_dms.tasks.daily"
-# 	],
-# 	"hourly": [
-# 		"mbw_integration_dms.tasks.hourly"
-# 	],
-# 	"weekly": [
-# 		"mbw_integration_dms.tasks.weekly"
-# 	],
-# 	"monthly": [
-# 		"mbw_integration_dms.tasks.monthly"
-# 	],
-# }
+scheduler_events = {
+    "cron": {
+        "0 */6 * * *": [
+            "mbw_integration_dms.mbw_integration_dms.kpi.get_kpi_dms",
+            "mbw_integration_dms.mbw_integration_dms.timesheets.get_timesheet_dms",
+        ]
+    }
+}
 
 # Testing
 # -------
@@ -227,3 +250,19 @@ app_license = "mit"
 # 	"Logging DocType Name": 30  # days to retain logs
 # }
 
+
+fixtures = [
+    {
+        "doctype": "Custom Field",
+        "filters": [["module", "in", ("MBW Integration DMS")]]
+    },
+    {
+        "doctype": "Client Script",
+        "filters": [["module", "in", ("MBW Integration DMS")]]
+    },
+    {
+        "doctype": "Server Script",
+        "filters": [["module", "in", ("MBW Integration DMS")]]
+    },
+
+]
