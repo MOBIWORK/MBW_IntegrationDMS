@@ -80,8 +80,14 @@ def create_sale_order(data=None, **kwargs):
         apply_discount_on = kwargs.get("apply_discount_on")
         promotions = kwargs.get("promotion_dms", [])
 
+        sales_person = None
         user_mail = kwargs.get("email_employee")
-        sales_person = frappe.get_value("Sales Person", {"email": user_mail}, "name")
+        sales_person_name = frappe.get_value("Sales Person", {"email": user_mail}, "name")
+        if sales_person_name:
+            sales_person = sales_person_name
+        else:
+            employee = frappe.get_value("Employee", {"user_id": user_mail}, "name")
+            sales_person = frappe.get_value("Sales Person", {"employee": employee}, "name")
 
         new_order.customer = validate_not_none(customer_name) if customer_name else validate_not_none(cus_name)
         new_order.dms_so_code = kwargs.get("dms_so_code")
