@@ -27,7 +27,6 @@ def get_projected_qty(item_code=None, last_updated=None):
     # Lấy danh sách warehouses hợp lệ (không bị disabled)
     valid_warehouses = frappe.get_all("Warehouse", filters={"disabled": 0, "is_sale_dms": 1}, pluck="name")
 
-    # Lấy số lượng projected_qty từ bảng Bin, chỉ lấy dữ liệu thuộc kho hợp lệ
     bins = frappe.get_all(
         "Bin",
         filters=filters,

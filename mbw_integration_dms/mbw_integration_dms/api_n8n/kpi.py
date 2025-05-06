@@ -2,7 +2,6 @@
 # For license information, please see LICENSE
 
 import frappe
-from mbw_integration_dms.mbw_integration_dms.apiclient import DMSApiClient
 from mbw_integration_dms.mbw_integration_dms.utils import create_dms_log, check_enable_integration_dms
 from mbw_integration_dms.mbw_integration_dms.helpers.helpers import publish
 from mbw_integration_dms.mbw_integration_dms.constants import KEY_REALTIME
@@ -69,57 +68,44 @@ def prepare_kpi_data(i, month, year):
 
     return data
 
-
 @frappe.whitelist(allow_guest=True)
 def get_kpi_dms(**kwargs):
     if enable_dms:
         try:
-            dms_client = DMSApiClient()
             month = int(nowdate().split('-')[1])
             year = int(nowdate().split('-')[0])
-
-            # Dữ liệu gửi đi
-            request_payload = {"orgid": dms_client.orgid, "month": month, "year": year}
-
-            # Ghi log request
-            create_dms_log(status="Processing", method="POST", message="Sync KPI DMS", request_data=request_payload)
-
+            
             # Gửi dữ liệu qua API DMS
-            response, success = dms_client.request(endpoint="/PublicAPI/reportKPI", method="POST", body=request_payload)
+            for i in kwargs.get("data", []):
+                sp_name = i["name"]
+                existing_sp = frappe.db.exists("Sales Person", {"name": sp_name})
+                if not existing_sp:
+                    continue
 
-            if response.get("result"):
-                results = response["result"]
+                existing_kpi = frappe.db.exists("DMS KPI", {"month": month, "year": year, "ten_nhan_vien": sp_name})
+                data = prepare_kpi_data(i, month, year)
 
-                for i in results:
-                    sp_name = i["name"]
-                    existing_sp = frappe.db.exists("Sales Person", {"name": sp_name})
-                    if not existing_sp:
-                        continue
+                if existing_kpi:
+                    # Cập nhật nếu đã tồn tại
+                    data.pop("doctype", None)
+                    frappe.db.set_value("DMS KPI", existing_kpi, data)
+                else:
+                    # Tạo mới nếu chưa tồn tại
+                    new_kpi = frappe.get_doc(data)
+                    new_kpi.insert(ignore_permissions=True)
 
-                    existing_kpi = frappe.db.exists("DMS KPI", {"month": month, "year": year, "ten_nhan_vien": sp_name})
-                    data = prepare_kpi_data(i, month, year)
+            frappe.db.commit()
 
-                    if existing_kpi:
-                        # Cập nhật nếu đã tồn tại
-                        data.pop("doctype", None)
-                        frappe.db.set_value("DMS KPI", existing_kpi, data)
-                    else:
-                        # Tạo mới nếu chưa tồn tại
-                        new_kpi = frappe.get_doc(data)
-                        new_kpi.insert(ignore_permissions=True)
-
-                frappe.db.commit()
-
-                create_dms_log(status="Success", response_data=response, message="KPI synced successfully.")
-                publish(KEY_REALTIME["key_realtime_kpi"], "KPI synced successfully.", done=True)
-                return {"message": "KPI synced successfully."}
-
-            create_dms_log(status="Failed", response_data=response, message="Failed to sync KPI DMS.")
-            frappe.logger().error(f"Failed to sync: {response}")
-            publish(KEY_REALTIME["key_realtime_kpi"], f"Failed to sync: {response}", error=True)
-            return {"error": response}
+            create_dms_log(status="Success", response_data=kwargs, message="KPI synced successfully.")
+            return {
+                "success": True,
+                "message": "KPI synced successfully."
+            }
 
         except Exception as e:
             create_dms_log(status="Error", exception=str(e), message="Exception occurred while syncing KPI.", rollback=True)
             frappe.logger().error(f"Sync Error: {str(e)}")
-            return {"error": str(e)}
+            return {
+                "success": True,
+                "error": str(e)
+            }

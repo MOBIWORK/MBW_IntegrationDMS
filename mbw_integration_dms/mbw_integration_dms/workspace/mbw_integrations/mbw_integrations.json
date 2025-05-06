@@ -16,8 +16,47 @@
   {
    "hidden": 0,
    "is_query_report": 0,
-   "label": "Danh m\u1ee5c d\u1eef li\u1ec7u",
+   "label": "Ch\u1ee9c n\u0103ng",
    "link_count": 3,
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Card Break"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "C\u1ea5u h\u00ecnh",
+   "link_count": 0,
+   "link_to": "Amazon SP API Settings",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Nh\u1eadt k\u00ed t\u00edch h\u1ee3p",
+   "link_count": 0,
+   "link_to": "Ecommerce Integration Log",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "\u0110\u1ed3ng b\u1ed9 d\u1eef li\u1ec7u th\u1ee7 c\u00f4ng",
+   "link_count": 0,
+   "link_to": "dms-import-products",
+   "link_type": "Page",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Danh m\u1ee5c d\u1eef li\u1ec7u",
+   "link_count": 5,
    "link_type": "DocType",
    "onboard": 0,
    "type": "Card Break"
@@ -55,18 +94,9 @@
   {
    "hidden": 0,
    "is_query_report": 0,
-   "label": "Ch\u1ee9c n\u0103ng",
-   "link_count": 3,
-   "link_type": "DocType",
-   "onboard": 0,
-   "type": "Card Break"
-  },
-  {
-   "hidden": 0,
-   "is_query_report": 0,
-   "label": "C\u1ea5u h\u00ecnh",
+   "label": "Ng\u00e0nh h\u00e0ng S\u1ea3n ph\u1ea9m",
    "link_count": 0,
-   "link_to": "Amazon SP API Settings",
+   "link_to": "DMS Industry",
    "link_type": "DocType",
    "onboard": 0,
    "type": "Link"
@@ -74,25 +104,15 @@
   {
    "hidden": 0,
    "is_query_report": 0,
-   "label": "Nh\u1eadt k\u00ed t\u00edch h\u1ee3p",
+   "label": "DMS KPI",
    "link_count": 0,
-   "link_to": "Ecommerce Integration Log",
+   "link_to": "DMS KPI",
    "link_type": "DocType",
-   "onboard": 0,
-   "type": "Link"
-  },
-  {
-   "hidden": 0,
-   "is_query_report": 0,
-   "label": "\u0110\u1ed3ng b\u1ed9 d\u1eef li\u1ec7u th\u1ee7 c\u00f4ng",
-   "link_count": 0,
-   "link_to": "dms-import-products",
-   "link_type": "Page",
    "onboard": 0,
    "type": "Link"
   }
  ],
- "modified": "2025-02-14 16:28:48.322870",
+ "modified": "2025-04-02 10:50:13.488659",
  "modified_by": "Administrator",
  "module": "MBW Integration DMS",
  "name": "MBW Integrations",

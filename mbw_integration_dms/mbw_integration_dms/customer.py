@@ -3,6 +3,7 @@
 
 import frappe
 import pydash
+import json
 
 from mbw_integration_dms.mbw_integration_dms.apiclient import DMSApiClient
 from mbw_integration_dms.mbw_integration_dms.utils import create_dms_log, check_enable_integration_dms
@@ -38,7 +39,7 @@ def sync_customer_job(*args, **kwargs):
             "Customer",
             filters={"is_sync": False, "is_sales_dms": True},
             fields=["customer_code_dms", "customer_name", "is_sales_dms", "email_id", "mobile_no", "tax_id", "dms_customer_group",
-                    "dms_customer_type", "sfa_sale_channel", "territory", "customer_primary_contact", "primary_address"]
+                    "dms_customer_type", "sfa_sale_channel", "territory", "customer_primary_contact", "customer_primary_address", "primary_address"]
         )
 
         if not customers:
@@ -49,8 +50,44 @@ def sync_customer_job(*args, **kwargs):
         # Khởi tạo API Client
         dms_client = DMSApiClient()
 
-        formatted_data = [
-            {
+        formatted_data = []
+        for i in customers:
+            longitude = None
+            latitude = None
+            address = None
+            address_shipping = None
+            phone_number = None
+
+            if i.get("customer_primary_address"):
+                addresses = frappe.get_all(
+                    "Address",
+                    filters={"name": i["customer_primary_address"]},
+                    fields=["address_title", "address_location"]
+                )
+            
+                for address_entry in addresses:
+                    # Lấy địa chỉ chính (primary address)
+                    address = address_entry.address_title
+                    address_shipping = address_entry.address_title
+
+                    # Lấy tọa độ từ address_location
+                    if address_entry.get("address_location"):
+                        try:
+                            location_data = json.loads(address_entry.address_location)
+                            longitude = location_data.get("long")
+                            latitude = location_data.get("lat")
+                        except Exception as e:
+                            frappe.log_error(f"JSON parsing error for address {address_entry.name}: {str(e)}")
+
+            if i.get("customer_primary_contact"):
+                contact_info = frappe.get_doc("Contact", i["customer_primary_contact"])
+
+                # Lấy tất cả các số điện thoại liên kết
+                if contact_info and contact_info.phone_nos:
+                    # Chỉ lấy số điện thoại đầu tiên, bạn có thể điều chỉnh nếu muốn lấy tất cả
+                    phone_number = contact_info.phone_nos[0].phone if contact_info.phone_nos else ""
+
+            formatted_data.append({
                 "code": i["customer_code_dms"],
                 "name": i["customer_name"],
                 "trang_thai": True,
@@ -60,13 +97,13 @@ def sync_customer_job(*args, **kwargs):
                 "loai_khach_hang": i["dms_customer_type"],
                 "kenh": i["sfa_sale_channel"],
                 "khu_vuc": i["territory"],
-                "sdt": i["mobile_no"],
+                "sdt": i["mobile_no"] if i["mobile_no"] else phone_number,
                 "nguoi_lien_he": i["customer_primary_contact"],
-                "address": i["primary_address"].strip().split("\n")[0] if i.get("primary_address") else "",
-                "address_shipping": i["primary_address"].strip().split("\n")[0] if i.get("primary_address") else ""
-            }
-            for i in customers
-        ]
+                "address": address if address else "",
+                "address_shipping": address_shipping if address_shipping else "",
+                "long": longitude,
+                "lat": latitude
+            })
 
         # Dữ liệu gửi đi
         request_payload = {
