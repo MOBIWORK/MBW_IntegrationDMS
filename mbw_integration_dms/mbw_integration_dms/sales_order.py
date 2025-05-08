@@ -76,7 +76,7 @@ def create_sale_order(data=None, **kwargs):
         new_order = frappe.new_doc("Sales Order")
 
         # Dữ liệu bắn lên để tạo sale order mới
-        discount_amount_so = float(kwargs.get("discount_amount", 0))
+        discount_amount_so = float(kwargs.get("discount_amount") or 0)
         apply_discount_on = kwargs.get("apply_discount_on")
         promotions = kwargs.get("promotion_dms", [])
 
