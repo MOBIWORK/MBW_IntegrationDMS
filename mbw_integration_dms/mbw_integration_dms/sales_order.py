@@ -4,7 +4,7 @@
 import frappe
 from frappe import _
 import json
-
+from frappe.utils import nowdate
 from mbw_integration_dms.mbw_integration_dms.utils import (
     create_dms_log
 )
@@ -91,7 +91,15 @@ def create_sale_order(data=None, **kwargs):
 
         new_order.customer = validate_not_none(customer_name) if customer_name else validate_not_none(cus_name)
         new_order.dms_so_code = kwargs.get("dms_so_code")
-        new_order.delivery_date = validate_date(kwargs.get("delivery_date") / 1000)
+        delivery_ts = kwargs.get("delivery_date")
+        if delivery_ts:
+            try:
+                new_order.delivery_date = validate_date(delivery_ts / 1000)
+            except:
+                new_order.delivery_date = nowdate()
+        else:
+            new_order.delivery_date = nowdate()
+
         new_order.set_warehouse = validate_not_none(kwargs.get("set_warehouse"))
         new_order.dms_so_code = kwargs.get("dms_so_code")
         new_order.dms_so_id = kwargs.get("dms_so_id")
