@@ -134,9 +134,9 @@ def get_remaining_qty(sales_order):
                 "stock_uom": item.stock_uom,
                 "remaining_qty": remaining_qty,
                 "rate": item.rate,
+                "price_list_rate": item.price_list_rate,
                 "is_free_item": item.is_free_item,
                 "income_account": income_account,
                 "sales_order": sales_order
             })
-    
     return remaining_items

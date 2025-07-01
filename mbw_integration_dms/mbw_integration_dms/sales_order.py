@@ -5,9 +5,7 @@ import frappe
 from frappe import _
 import json
 from frappe.utils import nowdate
-from mbw_integration_dms.mbw_integration_dms.utils import (
-    create_dms_log
-)
+from mbw_integration_dms.mbw_integration_dms.utils import create_dms_log
 from mbw_integration_dms.mbw_integration_dms.helpers import configs
 from mbw_integration_dms.mbw_integration_dms.customer import create_customers
 from mbw_integration_dms.mbw_integration_dms.helpers.helpers import create_partner_log
