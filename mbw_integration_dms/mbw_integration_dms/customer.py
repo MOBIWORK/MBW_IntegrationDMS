@@ -675,7 +675,6 @@ def create_new_contact(contact_data, customer_name, address_data):
 # Xóa khách hàng
 def delete_customer(doc, method):
     dms_client = DMSApiClient()
-
     customer_codes = [doc.customer_code_dms] if isinstance(doc, frappe.model.document.Document) else doc
 
     request_payload = {
@@ -694,7 +693,7 @@ def delete_customer(doc, method):
     try:
         # Gửi request xóa kh đến API DMS
         response, success = dms_client.request(
-            endpoint="/CustomerDel",
+            endpoint="/PublicAPI/CustomerDel",
             method="POST",
             body=request_payload
         )
