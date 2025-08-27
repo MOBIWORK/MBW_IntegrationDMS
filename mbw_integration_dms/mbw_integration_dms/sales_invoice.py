@@ -40,6 +40,7 @@ def create_sale_invoice(doc, method):
                 "id_dms": id_dms,
                 "ma_don": ma_don_dms,
                 "ma_don_erp": ma_don_erp,
+                "toDebit": 1,
                 "ck_don": ck_don,
                 "kho_hang": kho_hang,
                 "san_pham": san_pham
