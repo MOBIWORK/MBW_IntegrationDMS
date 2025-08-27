@@ -34,6 +34,8 @@ def create_sale_invoice(doc, method):
                     "is_km": i.is_free_item
                 }
                 san_pham.append(item)
+                
+            total_payment_amount = sum([row.payment_amount for row in doc.payment_schedule])
 
             request_payload = {
                 "orgid": dms_client.orgid,
@@ -41,6 +43,7 @@ def create_sale_invoice(doc, method):
                 "ma_don": ma_don_dms,
                 "ma_don_erp": ma_don_erp,
                 "toDebit": 1,
+                "totalDebit": total_payment_amount,
                 "ck_don": ck_don,
                 "kho_hang": kho_hang,
                 "san_pham": san_pham
