@@ -52,8 +52,6 @@ def sync_customer_job(*args, **kwargs):
 
         formatted_data = []
         for i in customers:
-            longitude = None
-            latitude = None
             address = None
             address_shipping = None
             phone_number = None
@@ -62,7 +60,7 @@ def sync_customer_job(*args, **kwargs):
                 addresses = frappe.get_all(
                     "Address",
                     filters={"name": i["customer_primary_address"]},
-                    fields=["address_title", "address_location"]
+                    fields=["address_title"]
                 )
             
                 for address_entry in addresses:
@@ -70,22 +68,12 @@ def sync_customer_job(*args, **kwargs):
                     address = address_entry.address_title
                     address_shipping = address_entry.address_title
 
-                    # Lấy tọa độ từ address_location
-                    if address_entry.get("address_location"):
-                        try:
-                            location_data = json.loads(address_entry.address_location)
-                            longitude = location_data.get("long")
-                            latitude = location_data.get("lat")
-                        except Exception as e:
-                            frappe.log_error(f"JSON parsing error for address {address_entry.name}: {str(e)}")
-
             if i.get("customer_primary_contact"):
                 contact_info = frappe.get_doc("Contact", i["customer_primary_contact"])
 
                 # Lấy tất cả các số điện thoại liên kết
                 if contact_info and contact_info.phone_nos:
-                    # Chỉ lấy số điện thoại đầu tiên, bạn có thể điều chỉnh nếu muốn lấy tất cả
-                    phone_number = contact_info.phone_nos[0].phone if contact_info.phone_nos else ""
+                    phone_number = contact_info.phone_nos[0].phone
 
             formatted_data.append({
                 "code": i["customer_code_dms"],
@@ -101,8 +89,6 @@ def sync_customer_job(*args, **kwargs):
                 "nguoi_lien_he": i["customer_primary_contact"],
                 "address": address if address else "",
                 "address_shipping": address_shipping if address_shipping else "",
-                "long": longitude,
-                "lat": latitude
             })
 
         # Dữ liệu gửi đi
