@@ -2,25 +2,17 @@
 # For license information, please see LICENSE
 
 import frappe
-import pydash
-import json
+from frappe import _
+import pydash, json, datetime
 
 from mbw_integration_dms.mbw_integration_dms.apiclient import DMSApiClient
 from mbw_integration_dms.mbw_integration_dms.utils import create_dms_log, check_enable_integration_dms
-
-from mbw_integration_dms.mbw_integration_dms.helpers import configs
 from mbw_integration_dms.mbw_integration_dms.helpers.helpers import (
     create_address_customer,
     create_partner_log,
     publish
 )
-from mbw_integration_dms.mbw_integration_dms.helpers.validators import (
-    validate_date, 
-    validate_phone_number, 
-    validate_choice,
-    validate_not_none,
-)
-
+from mbw_integration_dms.mbw_integration_dms.helpers.validators import validate_date
 from mbw_integration_dms.mbw_integration_dms.constants import KEY_REALTIME
 
 enable_dms = check_enable_integration_dms()
@@ -38,111 +30,141 @@ def sync_customer_job(*args, **kwargs):
         customers = frappe.get_all(
             "Customer",
             filters={"is_sync": False, "is_sales_dms": True},
-            fields=["customer_code_dms", "customer_name", "is_sales_dms", "email_id", "mobile_no", "tax_id", "dms_customer_group",
-                    "dms_customer_type", "sfa_sale_channel", "territory", "customer_primary_contact", "customer_primary_address", "primary_address"]
+            fields=[
+                "name",
+                "customer_code_dms",
+                "customer_name",
+                "email_id",
+                "mobile_no",
+                "tax_id",
+                "dms_customer_group",
+                "dms_customer_type",
+                "sfa_sale_channel",
+                "territory",
+                "customer_primary_contact",
+                "customer_primary_address",
+            ]
         )
 
         if not customers:
             create_dms_log(status="Skipped", message="No new customer to sync.")
-            publish(KEY_REALTIME["key_realtime_customer"], "No new customer to sync.", done = True)
+            publish(KEY_REALTIME["key_realtime_customer"], "No new customer to sync.", done=True)
             return {"message": "No new data to sync."}
-        
-        # Khởi tạo API Client
+
+        # Khởi tạo DMS API client
         dms_client = DMSApiClient()
 
-        formatted_data = []
-        for i in customers:
-            address = None
-            address_shipping = None
-            phone_number = None
+        success_count = 0
+        fail_count = 0
 
+        # Lặp qua từng customer để gửi riêng lẻ
+        for idx, i in enumerate(customers, start=1):
+            address = ""
+            address_shipping = ""
+            phone_number = ""
+
+            # Lấy địa chỉ chính
             if i.get("customer_primary_address"):
-                addresses = frappe.get_all(
+                address_doc = frappe.db.get_value(
                     "Address",
-                    filters={"name": i["customer_primary_address"]},
-                    fields=["address_title"]
+                    i["customer_primary_address"],
+                    "address_title"
                 )
-            
-                for address_entry in addresses:
-                    # Lấy địa chỉ chính (primary address)
-                    address = address_entry.address_title
-                    address_shipping = address_entry.address_title
+                if address_doc:
+                    address = address_doc
+                    address_shipping = address_doc
 
+            # Lấy số điện thoại liên hệ chính
             if i.get("customer_primary_contact"):
                 contact_info = frappe.get_doc("Contact", i["customer_primary_contact"])
-
-                # Lấy tất cả các số điện thoại liên kết
                 if contact_info and contact_info.phone_nos:
                     phone_number = contact_info.phone_nos[0].phone
 
-            formatted_data.append({
-                "code": i["customer_code_dms"],
-                "name": i["customer_name"],
+            # Chuẩn bị payload
+            request_payload = {
+                "ma_kh": i.get("customer_code_dms") or "",
+                "ten_kh": i.get("customer_name") or "",
                 "trang_thai": True,
-                "email": i["email_id"],
-                "mst": i["tax_id"],
-                "nhom_khach_hang": i["dms_customer_group"],
-                "loai_khach_hang": i["dms_customer_type"],
-                "kenh": i["sfa_sale_channel"],
-                "khu_vuc": i["territory"],
-                "sdt": i["mobile_no"] if i["mobile_no"] else phone_number,
-                "nguoi_lien_he": i["customer_primary_contact"],
-                "address": address if address else "",
-                "address_shipping": address_shipping if address_shipping else "",
-            })
+                "trang_thai_kh": "Hoạt động",
+                "email": i.get("email_id") or "",
+                "nhom_kh": i.get("dms_customer_group") or "",
+                "loai_kh": i.get("dms_customer_type") or "",
+                "kenh": i.get("sfa_sale_channel") or "",
+                "khu_vuc": i.get("territory") or "",
+                "sdt": i.get("mobile_no") or phone_number or "",
+                "nguoi_lien_he": i.get("customer_primary_contact") or "",
+                "dia_chi": address,
+                "dia_chi_gh": address_shipping,
+                "hinh_anh": "",
+                "han_muc_cn": "",
+            }
 
-        # Dữ liệu gửi đi
-        request_payload = {
-            "orgid": dms_client.orgid,
-            "data": formatted_data
-        }
-
-        # Ghi log request
-        create_dms_log(
-            status="Processing",
-            method="POST",
-            request_data=request_payload
-        )
-
-        # Gửi dữ liệu qua API DMS
-        response, success = dms_client.request(
-            endpoint="/PublicAPI/CustomerSync",
-            method="POST",
-            body=request_payload
-        )
-
-        # Nếu thành công, cập nhật is_sync = True
-        if response.get("status"):
-            for i in customers:
-                frappe.db.set_value("Customer", {"customer_code_dms": i["customer_code_dms"]}, "is_sync", True)
-            frappe.db.commit()
-
+            # Ghi log từng bản ghi
             create_dms_log(
-                status="Success",
-                response_data=response,
-                message="Customers synced successfully."
+                status="Processing",
+                method="POST",
+                request_data=request_payload
             )
-            publish(KEY_REALTIME["key_realtime_customer"], "Customers synced successfully.", done = True)
-            return {"message": "Customers synced successfully."}
-        else:
-            create_dms_log(
-                status="Failed",
-                response_data=response,
-                message="Failed to sync customers."
+
+            # Gửi request từng Customer
+            response, success = dms_client.request(
+                endpoint="/OpenAPI/V1/Customer",
+                method="POST",
+                body=request_payload
             )
-            frappe.logger().error(f"Failed to sync: {response}")
-            publish(KEY_REALTIME["key_realtime_customer"], f"Failed to sync: {response}", error = True)
-            return {"error": response}
+
+            # Nếu thành công
+            if response.get("status"):
+                frappe.db.set_value("Customer", i["name"], "is_sync", True)
+                success_count += 1
+
+                create_dms_log(
+                    status="Success",
+                    response_data=response,
+                    message=f"Customer {i['customer_name']} synced successfully."
+                )
+                publish(
+                    KEY_REALTIME["key_realtime_customer"],
+                    f"Synced Customer {i['customer_name']} successfully.",
+                )
+
+            else:
+                fail_count += 1
+                error_message = response.get("message", "Failed to sync.")
+                create_dms_log(
+                    status="Failed",
+                    response_data=response,
+                    message=f"Failed to sync Customer {i['customer_name']}: {error_message}"
+                )
+                frappe.logger().error(f"Failed to sync Customer {i['name']}: {response}")
+                publish(
+                    KEY_REALTIME["key_realtime_customer"],
+                    f"Failed to sync Customer {i['customer_name']}.",
+                    error=True,
+                )
+
+        frappe.db.commit()
+
+        # Tổng kết
+        message = f"Customer sync completed. Success: {success_count}, Failed: {fail_count}"
+        status = "Success" if fail_count == 0 else "Partial Success"
+
+        create_dms_log(status=status, message=message)
+        publish(KEY_REALTIME["key_realtime_customer"], message, done=True)
+
+        return {"message": message}
 
     except Exception as e:
+        frappe.db.rollback()
+        err_msg = f"Exception occurred while syncing customers: {str(e)}"
         create_dms_log(
             status="Error",
             exception=str(e),
-            message="Exception occurred while syncing customer.",
+            message=err_msg,
             rollback=True
         )
-        publish(KEY_REALTIME["key_realtime_customer"], f"Sync Error: {str(e)}", error = True)
-        frappe.logger().error(f"Sync Error: {str(e)}")
+        frappe.logger().error(f"[DMS Sync Exception] {err_msg}")
+        publish(KEY_REALTIME["key_realtime_customer"], err_msg, error=True)
         return {"error": str(e)}
     
 
@@ -161,71 +183,86 @@ def sync_customer_type_job(*args, **kwargs):
         customer_types = frappe.get_all(
             "Customer Type",
             filters={"is_sync": False},
-            fields=["customer_type_id", "customer_type_name", "is_sync"]
+            fields=["name", "customer_type_id", "customer_type_name"]
         )
 
         if not customer_types:
             create_dms_log(status="Skipped", message="No new customer types to sync.")
-            publish(KEY_REALTIME["key_realtime_categories"], f"No new customer types to sync.", done=True)
+            publish(KEY_REALTIME["key_realtime_categories"], "No new customer types to sync.", done=True)
             return {"message": "No new data to sync."}
 
         # Khởi tạo API Client
         dms_client = DMSApiClient()
 
-        formatted_data = [
-            {
-                "code": ct["customer_type_id"],  # Mã danh mục
-                "name": ct["customer_type_name"],  # Tên danh mục
-                "isActive": True  # Trạng thái danh mục (mặc định True)
+        success_count = 0
+        fail_count = 0
+
+        for idx, ct in enumerate(customer_types, start=1):
+            # Chuẩn bị payload cho từng bản ghi
+            request_payload = {
+                "stt": idx,
+                "ma": ct.get("customer_type_id") or "",
+                "ten": ct.get("customer_type_name") or "",
+                "trang_thai": True
             }
-            for ct in customer_types
-        ]
 
-        # Dữ liệu gửi đi
-        request_payload = {
-            "category": "CustomerType",
-            "orgid": dms_client.orgid,
-            "data": formatted_data
-        }
-
-        # Ghi log request
-        create_dms_log(
-            status="Processing",
-            method="POST",
-            request_data=request_payload
-        )
-
-        # Gửi dữ liệu qua API DMS
-        response, success = dms_client.request(
-            endpoint="/PublicAPI/CategorySync",
-            method="POST",
-            body=request_payload
-        )
-
-        # Nếu thành công, cập nhật is_sync = True
-        if response.get("status"):
-            for ct in customer_types:
-                frappe.db.set_value("Customer Type", {"customer_type_id": ct["customer_type_id"]}, "is_sync", True)
-            frappe.db.commit()
-
+            # Ghi log request
             create_dms_log(
-                status="Success",
-                response_data=response,
-                message="Customer Types synced successfully."
+                status="Processing",
+                method="POST",
+                request_data=request_payload
             )
-            publish(KEY_REALTIME["key_realtime_categories"], f"Customer Types synced successfully.", done = True)
-            return {"message": "Customer Types synced successfully."}
-        else:
-            create_dms_log(
-                status="Failed",
-                response_data=response,
-                message="Failed to sync customer types."
+
+            # Gửi từng Customer Type
+            response, success = dms_client.request(
+                endpoint="/OpenAPI/V1/CustomerType",
+                method="POST",
+                body=request_payload
             )
-            frappe.logger().error(f"Failed to sync: {response}")
-            publish(KEY_REALTIME["key_realtime_categories"], f"Failed to sync: {response}", error = True)
-            return {"error": response}
+
+            # Xử lý kết quả từng bản ghi
+            if response.get("status"):
+                frappe.db.set_value("Customer Type", ct["name"], "is_sync", True)
+                success_count += 1
+
+                create_dms_log(
+                    status="Success",
+                    response_data=response,
+                    message=f"Customer Type {ct['customer_type_name']} synced successfully."
+                )
+
+                publish(
+                    KEY_REALTIME["key_realtime_categories"],
+                    f"Synced Customer Type {ct['customer_type_name']} successfully.",
+                )
+
+            else:
+                fail_count += 1
+                create_dms_log(
+                    status="Failed",
+                    response_data=response,
+                    message=f"Failed to sync Customer Type {ct['customer_type_name']}."
+                )
+                frappe.logger().error(f"Failed to sync Customer Type {ct['name']}: {response}")
+                publish(
+                    KEY_REALTIME["key_realtime_categories"],
+                    f"Failed to sync Customer Type {ct['customer_type_name']}.",
+                    error=True,
+                )
+
+        frappe.db.commit()
+
+        # Tổng kết
+        message = f"Customer Type sync completed. Success: {success_count}, Failed: {fail_count}"
+        status = "Success" if fail_count == 0 else "Partial Success"
+
+        create_dms_log(status=status, message=message)
+        publish(KEY_REALTIME["key_realtime_categories"], message, done=True)
+
+        return {"message": message}
 
     except Exception as e:
+        frappe.db.rollback()
         create_dms_log(
             status="Error",
             exception=str(e),
@@ -233,8 +270,9 @@ def sync_customer_type_job(*args, **kwargs):
             rollback=True
         )
         frappe.logger().error(f"Sync Error: {str(e)}")
-        publish(KEY_REALTIME["key_realtime_categories"], f"Sync Error: {str(e)}", error = True)
+        publish(KEY_REALTIME["key_realtime_categories"], f"Sync Error: {str(e)}", error=True)
         return {"error": str(e)}
+
     
 # Đồng bộ danh sách nhóm khách hàng
 def sync_customer_group():
@@ -244,77 +282,91 @@ def sync_customer_group():
 
 def sync_customer_group_job(*args, **kwargs):
     try:
-        create_dms_log(status="Queued", message="Customer Type sync job started.")
+        create_dms_log(status="Queued", message="Customer Group sync job started.")
 
         # Lấy danh sách Customer Group chưa đồng bộ
         customer_groups = frappe.get_all(
             "DMS Customer Group",
             filters={"is_sync": False},
-            fields=["customer_group", "name_customer_group", "is_sync"]
+            fields=["name", "customer_group", "name_customer_group"]
         )
 
         if not customer_groups:
-            create_dms_log(status="Skipped", message="No new customer group to sync.")
-            publish(KEY_REALTIME["key_realtime_categories"], f"No new customer group to sync.", done=True)
+            create_dms_log(status="Skipped", message="No new customer groups to sync.")
+            publish(KEY_REALTIME["key_realtime_categories"], "No new customer groups to sync.", done=True)
             return {"message": "No new data to sync."}
 
-        # Khởi tạo API Client
+        # Khởi tạo DMS API client
         dms_client = DMSApiClient()
 
-        formatted_data = [
-            {
-                "code": ct["customer_group"],  # Mã danh mục
-                "name": ct["name_customer_group"],  # Tên danh mục
-                "isActive": True  # Trạng thái danh mục (mặc định True)
+        success_count = 0
+        fail_count = 0
+
+        # Lặp từng nhóm khách hàng để gửi request riêng
+        for idx, cg in enumerate(customer_groups, start=1):
+            request_payload = {
+                "stt": idx,
+                "ma": cg.get("customer_group") or "",
+                "ten": cg.get("name_customer_group") or "",
+                "trang_thai": True
             }
-            for ct in customer_groups
-        ]
 
-        # Dữ liệu gửi đi
-        request_payload = {
-            "category": "CustomerGroup",
-            "orgid": dms_client.orgid,
-            "data": formatted_data
-        }
-
-        # Ghi log request
-        create_dms_log(
-            status="Processing",
-            method="POST",
-            request_data=request_payload
-        )
-
-        # Gửi dữ liệu qua API DMS
-        response, success = dms_client.request(
-            endpoint="/PublicAPI/CategorySync",
-            method="POST",
-            body=request_payload
-        )
-
-        # Nếu thành công, cập nhật is_sync = True
-        if response.get("status"):
-            for ct in customer_groups:
-                frappe.db.set_value("DMS Customer Group", {"customer_group": ct["customer_group"]}, "is_sync", True)
-            frappe.db.commit()
-
+            # Ghi log từng request
             create_dms_log(
-                status="Success",
-                response_data=response,
-                message="Customer Group synced successfully."
+                status="Processing",
+                method="POST",
+                request_data=request_payload
             )
-            publish(KEY_REALTIME["key_realtime_categories"], f"Customer Group synced successfully.", done = True)
-            return {"message": "Customer Group synced successfully."}
-        else:
-            create_dms_log(
-                status="Failed",
-                response_data=response,
-                message="Failed to sync customer group."
+
+            # Gửi từng bản ghi lên DMS
+            response, success = dms_client.request(
+                endpoint="/OpenAPI/V1/CustomerGroup",
+                method="POST",
+                body=request_payload
             )
-            frappe.logger().error(f"Failed to sync: {response}")
-            publish(KEY_REALTIME["key_realtime_categories"], f"Failed to sync: {response}", error = True)
-            return {"error": response}
+
+            # Xử lý kết quả từng bản ghi
+            if response.get("status"):
+                frappe.db.set_value("DMS Customer Group", cg["name"], "is_sync", True)
+                success_count += 1
+
+                create_dms_log(
+                    status="Success",
+                    response_data=response,
+                    message=f"Customer Group {cg['name_customer_group']} synced successfully."
+                )
+                publish(
+                    KEY_REALTIME["key_realtime_categories"],
+                    f"Synced Customer Group {cg['name_customer_group']} successfully.",
+                )
+
+            else:
+                fail_count += 1
+                create_dms_log(
+                    status="Failed",
+                    response_data=response,
+                    message=f"Failed to sync Customer Group {cg['name_customer_group']}."
+                )
+                frappe.logger().error(f"Failed to sync Customer Group {cg['name']}: {response}")
+                publish(
+                    KEY_REALTIME["key_realtime_categories"],
+                    f"Failed to sync Customer Group {cg['name_customer_group']}.",
+                    error=True,
+                )
+
+        frappe.db.commit()
+
+        # Tổng kết
+        message = f"Customer Group sync completed. Success: {success_count}, Failed: {fail_count}"
+        status = "Success" if fail_count == 0 else "Partial Success"
+
+        create_dms_log(status=status, message=message)
+        publish(KEY_REALTIME["key_realtime_categories"], message, done=True)
+
+        return {"message": message}
 
     except Exception as e:
+        frappe.db.rollback()
         create_dms_log(
             status="Error",
             exception=str(e),
@@ -322,193 +374,210 @@ def sync_customer_group_job(*args, **kwargs):
             rollback=True
         )
         frappe.logger().error(f"Sync Error: {str(e)}")
-        publish(KEY_REALTIME["key_realtime_categories"], f"Sync Error: {str(e)}", error = True)
+        publish(KEY_REALTIME["key_realtime_categories"], f"Sync Error: {str(e)}", error=True)
         return {"error": str(e)}
     
 
-# Thêm mới khách hàng
 @frappe.whitelist(methods="POST")
 def create_customers(**kwargs):
-    results = []
     try:
-        data = kwargs.get("data", {})
-        customer_list = data.get("customers", [])  # Danh sách nhân viên
-        id_log_dms = data.get("id_log", "")  # ID log chung
+        # Nhận dữ liệu
+        raw_data = kwargs.get("data") or frappe.form_dict.get("data")
 
-        for customer_data in customer_list:
+        if isinstance(raw_data, bytes):
+            raw_data = json.loads(raw_data.decode("utf-8"))
+        if isinstance(raw_data, str):
+            raw_data = json.loads(raw_data)
+        if isinstance(raw_data, list):
+            data = {"data": raw_data}
+        elif isinstance(raw_data, dict):
+            data = raw_data
+        else:
+            frappe.throw("Dữ liệu truyền lên không hợp lệ.")
+
+        customers_data = data.get("data", [])
+
+        if not customers_data:
+            frappe.throw(_("Không có dữ liệu khách hàng để xử lý."))
+
+        results = []
+
+        for raw in customers_data:
             try:
-                customer_data = frappe._dict(customer_data)
-                customer_code_dms = customer_data.get("customer_code_dms")
+                item = frappe._dict(raw)
+                customer_code = item.get("makh")
+                customer_name = item.get("tenkh")
 
-                # Kiểm tra nếu khách hàng đã tồn tại theo customer_code_dms
-                existing_customer = frappe.db.exists("Customer", {"customer_code_dms": customer_code_dms})
+                if not customer_code or not customer_name:
+                    raise ValueError("Thiếu Mã KH hoặc Tên KH")
 
-                if existing_customer:
-                    # Nếu tồn tại, gọi hàm update_customer thay vì bỏ qua
-                    update_result = update_customer(**customer_data)
-
-                    create_dms_log(
-                        status="Updated",
-                        request_data=data,
-                        response_data=update_result,
-                        message=f"Customer {customer_code_dms} updated successfully."
-                    )
-                    
-                    if id_log_dms:
-                        create_partner_log(
-                            id_log_dms=id_log_dms,
-                            status=True,
-                            title="Customer updated successfully.",
-                            message=f"Customer {customer_code_dms} updated successfully."
-                        )
-
-                    results.append({"customer_code_dms": customer_code_dms, "status": "Updated"})
-                    continue  # Tiếp tục với khách hàng khác
-
-                # Nếu không tồn tại, tiến hành tạo mới khách hàng
-                phone_number = ""
-                address = customer_data.get("address")
-                contact = customer_data.get("contact")
-
-                if contact and contact.get("phone_number"):
-                    phone_number = validate_phone_number(contact.get("phone_number"))
-
-                # Ghi log bắt đầu tạo khách hàng
                 create_dms_log(
                     status="Processing",
                     method="POST",
-                    request_data=data,
-                    message=f"Creating customer {customer_data.get('customer_name')}"
+                    request_data=item,
+                    message=f"Đang xử lý khách hàng {customer_name} ({customer_code})"
                 )
 
-                # Tạo mới khách hàng
-                new_customer = frappe.new_doc("Customer")
-                required_fields = ["customer_name", "customer_code_dms"]
-                normal_fields = [
-                    "customer_details", "website", "dms_customer_group", "territory", 
-                    "dms_customer_type", "sfa_sale_channel", "mobile_no", "tax_id", 
-                    "email_id", "is_sales_dms"
-                ]
-                choice_fields = ["customer_type"]
-                date_fields = ["custom_birthday"]
+                existing = frappe.db.exists("Customer", {"customer_code_dms": customer_code})
 
-                for key, value in customer_data.items():
-                    if key in normal_fields:
-                        new_customer.set(key, value)
-                    elif key in required_fields:
-                        required = validate_not_none(value)
-                        new_customer.set(key, required)
-                    elif key in date_fields:
-                        custom_birthday = validate_date(float(value) / 1000) if value is not None else None
-                        new_customer.set(key, custom_birthday)
-                    elif key in choice_fields:
-                        customer_type = validate_choice(configs.customer_type)(value)
-                        new_customer.set(key, customer_type)
+                # --- Cập nhật ---
+                if existing:
+                    cust = frappe.get_doc("Customer", existing)
+                    cust.customer_name = customer_name
+                    cust.customer_details = item.get("trang_thai_kh")
+                    cust.dms_customer_group = item.get("nhom_kh")
+                    cust.dms_customer_type = item.get("loai_kh")
+                    cust.sfa_sale_channel = item.get("kenh")
+                    cust.mobile_no = item.get("sdt")
+                    cust.email_id = item.get("email")
+                    cust.custom_credit_limit = item.get("han_muc_cn")
+                    cust.custom_birthday = parse_date(item.get("sinh_nhat"))
+                    cust.is_sync = 1
 
-                new_customer.is_sync = 1
-                new_customer.insert()
+                    credit_limit_value = item.get("han_muc_cn")
+                    if credit_limit_value:
+                        cust.set("credit_limits", [])
+                        cust.append("credit_limits", {
+                            "company": frappe.defaults.get_global_default("company") or "Vinamilk",
+                            "credit_limit": credit_limit_value,
+                            "bypass_credit_limit_check": 0
+                        })
 
-                # Xử lý địa chỉ khách hàng
-                address = frappe._dict(address) if address else None
-                current_address = None
-                if address and address.address_title:
-                    current_address = create_address_customer(address, {})
+                    cust.save(ignore_permissions=True)
 
-                # Xử lý contact khách hàng
-                new_contact = None
-                if contact and contact.get("first_name"):
-                    new_contact = frappe.new_doc("Contact")
-                    contact_fields = "first_name"
-                    for key, value in contact.items():
-                        if key in contact_fields:
-                            new_contact.set(key, value)
+                    create_dms_log(
+                        status="Updated",
+                        response_data={"customer": cust.name},
+                        message=f"Customer {customer_code} updated successfully."
+                    )
 
-                    new_contact.is_primary_contact = 1
-                    new_contact.is_billing_contact = 1
+                    results.append({"makh": customer_code, "status": "Updated"})
+                    continue
 
-                    if phone_number:
-                        new_contact.append("phone_nos", {
-                            "phone": phone_number,
+                # --- Tạo mới ---
+                customer = frappe.new_doc("Customer")
+                customer.customer_code_dms = customer_code
+                customer.customer_name = customer_name
+                customer.customer_details = item.get("trang_thai_kh")
+                customer.dms_customer_group = item.get("nhom_kh")
+                customer.dms_customer_type = item.get("loai_kh")
+                customer.sfa_sale_channel = item.get("kenh")
+                customer.mobile_no = item.get("sdt")
+                customer.email_id = item.get("email")
+                customer.custom_credit_limit = item.get("han_muc_cn")
+                customer.custom_birthday = parse_date(item.get("sinh_nhat"))
+                customer.customer_type = "Company"
+                customer.is_sales_dms = 1
+                customer.is_sync = 1
+
+                if item.get("han_muc_cn"):
+                    customer.set("credit_limits", [])
+                    customer.append("credit_limits", {
+                        "company": frappe.defaults.get_global_default("company"),
+                        "credit_limit": item.get("han_muc_cn"),
+                        "bypass_credit_limit_check": 0
+                    })
+
+                customer.insert(ignore_permissions=True)
+
+                # --- Address ---
+                if item.get("dia_chi"):
+                    city_name = extract_city_from_address(item.get("dia_chi"))
+                    if city_name:
+                        address = frappe.new_doc("Address")
+                        address.address_title = customer_name
+                        address.address_line1 = item.get("dia_chi")
+                        address.city = city_name
+                        address.country = "Vietnam"
+                        address.address_type = "Billing"
+                        address.append("links", {
+                            "link_doctype": "Customer",
+                            "link_name": customer.name
+                        })
+                        address.insert(ignore_permissions=True)
+                        customer.customer_primary_address = address.name
+                        customer.primary_address = address.address_title
+                        customer.save(ignore_permissions=True)
+
+
+                # --- Contact ---
+                if item.get("nguoi_lien_he"):
+                    contact = frappe.new_doc("Contact")
+                    contact.first_name = item.get("nguoi_lien_he")
+                    contact.designation = item.get("chuc_vu")
+                    contact.is_primary_contact = 1
+                    contact.is_billing_contact = 1
+                    if item.get("sdt"):
+                        contact.append("phone_nos", {
+                            "phone": item.get("sdt"),
                             "is_primary_phone": 1,
                             "is_primary_mobile_no": 1
                         })
-                    new_contact.insert()
-
-                # Liên kết địa chỉ với khách hàng
-                if current_address:
-                    link_cs_address = {"link_doctype": new_customer.doctype, "link_name": new_customer.name}
-                    current_address.append("links", link_cs_address)
-                    current_address.save()
-
-                    new_customer.customer_primary_address = current_address.name if frappe.db.exists("Address", current_address.name) else current_address.address_title
-                    new_customer.primary_address = current_address.address_title
-                    new_customer.save()
-
-                # Liên kết contact với khách hàng
-                if new_contact:
-                    link_cs_contact = {"link_doctype": new_customer.doctype, "link_name": new_customer.name}
-                    new_contact.append("links", link_cs_contact)
-                    new_contact.save()
-                    new_customer.customer_primary_contact = new_contact.name
-                    new_customer.save()
+                    contact.email_id = item.get("email")
+                    contact.append("links", {
+                        "link_doctype": "Customer",
+                        "link_name": customer.name
+                    })
+                    contact.insert(ignore_permissions=True)
+                    customer.customer_primary_contact = contact.name
+                    customer.save(ignore_permissions=True)
 
                 frappe.db.commit()
 
-                # Ghi log thành công
                 create_dms_log(
                     status="Success",
-                    response_data={"customer": new_customer.name},
-                    message=f"Customer {new_customer.name} created successfully."
+                    response_data={"customer": customer.name},
+                    message=f"Customer {customer_code} created successfully."
                 )
-                
-                if id_log_dms:
-                    create_partner_log(
-                        id_log_dms=id_log_dms,
-                        status=True,
-                        title="Customer create successfully.",
-                        message=f"Customer {customer_code_dms} create successfully."
-                    )
-                
-                results.append({"customer_code_dms": customer_data.get("customer_code_dms"), "status": "Success"})
+
+                results.append({"makh": customer_code, "status": "Created"})
 
             except Exception as e:
-                error_message = f"Error creating/updating customer {customer_data.get('customer_code_dms')}: {str(e)}"
+                frappe.db.rollback()
+                error_message = f"Lỗi xử lý khách hàng {item.get('makh')}: {str(e)}"
+                create_dms_log(status="Failed", request_data=item, message=error_message)
+                frappe.log_error(frappe.get_traceback(), f"Customer Sync Error: {item.get('makh')}")
+                results.append({"makh": item.get("makh"), "status": "Failed", "error": str(e)})
 
-                # Ghi log thất bại
-                create_dms_log(
-                    status="Failed",
-                    request_data=data,
-                    message=error_message
-                )
-                
-                if id_log_dms:
-                    create_partner_log(
-                        id_log_dms=id_log_dms,
-                        status=False,
-                        title="Customer create failed.",
-                        message=error_message
-                    )
-
-                # Xóa bản ghi nếu đã tạo trước đó
-                try:
-                    if "new_customer" in locals() and new_customer:
-                        frappe.delete_doc("Customer", new_customer.name, ignore_permissions=True)
-
-                    if "current_address" in locals() and current_address:
-                        frappe.delete_doc("Address", {"address_title": ["like", f"%{current_address.address_title}%"]}, ignore_permissions=True)
-
-                    if "new_contact" in locals() and new_contact:
-                        frappe.delete_doc("Contact", new_contact.name, ignore_permissions=True)
-
-                except Exception as cleanup_error:
-                    frappe.logger().error(f"Cleanup failed: {str(cleanup_error)}")
-
-                results.append({"customer_code_dms": customer_data.get("customer_code_dms"), "status": "Failed", "error": str(e)})
-
+        frappe.db.commit()
         return {"results": results}
 
     except Exception as e:
-        frappe.throw(f"Lỗi xử lý danh sách khách hàng: {str(e)}")
+        frappe.db.rollback()
+        frappe.throw(_("Lỗi xử lý danh sách khách hàng: {0}").format(str(e)))
+
+
+# HÀM HỖ TRỢ
+def parse_date(value):
+    """Chuyển đổi ISO date (chuỗi từ DMS) sang Python datetime."""
+    if not value:
+        return None
+    try:
+        return datetime.fromisoformat(value.replace("Z", "+00:00"))
+    except Exception:
+        return None
+    
+def extract_city_from_address(address: str) -> str | None:
+    """Lấy phần cuối cùng của địa chỉ và kiểm tra có trong DMS Province không"""
+    if not address:
+        return None
+
+    try:
+        # Lấy phần cuối cùng sau dấu '-'
+        parts = [p.strip() for p in address.split('-') if p.strip()]
+        if not parts:
+            return None
+
+        possible_city = parts[-1]
+
+        # Kiểm tra trong DMS Province
+        province = frappe.db.get_value("DMS Province", {"province_name": possible_city}, "province_name")
+        if province:
+            return province
+        return None
+    except Exception:
+        return None
+
 
     
 # Chỉnh sửa khách hàng
@@ -640,8 +709,7 @@ def delete_customer(doc, method):
     customer_codes = [doc.customer_code_dms] if isinstance(doc, frappe.model.document.Document) else doc
 
     request_payload = {
-        "orgid": dms_client.orgid,
-        "data": customer_codes
+        "ma": customer_codes
     }
 
     # Ghi log request
@@ -655,7 +723,7 @@ def delete_customer(doc, method):
     try:
         # Gửi request xóa kh đến API DMS
         response, success = dms_client.request(
-            endpoint="/CustomerDel",
+            endpoint="/OpenAPI/V1/Customer",
             method="POST",
             body=request_payload
         )

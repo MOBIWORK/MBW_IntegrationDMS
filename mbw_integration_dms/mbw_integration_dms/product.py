@@ -22,9 +22,10 @@ def sync_product():
         frappe.enqueue("mbw_integration_dms.mbw_integration_dms.product.sync_product_job", queue="long", timeout=300, key = KEY_REALTIME["key_realtime_product"])
         return {"message": "Product Sync job has been queued."}
 
+@frappe.whitelist()
 def sync_product_job(*args, **kwargs):
     try:
-        create_dms_log(status="Queued", message="Brand sync job started.")
+        create_dms_log(status="Queued", message="Product sync job started.")
 
         query = """
             SELECT 
@@ -58,86 +59,87 @@ def sync_product_job(*args, **kwargs):
 
         if not items:
             create_dms_log(status="Skipped", message="No new item to sync.")
-            publish(KEY_REALTIME["key_realtime_product"], "No new item to sync.", done= True)
+            publish(KEY_REALTIME["key_realtime_product"], "No new item to sync.", done=True)
             return {"message": "No new data to sync."}
-        
-        # Khởi tạo API Client
+
+        # Khởi tạo API client
         dms_client = DMSApiClient()
 
-        formatted_data = [
-            {
-                "code": i["item_code"],
-                "name": i["item_name"],
-                "industry": i["industry_dms"],
-                "provider": i["provider"],
-                "brand": i["brand"],
-                "unit_even": i["unit_even"],
-                "unit_odd": i["stock_uom"],
-                "gia_le": i["price_unit_odd"],
-                "gia": i["price_unit_even"],
-                "conversion_rate": i["unit_even_conversion"],
-                "tax": frappe.db.get_value("Item Tax Template Detail", {"parent": i.get("item_tax_template")}, "tax_rate") if i.get("item_tax_template") else 0,
-                "description": i["description"]
+        total = len(items)
+        success_count = 0
+        fail_count = 0
+
+        for idx, i in enumerate(items, start=1):
+            payload = {
+                "stt": idx,
+                "ma_sp": i.get("item_code") or "",
+                "ten_sp": i.get("item_name") or "",
+                "nganh_hang": i.get("industry_dms") or "",
+                "nha_cung_cap": i.get("provider") or "",
+                "nhan_hieu": i.get("brand") or "",
+                "dvt_chan": i.get("unit_even") or "",
+                "dvt_le": i.get("stock_uom") or "",
+                "ma_vach": "",
+                "gia_le": i.get("price_unit_odd") or 0,
+                "gia_chan": i.get("price_unit_even") or 0,
+                "hsqd": i.get("unit_even_conversion") or 0,
+                "gia_nhap": 1,
+                "gia_nhap_le": 1,
+                "vat": frappe.db.get_value(
+                    "Item Tax Template Detail",
+                    {"parent": i.get("item_tax_template")},
+                    "tax_rate"
+                ) if i.get("item_tax_template") else 0,
+                "mo_ta": i.get("description") or ""
             }
-            for i in items
-        ]
 
-        # Dữ liệu gửi đi
-        request_payload = {
-            "orgid": dms_client.orgid,
-            "data": formatted_data
-        }
+            # Log từng request
+            create_dms_log(
+                status="Processing",
+                method="POST",
+                request_data=payload,
+                message=f"Syncing item {i['item_code']} ({idx}/{total})"
+            )
 
-        # Ghi log request
+            # Gửi dữ liệu qua API
+            response, success = dms_client.request(
+                endpoint="/OpenAPI/V1/Product",
+                method="POST",
+                body=payload
+            )
+
+            if success and response.get("status"):
+                frappe.db.set_value("Item", i["name"], "is_sync", True, update_modified=False)
+                success_count += 1
+            else:
+                fail_count += 1
+                frappe.logger().error(f"Failed to sync item {i['item_code']}: {response}")
+                create_dms_log(
+                    status="Failed",
+                    response_data=response,
+                    message=f"Failed to sync item {i['item_code']}"
+                )
+
+        frappe.db.commit()
+
+        summary_msg = f"Product sync completed. Success: {success_count}/{total}, Failed: {fail_count}/{total}"
         create_dms_log(
-            status="Processing",
-            method="POST",
-            request_data=request_payload
+            status="Success" if fail_count == 0 else "Partial Success",
+            message=summary_msg
         )
+        publish(KEY_REALTIME["key_realtime_product"], summary_msg, done=True)
 
-        # Gửi dữ liệu qua API DMS
-        response, success = dms_client.request(
-            endpoint="/PublicAPI/ProductSync",
-            method="POST",
-            body=request_payload
-        )
-
-        # Nếu thành công, cập nhật is_sync = True
-        if response.get("status"):
-            for i in items:
-                frappe.db.set_value("Item", {"name": i["name"]}, "is_sync", True)
-            frappe.db.commit()
-
-            create_dms_log(
-                status="Success",
-                response_data=response,
-                message="Item synced successfully."
-            )
-            publish(KEY_REALTIME["key_realtime_product"],"Item synced successfully.", done=True)
-            return {"message": "Item synced successfully."}
-        else:
-            error_message = response.get("message", "Failed to sync item.")
-            errors_detail = response.get("errorsmsg", [])
-
-            create_dms_log(
-                status="Failed",
-                response_data=response,
-                message=f"Failed to sync item: {error_message}. Errors: {', '.join(errors_detail)}"
-            )
-
-            frappe.logger().error(f"Failed to sync: {response}")
-            publish(KEY_REALTIME["key_realtime_product"] ,f"Failed to sync: {response}", error=True)
-            return {"error": error_message, "details": errors_detail}
+        return {"message": summary_msg}
 
     except Exception as e:
         create_dms_log(
             status="Error",
             exception=str(e),
-            message="Exception occurred while syncing item.",
+            message="Exception occurred while syncing product.",
             rollback=True
         )
         frappe.logger().error(f"Sync Error: {str(e)}")
-        publish(KEY_REALTIME["key_realtime_product"],f"Sync Error: {str(e)}", error=True)
+        publish(KEY_REALTIME["key_realtime_product"], f"Sync Error: {str(e)}", error=True)
         return {"error": str(e)}
     
 

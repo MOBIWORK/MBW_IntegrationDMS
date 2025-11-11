@@ -18,7 +18,7 @@ def sync_unit():
 
 def sync_unit_job(*args, **kwargs):
     try:
-        create_dms_log(status="Queued", message="unit sync job started.")
+        create_dms_log(status="Queued", message="Unit sync job started.")
 
         # Lấy danh sách unit chưa đồng bộ
         units = frappe.get_all(
@@ -35,58 +35,54 @@ def sync_unit_job(*args, **kwargs):
         # Khởi tạo API Client
         dms_client = DMSApiClient()
 
-        formatted_data = [
-            {
-                "code": ct["name"],  # Mã danh mục
-                "name": ct["uom_name"],  # Tên danh mục
-                "isActive": ct["enabled"]  # Trạng thái danh mục
+        total = len(units)
+        success_count = 0
+        fail_count = 0
+
+        # Gửi từng đơn vị đo lường một
+        for idx, ct in enumerate(units, start=1):
+            single_payload = {
+                "stt": idx,
+                "ma": ct["name"],        # Mã danh mục (ví dụ: "Kg", "Cái")
+                "ten": ct["uom_name"],   # Tên danh mục
+                "trang_thai": bool(ct["enabled"])  # True/False
             }
-            for ct in units
-        ]
 
-        # Dữ liệu gửi đi
-        request_payload = {
-            "category": "Unit",
-            "orgid": dms_client.orgid,
-            "data": formatted_data
-        }
-
-        # Ghi log request
-        create_dms_log(
-            status="Processing",
-            method="POST",
-            request_data=request_payload
-        )
-
-        # Gửi dữ liệu qua API DMS
-        response, success = dms_client.request(
-            endpoint="/PublicAPI/CategorySync",
-            method="POST",
-            body=request_payload
-        )
-
-        # Nếu thành công, cập nhật is_sync = True
-        if response.get("status"):
-            for ct in units:
-                frappe.db.set_value("UOM", {"name": ct["name"]}, "is_sync", True)
-            frappe.db.commit()
-
+            # Ghi log từng request
             create_dms_log(
-                status="Success",
-                response_data=response,
-                message="Unit synced successfully."
+                status="Processing",
+                method="POST",
+                request_data=single_payload
             )
-            publish(KEY_REALTIME["key_realtime_categories"], "Unit Synced successfully.", done=True)
-            return {"message": "Unit synced successfully."}
-        else:
-            create_dms_log(
-                status="Failed",
-                response_data=response,
-                message="Failed to sync unit."
+
+            # Gửi dữ liệu đến DMS
+            response, success = dms_client.request(
+                endpoint="/OpenAPI/V1/ItemUnit",
+                method="POST",
+                body=single_payload
             )
-            frappe.logger().error(f"Failed to sync: {response}")
-            publish(KEY_REALTIME["key_realtime_categories"], f"Failed to sync: {response}", error=True)
-            return {"error": response}
+
+            # Xử lý kết quả
+            if success and response.get("status"):
+                frappe.db.set_value("UOM", ct["name"], "is_sync", True, update_modified=False)
+                success_count += 1
+            else:
+                fail_count += 1
+                frappe.logger().error(f"Failed to sync unit {ct['uom_name']}: {response}")
+                create_dms_log(
+                    status="Failed",
+                    response_data=response,
+                    message=f"Failed to sync unit {ct['uom_name']}."
+                )
+
+        frappe.db.commit()
+
+        # Tổng kết kết quả
+        summary_msg = f"Unit sync completed. Success: {success_count}/{total}, Failed: {fail_count}/{total}"
+        create_dms_log(status="Success" if fail_count == 0 else "Partial Success", message=summary_msg)
+        publish(KEY_REALTIME["key_realtime_categories"], summary_msg, done=True)
+
+        return {"message": summary_msg}
 
     except Exception as e:
         create_dms_log(

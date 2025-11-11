@@ -14,8 +14,7 @@ enable_dms = check_enable_integration_dms()
 def sync_brand():
     if enable_dms:
         frappe.enqueue("mbw_integration_dms.mbw_integration_dms.brand.sync_brand_job", queue="long", timeout=300, key=KEY_REALTIME["key_realtime_categories"])
-        return {"message": "Brand Sync job has been queued."}
-
+   
 def sync_brand_job(*args, **kwargs):
     try:
         create_dms_log(status="Queued", message="Brand sync job started.")
@@ -35,58 +34,52 @@ def sync_brand_job(*args, **kwargs):
         # Khởi tạo API Client
         dms_client = DMSApiClient()
 
-        formatted_data = [
-            {
-                "code": ct["name"],  # Mã danh mục
-                "name": ct["brand"],  # Tên danh mục
-                "isActive": True  # Trạng thái danh mục (mặc định True)
+        success_count = 0
+        fail_count = 0
+
+        # Lặp từng brand và gửi từng request riêng
+        for idx, ct in enumerate(brands, start=1):
+            request_payload = {
+                "stt": idx,
+                "ma": ct["name"],
+                "ten": ct["brand"],
+                "trang_thai": True
             }
-            for ct in brands
-        ]
 
-        # Dữ liệu gửi đi
-        request_payload = {
-            "category": "Brand",
-            "orgid": dms_client.orgid,
-            "data": formatted_data
-        }
+            # Ghi log request từng brand
+            create_dms_log(
+                status="Processing",
+                method="POST",
+                request_data=request_payload
+            )
 
-        # Ghi log request
+            # Gửi từng brand
+            response, success = dms_client.request(
+                endpoint="/OpenAPI/V1/ItemBrand",
+                method="POST",
+                body=request_payload
+            )
+
+            if response.get("status"):
+                frappe.db.set_value("Brand", ct["name"], "is_sync", True)
+                success_count += 1
+            else:
+                fail_count += 1
+                frappe.logger().error(f"Failed to sync brand {ct['name']}: {response}")
+
+        frappe.db.commit()
+
+        # Ghi log kết quả tổng
+        message = f"Brand sync done. Success: {success_count}, Failed: {fail_count}"
+        status = "Success" if fail_count == 0 else "Partial Success"
+
         create_dms_log(
-            status="Processing",
-            method="POST",
-            request_data=request_payload
+            status=status,
+            message=message
         )
+        publish(KEY_REALTIME["key_realtime_categories"], message, done=True)
 
-        # Gửi dữ liệu qua API DMS
-        response, success = dms_client.request(
-            endpoint="/PublicAPI/CategorySync",
-            method="POST",
-            body=request_payload
-        )
-
-        # Nếu thành công, cập nhật is_sync = True
-        if response.get("status"):
-            for ct in brands:
-                frappe.db.set_value("Brand", {"name": ct["name"]}, "is_sync", True)
-            frappe.db.commit()
-
-            create_dms_log(
-                status="Success",
-                response_data=response,
-                message="Brand synced successfully."
-            )
-            publish(KEY_REALTIME["key_realtime_categories"], "Brand synced successfully.", done=True)
-            return {"message": "Brand synced successfully."}
-        else:
-            create_dms_log(
-                status="Failed",
-                response_data=response,
-                message="Failed to sync brand."
-            )
-            frappe.logger().error(f"Failed to sync: {response}")
-            publish(KEY_REALTIME["key_realtime_categories"], f"Failed to sync: {response}", error=True)
-            return {"error": response}
+        return {"message": message}
 
     except Exception as e:
         create_dms_log(

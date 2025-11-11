@@ -1,7 +1,6 @@
 # Copyright (c) 2025, MBW and contributors
 # For license information, please see license.txt
 
-import json
 
 import frappe
 from frappe import _
@@ -10,6 +9,7 @@ from frappe.query_builder import Interval
 from frappe.query_builder.functions import Now
 from frappe.utils import strip_html
 from frappe.utils.data import cstr
+import json
 
 
 class MBWIntegrationLog(Document):
@@ -53,17 +53,31 @@ def create_log(
 	if rollback:
 		frappe.db.rollback()
 
+	# 🔧 Xử lý dữ liệu request_data và response_data nếu là bytes
+	if isinstance(request_data, bytes):
+		try:
+			request_data = json.loads(request_data.decode("utf-8"))
+		except Exception:
+			request_data = {"raw_bytes": str(request_data)}
+
+	if isinstance(response_data, bytes):
+		try:
+			response_data = json.loads(response_data.decode("utf-8"))
+		except Exception:
+			response_data = {"raw_bytes": str(response_data)}
+
 	if make_new:
 		log = frappe.get_doc({"doctype": "MBW Integration Log", "integration": cstr(module_def)})
 		log.insert(ignore_permissions=True)
 	else:
 		log = frappe.get_doc("MBW Integration Log", frappe.flags.request_id)
 
+	# 🔒 Chuyển sang JSON string nếu không phải string
 	if response_data and not isinstance(response_data, str):
-		response_data = json.dumps(response_data, sort_keys=True, indent=4)
+		response_data = json.dumps(response_data, sort_keys=True, indent=4, default=str)
 
 	if request_data and not isinstance(request_data, str):
-		request_data = json.dumps(request_data, sort_keys=True, indent=4)
+		request_data = json.dumps(request_data, sort_keys=True, indent=4, default=str)
 
 	log.message = message or _get_message(exception)
 	log.method = log.method or method

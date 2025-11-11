@@ -16,78 +16,72 @@ def sync_industry():
         frappe.enqueue("mbw_integration_dms.mbw_integration_dms.industry.sync_industry_job", queue="long", timeout=300, key=KEY_REALTIME["key_realtime_categories"])
         return {"message": "Industry Sync job has been queued."}
     
-@frappe.whitelist(allow_guest=True)
 def sync_industry_job(*args, **kwargs):
     try:
         create_dms_log(status="Queued", message="Industry sync job started.")
 
         # Lấy danh sách Industry chưa đồng bộ
-        industrys = frappe.get_all(
+        industries = frappe.get_all(
             "DMS Industry",
             filters={"is_sync": False},
             fields=["industry_name", "industry_code", "is_sync"]
         )
 
-        if not industrys:
+        if not industries:
             create_dms_log(status="Skipped", message="No new industry to sync.")
-            publish(KEY_REALTIME["key_realtime_categories"], "No new industry to sync.", done = True)
+            publish(KEY_REALTIME["key_realtime_categories"], "No new industry to sync.", done=True)
             return {"message": "No new data to sync."}
 
         # Khởi tạo API Client
         dms_client = DMSApiClient()
 
-        formatted_data = [
-            {
-                "code": ct["industry_code"],  # Mã danh mục
-                "name": ct["industry_name"],  # Tên danh mục
-                "isActive": True  # Trạng thái danh mục (mặc định True)
+        success_count = 0
+        fail_count = 0
+
+        # Lặp từng industry và gửi riêng lẻ
+        for idx, ct in enumerate(industries, start=1):
+            request_payload = {
+                "stt": idx,
+                "ma": ct["industry_code"],   # Mã danh mục
+                "ten": ct["industry_name"],  # Tên danh mục
+                "trang_thai": True           # Mặc định True
             }
-            for ct in industrys
-        ]
 
-        # Dữ liệu gửi đi
-        request_payload = {
-            "category": "Industry",
-            "orgid": dms_client.orgid,
-            "data": formatted_data
-        }
+            # Ghi log từng request
+            create_dms_log(
+                status="Processing",
+                method="POST",
+                request_data=request_payload
+            )
 
-        # Ghi log request
+            # Gửi dữ liệu qua API DMS
+            response, success = dms_client.request(
+                endpoint="/OpenAPI/V1/ItemIndustry",
+                method="POST",
+                body=request_payload
+            )
+
+            # Kiểm tra phản hồi
+            if response.get("status"):
+                frappe.db.set_value("DMS Industry", {"industry_code": ct["industry_code"]}, "is_sync", True)
+                success_count += 1
+            else:
+                fail_count += 1
+                frappe.logger().error(f"Failed to sync industry {ct['industry_code']}: {response}")
+
+        frappe.db.commit()
+
+        # Tổng kết kết quả
+        message = f"Industry sync done. Success: {success_count}, Failed: {fail_count}"
+        status = "Success" if fail_count == 0 else "Partial Success"
+
         create_dms_log(
-            status="Processing",
-            method="POST",
-            request_data=request_payload
+            status=status,
+            message=message
         )
+        publish(KEY_REALTIME["key_realtime_categories"], message, done=True)
 
-        # Gửi dữ liệu qua API DMS
-        response, success = dms_client.request(
-            endpoint="/PublicAPI/CategorySync",
-            method="POST",
-            body=request_payload
-        )
-
-        # Nếu thành công, cập nhật is_sync = True
-        if response.get("status"):
-            for ct in industrys:
-                frappe.db.set_value("DMS Industry", {"name": ct["industry_name"]}, "is_sync", True)
-            frappe.db.commit()
-
-            create_dms_log(
-                status="Success",
-                response_data=response,
-                message="Industry synced successfully."
-            )
-            publish(KEY_REALTIME["key_realtime_categories"], "Industry synced successfully.", done=True)
-            return {"message": "Industry synced successfully."}
-        else:
-            create_dms_log(
-                status="Failed",
-                response_data=response,
-                message="Failed to sync industry."
-            )
-            frappe.logger().error(f"Failed to sync: {response}")
-            publish(KEY_REALTIME["key_realtime_categories"], f"Failed to sync: {response}", error = True)
-            return {"error": response}
+        return {"message": message}
 
     except Exception as e:
         create_dms_log(
@@ -97,5 +91,5 @@ def sync_industry_job(*args, **kwargs):
             rollback=True
         )
         frappe.logger().error(f"Sync Error: {str(e)}")
-        publish(KEY_REALTIME["key_realtime_categories"], f"Sync Error: {str(e)}", error = True)
+        publish(KEY_REALTIME["key_realtime_categories"], f"Sync Error: {str(e)}", error=True)
         return {"error": str(e)}

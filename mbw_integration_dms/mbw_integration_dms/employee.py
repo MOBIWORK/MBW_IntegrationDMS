@@ -4,148 +4,122 @@
 import frappe
 from frappe.utils import nowdate
 from mbw_integration_dms.mbw_integration_dms.utils import create_dms_log
-from mbw_integration_dms.mbw_integration_dms.helpers.helpers import (
-    create_partner_log
-)
-from mbw_integration_dms.mbw_integration_dms.helpers.validators import (
-    validate_not_none,
-    validate_date,
-    validate_choice
-)
-from mbw_integration_dms.mbw_integration_dms.helpers import configs
 
 @frappe.whitelist()
 def create_employee_and_sales_person(**kwargs):
-    """API xử lý danh sách nhân viên và ghi log"""
+    """
+    API tạo hoặc cập nhật Employee và Sales Person theo payload DMS
+    """
     try:
-        request_data = kwargs.get("data", {})
-        employee_list = request_data.get("employees", [])  # Danh sách nhân viên
-        id_log_dms = request_data.get("id_log", "")  # ID log chung
-        results = []  # Danh sách kết quả trả về
-        failed_records = []  # Danh sách lỗi
+        payload = frappe._dict(kwargs)
+        # data = payload.get("data", {}).get("data", [])
+        data = payload.get("data", [])
 
-        # Ghi log bắt đầu request
+        if not data:
+            frappe.throw("Không có dữ liệu nhân viên để xử lý.")
+
+        results, failed_records = [], []
+
+        # --- Ghi log bắt đầu ---
         create_dms_log(
             status="Processing",
-            request_data=kwargs,
-            message="Starting Employee and Sales Person creation"
+            request_data=payload,
+            message=f"Bắt đầu xử lý {len(data)} nhân viên từ DMS"
         )
 
-        for employee_data in employee_list:
-            email = employee_data.get("email")
-            gender_data = employee_data.get("gender")
-            emp_name = employee_data.get("employee_name")
-
+        for emp_data in data:
+            emp = frappe._dict(emp_data)
             try:
-                # Kiểm tra nếu Employee đã tồn tại theo company_email
-                existing_employee = frappe.get_all("Employee", filters={"company_email": email}, fields=["name", "first_name"])
+                email = emp.get("email")
+                full_name = emp.get("ten")
+                gender = "Male" if emp.get("gioi_tinh") == "Nam" else "Female"
+                phone = emp.get("so_dien_thoai")
+                status = "Active" if emp.get("trang_thai") == "1" else "Left"
 
-                if existing_employee:
-                    # Nếu tồn tại, cập nhật Employee
-                    employee = frappe.get_doc("Employee", existing_employee[0]["name"])
-                    employee.first_name = validate_not_none(employee_data.get("employee_name"), "Employee Name")
-                    employee.date_of_birth = validate_date(float(employee_data.get("date_of_birth")) / 1000)
-                    employee.gender = validate_choice(configs.gender)(gender_data)
-                    employee.status = "Active"
-                    employee.save(ignore_permissions=True)
-                    is_new = False
-                    sales_person_name = None  # Không tạo mới Sales Person
-                else:
-                    # Nếu không tồn tại, tạo mới Employee
-                    employee = frappe.get_doc({
-                        "doctype": "Employee",
-                        "first_name": validate_not_none(employee_data.get("employee_name")),
-                        "date_of_birth": validate_date(float(employee_data.get("date_of_birth")) / 1000),
-                        "gender": validate_choice(configs.gender)(gender_data),
-                        "company_email": email,
-                        "date_of_joining": nowdate(),
-                        "status": "Active"
+                if not email or not full_name:
+                    raise ValueError("Thiếu email hoặc tên nhân viên")
+
+                existing_emp = frappe.db.exists("Employee", {"company_email": email})
+
+                if existing_emp:
+                    # --- Cập nhật Employee ---
+                    frappe.db.set_value("Employee", existing_emp, {
+                        "gender": gender,
+                        "status": status,
+                        "cell_number": phone
                     })
+                    is_new = False
+
+                else:
+                    # --- Tạo mới Employee ---
+                    employee = frappe.new_doc("Employee")
+                    employee.first_name = full_name
+                    employee.gender = gender
+                    employee.company_email = email
+                    employee.cell_number = phone
+                    employee.date_of_joining = nowdate()
+                    employee.date_of_birth = "1999-01-01"
+                    employee.status = status
                     employee.insert(ignore_permissions=True)
                     is_new = True
 
-                    new_name = employee_data.get("employee_code")
-                    if new_name and new_name != employee.name:
-                        frappe.rename_doc("Employee", employee.name, new_name, force=True)
-                        frappe.db.commit()
-
-                    # Kiểm tra xem đã có Sales Person trùng tên chưa
-                    existing_sales_persons = frappe.get_all("Sales Person", filters={"sales_person_name": emp_name}, fields=["name"])
-                    if existing_sales_persons:
-                        sales_person_name = f"{emp_name}-{len(existing_sales_persons) + 1}"
-                    else:
-                        sales_person_name = emp_name
-
-                    # Chỉ tạo mới Sales Person nếu Employee mới được tạo
-                    sales_person = frappe.get_doc({
-                        "doctype": "Sales Person",
-                        "sales_person_name": emp_name,
-                        "employee": new_name,
-                        "email": email,
-                        "parent_sales_person": "",
-                        "enabled": 1
-                    })
+                # --- Có thể bật lại đoạn tạo Sales Person nếu cần ---
+                sales_person_exists = frappe.db.exists("Sales Person", {"employee": employee.name})
+                if not sales_person_exists:
+                    sales_person = frappe.new_doc("Sales Person")
+                    sales_person.sales_person_name = full_name
+                    sales_person.employee = employee.name
+                    sales_person.email = email
+                    sales_person.enabled = 1
                     sales_person.insert(ignore_permissions=True)
+                    sales_person_id = sales_person.name
+                else:
+                    sales_person_id = sales_person_exists
 
                 results.append({
                     "status": "success",
-                    "message": "Employee updated successfully" if not is_new else "Employee and Sales Person created successfully",
                     "employee_id": employee.name,
-                    "sales_person_id": sales_person_name if is_new else None,
-                    "is_new_employee": is_new
+                    "sales_person_id": sales_person_id,
+                    "is_new_employee": is_new,
+                    "email": email,
+                    "message": "Đã cập nhật nhân viên" if not is_new else "Đã tạo mới nhân viên và Sales Person"
                 })
 
             except Exception as e:
+                frappe.db.rollback()
                 failed_records.append({
                     "status": "error",
                     "message": str(e),
-                    "employee_data": employee_data
+                    "employee_data": emp
                 })
+                frappe.log_error(frappe.get_traceback(), f"Employee Sync Error: {emp.get('ma')}")
 
-        # Ghi log kết thúc request (chỉ log thành công hoặc thất bại)
+        # --- Ghi log kết quả ---
         if failed_records:
             create_dms_log(
                 status="Failed",
-                request_data=kwargs,
-                response_data=failed_records,
-                message="Some Employees failed to process"
+                request_data=payload,
+                response_data={"success": results, "failed": failed_records},
+                message=f"Có {len(failed_records)} nhân viên xử lý thất bại."
             )
-
-            failed_records_message = failed_records[0]["message"]
-            if id_log_dms:
-                create_partner_log(
-                    id_log_dms=id_log_dms,
-                    status=False,
-                    title="Some Employee creations failed.",
-                    message=f"Some Employees could not be processed: {failed_records_message}."
-                )
-
-            return failed_records
+            return {"status": False, "results": results, "failed": failed_records}
 
         else:
             create_dms_log(
                 status="Completed",
-                request_data=kwargs,
+                request_data=payload,
                 response_data=results,
-                message="Finished processing Employee and Sales Person"
+                message=f"Hoàn tất xử lý {len(results)} nhân viên từ DMS."
             )
-
-            if id_log_dms:
-                create_partner_log(
-                    id_log_dms=id_log_dms,
-                    status=True,
-                    title="Employee processing completed.",
-                    message="Employee creation and updates have been processed."
-                )
-
-            return results
+            return {"status": True, "results": results, "total": len(results)}
 
     except Exception as e:
-        # Ghi log thất bại toàn bộ request nếu có lỗi lớn
+        frappe.db.rollback()
         create_dms_log(
             status="Error",
             request_data=kwargs,
             exception=e,
             rollback=True,
-            message="Critical error occurred while processing Employee and Sales Person"
+            message=f"Lỗi nghiêm trọng khi xử lý Employee DMS: {str(e)}"
         )
+        frappe.throw(f"Lỗi xử lý Employee DMS: {str(e)}")

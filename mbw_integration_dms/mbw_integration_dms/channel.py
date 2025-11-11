@@ -20,7 +20,7 @@ def sync_channel_job(*args, **kwargs):
     try:
         create_dms_log(status="Queued", message="Channel sync job started.")
 
-        # Lấy danh sách channel chưa đồng bộ
+        # Lấy danh sách Channel chưa đồng bộ
         channels = frappe.get_all(
             "Channel",
             filters={"is_sync": False},
@@ -29,63 +29,58 @@ def sync_channel_job(*args, **kwargs):
 
         if not channels:
             create_dms_log(status="Skipped", message="No new channel to sync.")
-            publish(KEY_REALTIME["key_realtime_categories"], "No new data to sync.", done= True)
+            publish(KEY_REALTIME["key_realtime_categories"], "No new data to sync.", done=True)
             return {"message": "No new data to sync."}
 
         # Khởi tạo API Client
         dms_client = DMSApiClient()
 
-        formatted_data = [
-            {
-                "code": ct["channel_code"],  # Mã danh mục
-                "name": ct["channel_name"],  # Tên danh mục
-                "isActive": True  # Trạng thái danh mục (mặc định True)
+        success_count = 0
+        fail_count = 0
+
+        # Lặp từng channel và gửi từng request riêng
+        for idx, ct in enumerate(channels, start=1):
+            request_payload = {
+                "stt": idx,
+                "ma": ct["channel_code"],  # Mã danh mục
+                "ten": ct["channel_name"],  # Tên danh mục
+                "trang_thai": True
             }
-            for ct in channels
-        ]
 
-        # Dữ liệu gửi đi
-        request_payload = {
-            "category": "Channel",
-            "orgid": dms_client.orgid,
-            "data": formatted_data
-        }
+            # Ghi log request từng channel
+            create_dms_log(
+                status="Processing",
+                method="POST",
+                request_data=request_payload
+            )
 
-        # Ghi log request
-        create_dms_log(
-            status="Processing",
-            method="POST",
-            request_data=request_payload
-        )
+            # Gửi từng Channel
+            response, success = dms_client.request(
+                endpoint="/OpenAPI/V1/CustomerChannel",
+                method="POST",
+                body=request_payload
+            )
 
-        # Gửi dữ liệu qua API DMS
-        response, success = dms_client.request(
-            endpoint="/PublicAPI/CategorySync",
-            body=request_payload
-        )
-
-        # Nếu thành công, cập nhật is_sync = True
-        if response.get("status"):
-            for ct in channels:
+            if response.get("status"):
                 frappe.db.set_value("Channel", {"channel_code": ct["channel_code"]}, "is_sync", True)
-            frappe.db.commit()
+                success_count += 1
+            else:
+                fail_count += 1
+                frappe.logger().error(f"Failed to sync channel {ct['channel_code']}: {response}")
 
-            create_dms_log(
-                status="Success",
-                response_data=response,
-                message="Channel synced successfully."
-            )
-            publish(KEY_REALTIME["key_realtime_categories"], "Channel synced successfully.", done= True)
-            return {"message": "Channel synced successfully."}
-        else:
-            create_dms_log(
-                status="Failed",
-                response_data=response,
-                message="Failed to sync channel."
-            )
-            frappe.logger().error(f"Failed to sync: {response}")
-            publish(KEY_REALTIME["key_realtime_categories"], "Failed to sync channel.", error=True)
-            return {"error": response}
+        frappe.db.commit()
+
+        # Tổng kết kết quả
+        message = f"Channel sync done. Success: {success_count}, Failed: {fail_count}"
+        status = "Success" if fail_count == 0 else "Partial Success"
+
+        create_dms_log(
+            status=status,
+            message=message
+        )
+        publish(KEY_REALTIME["key_realtime_categories"], message, done=True)
+
+        return {"message": message}
 
     except Exception as e:
         create_dms_log(

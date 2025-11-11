@@ -12,6 +12,8 @@
   "orgid",
   "dms_access_token",
   "dms_api_url",
+  "username",
+  "password",
   "erp_authentication",
   "company",
   "erp_api_key",
@@ -31,6 +33,7 @@
   {
    "fieldname": "dms_access_token",
    "fieldtype": "Data",
+   "hidden": 1,
    "label": "DMS Access Token"
   },
   {
@@ -62,6 +65,7 @@
   {
    "fieldname": "orgid",
    "fieldtype": "Data",
+   "hidden": 1,
    "label": "M\u00e3 t\u1ed5 ch\u1ee9c"
   },
   {
@@ -129,11 +133,21 @@
    "fieldname": "auto_add_category",
    "fieldtype": "Button",
    "label": "T\u1ef1 \u0111\u1ed9ng th\u00eam danh m\u1ee5c"
+  },
+  {
+   "fieldname": "username",
+   "fieldtype": "Data",
+   "label": "DMS ID"
+  },
+  {
+   "fieldname": "password",
+   "fieldtype": "Data",
+   "label": "DMS Token Key"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-03-06 08:49:57.183532",
+ "modified": "2025-10-31 10:38:49.006440",
  "modified_by": "Administrator",
  "module": "MBW Integration DMS",
  "name": "MBW Integration Settings",
@@ -153,6 +167,8 @@
    "write": 1
   }
  ],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
  "show_title_field_in_link": 1,
  "sort_field": "modified",
  "sort_order": "DESC",

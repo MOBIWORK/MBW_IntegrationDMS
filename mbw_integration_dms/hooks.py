@@ -130,7 +130,7 @@ doc_events = {
         "before_save": "mbw_integration_dms.mbw_integration_dms.product.check_uom_dms"
 	},
     "Customer": {
-        "on_trash": "mbw_integration_dms.mbw_integration_dms.customer.delete_customer",
+        # "on_trash": "mbw_integration_dms.mbw_integration_dms.customer.delete_customer",
         "before_save": "mbw_integration_dms.mbw_integration_dms.customer.update_status_after_change"
     },
     "Sales Invoice": {
