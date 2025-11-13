@@ -9,7 +9,7 @@ from mbw_integration_dms.mbw_integration_dms.utils import create_dms_log
 
 # Tạo mới đơn hàng DMS to ERP
 @frappe.whitelist()
-def create_sales_order(**kwargs):
+def create_sale_order(**kwargs):
     try:
         payload = kwargs if isinstance(kwargs, dict) else json.loads(kwargs or "{}")
 
@@ -27,7 +27,7 @@ def create_sales_order(**kwargs):
         if not customer:
             frappe.throw(f"Không tìm thấy khách hàng với mã {customer_code}")
 
-        sales_person = frappe.get_value("Sales Person", {"sales_person_dms_code": employee_code}, "name")
+        sales_person = frappe.get_value("Sales Person", {"employee": employee_code}, "name")
 
         if not sales_person:
             frappe.throw(f"Không tìm thấy Sales Person với mã {employee_code}")
@@ -51,25 +51,31 @@ def create_sales_order(**kwargs):
             new_order.append("items", {
                 "item_code": item.get("ma_sp"),
                 "qty": item.get("so_luong"),
-                "uom": item.get("ma_dvt") or "Nos",
+                "uom": item.get("ten_dvt") or "Nos",
                 "warehouse": item.get("ma_kho_xuat"),
                 "price_list_rate": item.get("don_gia"),
+                "rate": item.get("don_gia"),
                 "custom_item_discount": item.get("chiet_khau_sp") or 0,
                 "is_free_item": 0,
                 "additional_notes": item.get("ghi_chu")
             })
 
         # Thêm sản phẩm khuyến mãi
-        for item_km in payload.get("km", []):
-            new_order.append("items", {
-                "item_code": item_km.get("ma_sp_km"),
-                "qty": item_km.get("so_luong_km"),
-                "uom": item_km.get("ma_dvt_km") or "Nos",
-                "warehouse": item_km.get("ma_kho_xuat_km"),
-                "price_list_rate": 0,
-                "is_free_item": 1,
-                "additional_notes": item_km.get("ghi_chu_km"),
-            })
+        if payload.get("promotion"):
+            for item_km in payload.get("promotion", []):
+                # product có thể là danh sách (nhiều sản phẩm khuyến mãi)
+                for prod in item_km.get("product", []):
+                    new_order.append("promotion_result", {
+                        "promotion_id": item_km.get("id"),
+                        "promotion_name": item_km.get("ten_khuyen_mai"),
+                        "promotion_type": frappe.parse_json(item_km.get("ptype")).get("value") if item_km.get("ptype") else "",
+                        "promotion_code": payload.get("ma_phieu"),
+                        "promotion_item_id": prod.get("_id"),
+                        "promotion_item_code": prod.get("ma_san_pham"),
+                        "promotional_item_name": prod.get("ten_san_pham"),
+                        "promotional_quantity": prod.get("so_luong") or 0,
+                        "promotional_amount": 0
+                    })
 
         total_discount = discount_order + discount_product
         if total_discount > 0:

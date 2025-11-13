@@ -126,7 +126,7 @@ doctype_js = {
 
 doc_events = {
 	"Item": {
-		"on_trash": "mbw_integration_dms.mbw_integration_dms.product.delete_product",
+		# "on_trash": "mbw_integration_dms.mbw_integration_dms.product.delete_product",
         "before_save": "mbw_integration_dms.mbw_integration_dms.product.check_uom_dms"
 	},
     "Customer": {

@@ -15,7 +15,7 @@ def sync_industry():
     if enable_dms:
         frappe.enqueue("mbw_integration_dms.mbw_integration_dms.industry.sync_industry_job", queue="long", timeout=300, key=KEY_REALTIME["key_realtime_categories"])
         return {"message": "Industry Sync job has been queued."}
-    
+
 def sync_industry_job(*args, **kwargs):
     try:
         create_dms_log(status="Queued", message="Industry sync job started.")
