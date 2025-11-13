@@ -91,16 +91,14 @@ def update_dms_order_status(doc):
     dms_client = DMSApiClient()
     
     payload = {
-        "id": doc.dms_so_id,
-        "ma_don": doc.dms_so_code,
-        "orgid": dms_client.orgid,
-        "status": "Đã giao hàng",
+        "ma_phieu": doc.dms_so_code,
+        "trang_thai": "Đã giao hàng",
     }
 
     try:
         response = dms_client.request(
-            endpoint="/PublicAPI/postOrderStatus",
-            method="POST",
+            endpoint="/OpenAPI/V1/Order",
+            method="PUT",
             body=payload
         )
         return response.json()
@@ -118,16 +116,14 @@ def update_stt_so_cancel(doc, method):
         dms_client = DMSApiClient()
         if doc.is_sale_dms:
             payload = {
-                "id": doc.dms_so_id,
-                "ma_don": doc.dms_so_code,
-                "orgid": dms_client.orgid,
-                "status": "Từ chối",
+                "ma_phieu": doc.dms_so_code,
+                "trang_thai": "Từ chối",
             }
 
             try:
                 response = dms_client.request(
-                    endpoint="/PublicAPI/postOrderStatus",
-                    method="POST",
+                    endpoint="/OpenAPI/V1/Order",
+                    method="PUT",
                     body=payload
                 )
                 return response.json()
