@@ -14,7 +14,8 @@ enable_dms = check_enable_integration_dms()
 def sync_brand():
     if enable_dms:
         frappe.enqueue("mbw_integration_dms.mbw_integration_dms.brand.sync_brand_job", queue="long", timeout=300, key=KEY_REALTIME["key_realtime_categories"])
-   
+
+@frappe.whitelist()
 def sync_brand_job(*args, **kwargs):
     try:
         create_dms_log(status="Queued", message="Brand sync job started.")

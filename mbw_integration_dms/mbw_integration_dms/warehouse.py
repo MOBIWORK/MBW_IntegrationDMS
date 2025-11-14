@@ -16,6 +16,7 @@ def sync_warehouse():
         frappe.enqueue("mbw_integration_dms.mbw_integration_dms.warehouse.sync_warehouse_job", queue="long", timeout=300, key=KEY_REALTIME["key_realtime_categories"])
         return {"message": "Warehouse Sync job has been queued."}
 
+@frappe.whitelist()
 def sync_warehouse_job(*args, **kwargs):
     try:
         create_dms_log(status="Queued", message="Warehouse sync job started.")

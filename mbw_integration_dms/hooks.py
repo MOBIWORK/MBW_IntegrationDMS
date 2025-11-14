@@ -126,11 +126,11 @@ doctype_js = {
 
 doc_events = {
 	"Item": {
-		# "on_trash": "mbw_integration_dms.mbw_integration_dms.product.delete_product",
+		"on_trash": "mbw_integration_dms.mbw_integration_dms.product.delete_product",
         "before_save": "mbw_integration_dms.mbw_integration_dms.product.check_uom_dms"
 	},
     "Customer": {
-        # "on_trash": "mbw_integration_dms.mbw_integration_dms.customer.delete_customer",
+        "on_trash": "mbw_integration_dms.mbw_integration_dms.customer.delete_customer",
         "before_save": "mbw_integration_dms.mbw_integration_dms.customer.update_status_after_change"
     },
     "Sales Invoice": {
@@ -138,12 +138,15 @@ doc_events = {
         "before_insert": "mbw_integration_dms.mbw_integration_dms.sales_invoice.add_sales_order"
     },
     "Delivery Note": {
-        "on_submit": "mbw_integration_dms.mbw_integration_dms.delivery_note.create_delivery_note",
+        # "on_submit": "mbw_integration_dms.mbw_integration_dms.delivery_note.create_delivery_note",
         "before_insert": "mbw_integration_dms.mbw_integration_dms.delivery_note.add_sales_order"
     },
     "Sales Order": {
         "on_cancel": "mbw_integration_dms.mbw_integration_dms.helpers.helpers.update_stt_so_cancel",
         "on_update_after_submit": "mbw_integration_dms.mbw_integration_dms.helpers.helpers.on_sales_order_update",
+    },
+    "Sales Person": {
+        "after_insert": "mbw_integration_dms.mbw_integration_dms.employee.create_sales_dms"
     },
     "UOM": {
         "before_save": "mbw_integration_dms.mbw_integration_dms.unit.update_status_after_change"

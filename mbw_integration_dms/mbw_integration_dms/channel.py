@@ -16,6 +16,7 @@ def sync_channel():
         frappe.enqueue("mbw_integration_dms.mbw_integration_dms.channel.sync_channel_job", queue="long", timeout=300, key=KEY_REALTIME["key_realtime_categories"])
         return {"message": "Channel Sync job has been queued."}
 
+@frappe.whitelist()
 def sync_channel_job(*args, **kwargs):
     try:
         create_dms_log(status="Queued", message="Channel sync job started.")

@@ -710,9 +710,10 @@ def delete_customer(doc, method):
     dms_client = DMSApiClient()
 
     customer_codes = [doc.customer_code_dms] if isinstance(doc, frappe.model.document.Document) else doc
+    codes_str = ";".join(customer_codes)
 
     request_payload = {
-        "ma": customer_codes
+        "ma": codes_str
     }
 
     # Ghi log request
@@ -727,7 +728,7 @@ def delete_customer(doc, method):
         # Gửi request xóa kh đến API DMS
         response, success = dms_client.request(
             endpoint="/OpenAPI/V1/Customer",
-            method="POST",
+            method="DELETE",
             body=request_payload
         )
 

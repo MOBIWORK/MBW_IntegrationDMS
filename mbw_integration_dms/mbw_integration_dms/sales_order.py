@@ -27,11 +27,6 @@ def create_sale_order(**kwargs):
         if not customer:
             frappe.throw(f"Không tìm thấy khách hàng với mã {customer_code}")
 
-        sales_person = frappe.get_value("Sales Person", {"employee": employee_code}, "name")
-
-        if not sales_person:
-            frappe.throw(f"Không tìm thấy Sales Person với mã {employee_code}")
-
         new_order = frappe.new_doc("Sales Order")
         new_order.customer = customer
         new_order.customer_name = customer_name
@@ -42,10 +37,18 @@ def create_sale_order(**kwargs):
         new_order.ignore_pricing_rule = 1
         new_order.transaction_date = getdate(delivery_date)
 
-        new_order.append("sales_team", {
-            "sales_person": sales_person,
-            "allocated_percentage": 100,
-        })
+        if frappe.db.exists("Sales Person", {"employee": employee_code}):
+            sales_person = frappe.get_value("Sales Person", {"employee": employee_code}, "name")
+            new_order.append("sales_team", {
+                "sales_person": sales_person,
+                "allocated_percentage": 100,
+            })
+        
+        else:
+            new_order.append("sales_team", {
+                "sales_person": "Sales Team",
+                "allocated_percentage": 100,
+            })
 
         for item in payload.get("san_pham", []):
             new_order.append("items", {
@@ -56,7 +59,7 @@ def create_sale_order(**kwargs):
                 "price_list_rate": item.get("don_gia"),
                 "rate": item.get("don_gia"),
                 "custom_item_discount": item.get("chiet_khau_sp") or 0,
-                "is_free_item": 0,
+                "is_free_item": item.get("is_km") or 0,
                 "additional_notes": item.get("ghi_chu")
             })
 
@@ -96,7 +99,6 @@ def create_sale_order(**kwargs):
 
     except Exception as e:
         frappe.db.rollback()
-        frappe.log_error(f"Error creating Sales Order from DMS: {frappe.get_traceback()}")
         create_dms_log(
             status="Error",
             request_data=kwargs,

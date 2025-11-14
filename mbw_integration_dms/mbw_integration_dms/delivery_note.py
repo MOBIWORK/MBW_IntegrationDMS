@@ -14,7 +14,6 @@ def create_delivery_note(doc, method):
         try:
             dms_client = DMSApiClient()
 
-            id_dms = doc.id_dms
             ma_don_erp = doc.sales_order
             ma_don_dms = frappe.get_value("Sales Order", {"name": ma_don_erp}, "dms_so_code")
             kho_hang = doc.set_warehouse
@@ -25,23 +24,19 @@ def create_delivery_note(doc, method):
             for i in items:
                 item = {
                     "ma_sp": i.item_code,
-                    "dvt": i.uom,
-                    "sl": i.qty,
+                    "ma_dvt": i.uom,
+                    "so_luong": i.qty,
                     "don_gia": i.price_list_rate,
-                    "ck": i.discount_amount,
+                    "chiet_khau_sp": i.discount_amount,
                     "vat": 0,
                     "ghi_chu": "",
-                    "is_km": i.is_free_item
                 }
                 san_pham.append(item)
 
             request_payload = {
-                "orgid": dms_client.orgid,
-                "id_dms": id_dms,
-                "ma_don": ma_don_dms,
-                "ma_don_erp": ma_don_erp,
-                "ck_don": ck_don,
-                "kho_hang": kho_hang,
+                "ma_don_lien_quan": ma_don_dms,
+                "ckdh": ck_don,
+                "kho_xuat": kho_hang,
                 "san_pham": san_pham
             }
 
@@ -54,7 +49,7 @@ def create_delivery_note(doc, method):
 
             # Gửi dữ liệu qua API DMS
             response, success = dms_client.request(
-                endpoint="/PublicAPI/sync_postWarehouse",
+                endpoint="/OpenAPI/V1/InventoryExportCustomer",
                 method="POST",
                 body=request_payload
             )
