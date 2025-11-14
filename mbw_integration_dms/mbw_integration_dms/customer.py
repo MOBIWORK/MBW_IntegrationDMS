@@ -9,7 +9,6 @@ from mbw_integration_dms.mbw_integration_dms.apiclient import DMSApiClient
 from mbw_integration_dms.mbw_integration_dms.utils import create_dms_log, check_enable_integration_dms
 from mbw_integration_dms.mbw_integration_dms.helpers.helpers import (
     create_address_customer,
-    create_partner_log,
     publish
 )
 from mbw_integration_dms.mbw_integration_dms.helpers.validators import validate_date

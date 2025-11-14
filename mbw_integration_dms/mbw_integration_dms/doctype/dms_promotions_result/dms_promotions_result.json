@@ -20,11 +20,13 @@
   {
    "fieldname": "promotion_id",
    "fieldtype": "Data",
+   "in_list_view": 1,
    "label": "Promotion ID"
   },
   {
    "fieldname": "promotion_code",
    "fieldtype": "Data",
+   "in_list_view": 1,
    "label": "Promotion Code"
   },
   {
@@ -57,23 +59,27 @@
   {
    "fieldname": "promotion_type",
    "fieldtype": "Data",
+   "in_list_view": 1,
    "label": "Promotion Type"
   },
   {
    "fieldname": "promotion_name",
    "fieldtype": "Data",
+   "in_list_view": 1,
    "label": "Promotion Name"
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2025-04-01 08:43:39.329832",
+ "modified": "2025-11-14 14:42:17.072917",
  "modified_by": "Administrator",
  "module": "MBW Integration DMS",
  "name": "DMS Promotions Result",
  "owner": "Administrator",
  "permissions": [],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
  "sort_field": "modified",
  "sort_order": "DESC",
  "states": []

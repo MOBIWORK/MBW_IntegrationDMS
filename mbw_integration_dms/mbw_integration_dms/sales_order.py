@@ -13,6 +13,11 @@ def create_sale_order(**kwargs):
     try:
         payload = kwargs if isinstance(kwargs, dict) else json.loads(kwargs or "{}")
 
+        if isinstance(payload.get("data"), list):
+            if len(payload.get("data")) == 0:
+                frappe.throw("Payload list is empty")
+            payload = payload.get("data")[0]
+        
         # Lấy dữ liệu chính
         customer_code = payload.get("ma_kh")
         customer_name = payload.get("ten_kh")
@@ -21,7 +26,7 @@ def create_sale_order(**kwargs):
         warehouse = payload.get("san_pham", [{}])[0].get("ma_kho_xuat")
         discount_order = float(payload.get("ck_don_hang") or 0)
         discount_product = float(payload.get("tong_ck_sp") or 0)
-        employee_code = payload.get("ma_nv_dat")
+        sales_person = payload.get("ten_nguoi_dat")
 
         customer = frappe.get_value("Customer", {"customer_code_dms": customer_code}, "name")
         if not customer:
@@ -37,13 +42,12 @@ def create_sale_order(**kwargs):
         new_order.ignore_pricing_rule = 1
         new_order.transaction_date = getdate(delivery_date)
 
-        if frappe.db.exists("Sales Person", {"employee": employee_code}):
-            sales_person = frappe.get_value("Sales Person", {"employee": employee_code}, "name")
+        if frappe.db.exists("Sales Person", {"sales_person_name": sales_person}):
+            sales_person = frappe.get_value("Sales Person", {"sales_person_name": sales_person}, "name")
             new_order.append("sales_team", {
                 "sales_person": sales_person,
                 "allocated_percentage": 100,
             })
-        
         else:
             new_order.append("sales_team", {
                 "sales_person": "Sales Team",
@@ -53,12 +57,12 @@ def create_sale_order(**kwargs):
         for item in payload.get("san_pham", []):
             new_order.append("items", {
                 "item_code": item.get("ma_sp"),
-                "qty": item.get("so_luong"),
+                "qty": float(item.get("so_luong")),
                 "uom": item.get("ten_dvt") or "Nos",
                 "warehouse": item.get("ma_kho_xuat"),
-                "price_list_rate": item.get("don_gia"),
-                "rate": item.get("don_gia"),
-                "custom_item_discount": item.get("chiet_khau_sp") or 0,
+                "price_list_rate": float(item.get("don_gia")),
+                "rate": float(item.get("don_gia")),
+                "custom_item_discount": float(item.get("chiet_khau")) or 0,
                 "is_free_item": item.get("is_km") or 0,
                 "additional_notes": item.get("ghi_chu")
             })
@@ -84,7 +88,9 @@ def create_sale_order(**kwargs):
         if total_discount > 0:
             new_order.apply_discount_on = "Grand Total"
             new_order.discount_amount = total_discount
+        
 
+        
         new_order.insert(ignore_permissions=True)
         frappe.db.commit()
 
