@@ -101,7 +101,10 @@ def create_sale_order(**kwargs):
             message=f"Tạo Sales Order thành công: {new_order.name}"
         )
 
-        return {"name": new_order.name}
+        return {
+            "status": "ok",
+            "name": new_order.name
+        }
 
     except Exception as e:
         frappe.db.rollback()
