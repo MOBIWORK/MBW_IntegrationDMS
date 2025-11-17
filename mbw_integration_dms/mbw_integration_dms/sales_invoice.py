@@ -2,6 +2,7 @@
 # For license information, please see LICENSE
 
 import frappe
+from datetime import datetime
 from mbw_integration_dms.mbw_integration_dms.apiclient import DMSApiClient
 from mbw_integration_dms.mbw_integration_dms.utils import create_dms_log, check_enable_integration_dms
 
@@ -25,7 +26,7 @@ def create_sale_invoice(doc, method):
         sdt = frappe.get_value("Customer", ma_kh, "mobile_no") or ""
         dia_chi = frappe.get_value("Customer", ma_kh, "customer_primary_address") or ""
         dien_giai = doc.remarks or ""
-        ngay_dat = doc.posting_date.strftime("%d/%m/%Y") if doc.posting_date else ""
+        ngay_dat = ngay_dat = format_date_safe(doc.posting_date)
         tong_tien_hang = doc.total or 0
         tong_tien_vat = doc.total_taxes_and_charges or 0
         tong_ck_sp = sum([i.discount_amount for i in doc.items if not i.is_free_item]) or 0
@@ -132,7 +133,15 @@ def create_sale_invoice(doc, method):
         )
         frappe.logger().error(f"Sync Error: {str(e)}")
         return {"error": str(e)}
-    
+
+
+def format_date_safe(d):
+    if not d:
+        return ""
+    if isinstance(d, str):
+        return datetime.strptime(d, "%Y-%m-%d").strftime("%d/%m/%Y")
+    return d.strftime("%d/%m/%Y")
+
 
 def add_sales_order(doc, method):
     items = doc.items
