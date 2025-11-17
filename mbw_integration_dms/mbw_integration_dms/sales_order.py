@@ -67,6 +67,18 @@ def create_sale_order(**kwargs):
                 "additional_notes": item.get("ghi_chu")
             })
 
+        for km in payload.get("san_pham_km", []):
+            new_order.append("items", {
+                "item_code": km.get("ma_sp_km"),
+                "qty": float(km.get("so_luong_km") or 0),
+                "uom": km.get("ten_dvt_km") or "Nos",
+                "warehouse": km.get("ma_kho_xuat_km"),
+                "rate": 0,
+                "price_list_rate": 0,
+                "is_free_item": 1,
+                "additional_notes": km.get("ghi_chu_km")
+            })
+
         # Thêm sản phẩm khuyến mãi
         if payload.get("promotion"):
             for item_km in payload.get("promotion", []):
@@ -88,8 +100,6 @@ def create_sale_order(**kwargs):
         if total_discount > 0:
             new_order.apply_discount_on = "Grand Total"
             new_order.discount_amount = total_discount
-        
-
         
         new_order.insert(ignore_permissions=True)
         frappe.db.commit()
