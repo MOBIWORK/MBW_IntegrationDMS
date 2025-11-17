@@ -19,13 +19,11 @@ def create_sale_invoice(doc, method):
         # Lấy dữ liệu chính từ doc
         ma_phieu = doc.name
         ma_phieu_dat = doc.sales_order or ""
-        ma_nhom = getattr(doc, "dms_ma_nhom", "") or ""
-        ma_nv_dat = getattr(doc, "dms_ma_nv_dat", "") or ""
         ma_kh = getattr(doc, "customer", "")
         ma_kh_dms = frappe.get_value("Customer", ma_kh, "customer_code_dms") if ma_kh else ""
         ten_kh = frappe.get_value("Customer", ma_kh, "customer_name") if ma_kh else ""
         sdt = frappe.get_value("Customer", ma_kh, "mobile_no") or ""
-        dia_chi = frappe.get_value("Customer", ma_kh, "customer_address") or ""
+        dia_chi = frappe.get_value("Customer", ma_kh, "customer_primary_address") or ""
         dien_giai = doc.remarks or ""
         ngay_dat = doc.posting_date.strftime("%d/%m/%Y") if doc.posting_date else ""
         tong_tien_hang = doc.total or 0
@@ -79,8 +77,6 @@ def create_sale_invoice(doc, method):
             "trang_thai": "Chờ duyệt",
             "ma_phieu": ma_phieu,
             "ma_phieu_dat": ma_phieu_dat,
-            "ma_nhom": ma_nhom,
-            "ma_nv_dat": ma_nv_dat,
             "ma_kh": ma_kh_dms,
             "ten_kh": ten_kh,
             "sdt": sdt,
