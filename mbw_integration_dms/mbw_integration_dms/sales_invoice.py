@@ -20,6 +20,8 @@ def create_sale_invoice(doc, method):
         # Lấy dữ liệu chính từ doc
         ma_phieu = doc.name
         ma_phieu_dat = doc.sales_order or ""
+        ma_nhom = doc.group_id or ""
+        ma_nv_dat = doc.sales_person_code or ""
         ma_kh = getattr(doc, "customer", "")
         ma_kh_dms = frappe.get_value("Customer", ma_kh, "customer_code_dms") if ma_kh else ""
         ten_kh = frappe.get_value("Customer", ma_kh, "customer_name") if ma_kh else ""
@@ -75,9 +77,11 @@ def create_sale_invoice(doc, method):
 
         # Build payload
         request_payload = {
-            "trang_thai": "Chờ duyệt",
+            "trang_thai": "Đã bán hàng",
             "ma_phieu": ma_phieu,
             "ma_phieu_dat": ma_phieu_dat,
+            "ma_nhom": ma_nhom,
+            "ma_nv_dat": ma_nv_dat,
             "ma_kh": ma_kh_dms,
             "ten_kh": ten_kh,
             "sdt": sdt,
@@ -144,16 +148,26 @@ def format_date_safe(d):
 
 
 def add_sales_order(doc, method):
-    items = doc.items
-    so_name = None
+    # Tìm sales_order đầu tiên trong item list
+    so_name = next((i.sales_order for i in doc.items if i.sales_order), None)
 
-    for i in items:
-        so_name = i.sales_order
+    if not so_name:
+        return
 
-    if so_name:
-        doc.sales_order = so_name
-        so_id = frappe.get_value("Sales Order", so_name, "dms_so_id")
-        doc.id_dms = so_id
+    # Gán vào DN
+    doc.sales_order = so_name
+
+    # Lấy các field từ Sales Order
+    so_fields = frappe.db.get_value(
+        "Sales Order", so_name,
+        ["dms_so_id", "group_id", "sales_person_code"],
+        as_dict=True
+    )
+
+    if so_fields:
+        doc.id_dms = so_fields.dms_so_id
+        doc.group_id = so_fields.group_id
+        doc.sales_person_code = so_fields.sales_person_code
 
 
 @frappe.whitelist()

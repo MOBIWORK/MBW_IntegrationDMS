@@ -542,10 +542,10 @@ def create_customers(**kwargs):
                 results.append({"makh": item.get("makh"), "status": "Failed", "error": str(e)})
 
         frappe.db.commit()
-        return {
-            "status": "ok",
-            "results": results
-        }
+
+        frappe.response["status"] = "ok"
+        frappe.response["results"] = results
+        return
 
     except Exception as e:
         frappe.db.rollback()
