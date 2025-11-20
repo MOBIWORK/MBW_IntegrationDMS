@@ -148,16 +148,15 @@ def format_date_safe(d):
 
 
 def add_sales_order(doc, method):
-    # Tìm sales_order đầu tiên trong item list
+    # Lấy SO đầu tiên trong items
     so_name = next((i.sales_order for i in doc.items if i.sales_order), None)
-
     if not so_name:
         return
 
-    # Gán vào DN
+    # Gán SO vào header
     doc.sales_order = so_name
 
-    # Lấy các field từ Sales Order
+    # Gán các field header
     so_fields = frappe.db.get_value(
         "Sales Order", so_name,
         ["dms_so_id", "group_id", "sales_person_code"],
@@ -168,6 +167,37 @@ def add_sales_order(doc, method):
         doc.id_dms = so_fields.dms_so_id
         doc.group_id = so_fields.group_id
         doc.sales_person_code = so_fields.sales_person_code
+
+    # Lấy toàn bộ item rows của SO
+    so_items = frappe.get_all(
+        "Sales Order Item",
+        filters={"parent": so_name},
+        fields=["name", "item_code", "idx"]
+    )
+
+    so_map = {}
+    for row in so_items:
+        so_map.setdefault(row.item_code, []).append(row)
+
+    for key in so_map:
+        so_map[key].sort(key=lambda r: r.idx)
+
+    usage_counter = {}
+
+    for item in doc.items:
+        if not item.item_code:
+            continue
+
+        if item.item_code not in so_map:
+            continue
+
+        # Lấy dòng kế tiếp theo thứ tự
+        usage_counter.setdefault(item.item_code, 0)
+        index = usage_counter[item.item_code]
+
+        if index < len(so_map[item.item_code]):
+            item.so_detail = so_map[item.item_code][index].name
+            usage_counter[item.item_code] += 1
 
 
 @frappe.whitelist()
