@@ -19,7 +19,7 @@ def create_sale_invoice(doc, method):
 
         # Lấy dữ liệu chính từ doc
         ma_phieu = doc.name
-        ma_phieu_dat = doc.sales_order or ""
+        ma_phieu_dat = doc.dms_so_code or ""
         ma_nhom = doc.group_id or ""
         ma_nv_dat = doc.sales_person_code or ""
         ma_kh = getattr(doc, "customer", "")
