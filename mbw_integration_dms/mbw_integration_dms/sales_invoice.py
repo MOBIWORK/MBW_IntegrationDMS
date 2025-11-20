@@ -28,7 +28,7 @@ def create_sale_invoice(doc, method):
         sdt = frappe.get_value("Customer", ma_kh, "mobile_no") or ""
         dia_chi = frappe.get_value("Customer", ma_kh, "customer_primary_address") or ""
         dien_giai = doc.remarks or ""
-        ngay_dat = ngay_dat = format_date_safe(doc.posting_date)
+        ngay_dat = format_date_safe(doc.posting_date)
         tong_tien_hang = doc.total or 0
         tong_tien_vat = doc.total_taxes_and_charges or 0
         tong_ck_sp = sum([i.discount_amount for i in doc.items if not i.is_free_item]) or 0
@@ -87,6 +87,7 @@ def create_sale_invoice(doc, method):
             "sdt": sdt,
             "dia_chi": dia_chi,
             "ngay_dat": ngay_dat,
+            "ngay_ban": ngay_dat,
             "dien_giai": dien_giai,
             "tong_tien_hang": tong_tien_hang,
             "tong_tien_vat": tong_tien_vat,
