@@ -19,7 +19,7 @@ def create_sale_invoice(doc, method):
 
         # Lấy dữ liệu chính từ doc
         ma_phieu = doc.name
-        ma_phieu_dat = doc.dms_so_code or ""
+        ma_phieu_dat = doc.id_dms or ""
         ma_nhom = doc.group_id or ""
         ma_nv_dat = doc.sales_person_code or ""
         ma_kh = getattr(doc, "customer", "")
@@ -159,12 +159,12 @@ def add_sales_order(doc, method):
     # Gán các field header
     so_fields = frappe.db.get_value(
         "Sales Order", so_name,
-        ["dms_so_id", "group_id", "sales_person_code"],
+        ["dms_so_code", "group_id", "sales_person_code"],
         as_dict=True
     )
 
     if so_fields:
-        doc.id_dms = so_fields.dms_so_id
+        doc.id_dms = so_fields.dms_so_code
         doc.group_id = so_fields.group_id
         doc.sales_person_code = so_fields.sales_person_code
 
