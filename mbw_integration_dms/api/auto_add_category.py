@@ -1,16 +1,17 @@
+
+import frappe
+from frappe import _, new_doc
 import json
 import os
 import datetime
 
-import frappe
-from frappe import _, new_doc
-
 CATEGORY_DOCTYPE = ["Brand", "Industry Type", "UOM", "Customer Type", "DMS Customer Group", "Territory", "Channel", "Warehouse", "Supplier"]
 CATEGORIES = ["Brand", "Industry", "Unit", "CustomerType", "CustomerGroup", "Region", "Channel", "Warehouse", "Provider"]
+
 @frappe.whitelist()
 def auto_add_category():
     import_master_data()
-    pass
+
 
 def import_master_data():
     # xoa cac brand dang ton tai
@@ -21,6 +22,7 @@ def import_master_data():
     except Exception as ex:
         frappe.log_error(f"Error reading master_data.json: {ex}")
         return False
+    
     for idx, category in enumerate(CATEGORY_DOCTYPE):
         if category not in ["Warehouse", "Territory"]:
             try:
@@ -28,6 +30,7 @@ def import_master_data():
                 frappe.db.commit()
             except Exception as ex:
                 return False
+            
         elif category == "Warehouse":
             try:
                 frappe.db.sql("""
@@ -38,6 +41,7 @@ def import_master_data():
             except Exception as ex:
                 frappe.log_error(f"Error deleting warehouses: {ex}")
                 return False
+            
         elif category == "Territory":
             try:
                 frappe.db.sql("""
@@ -48,6 +52,7 @@ def import_master_data():
             except Exception as ex:
                 frappe.log_error(f"Error deleting territory: {ex}")
                 return False
+            
         if CATEGORIES[idx] in data:
             data_category = data[CATEGORIES[idx]]
             for d in data_category:
@@ -72,6 +77,7 @@ def import_master_data():
                                 """, element)
                     except Exception as ex:
                         frappe.log_error(f"Error inserting brand {d}: {ex}")
+
                 elif category == "Industry Type":
                     element['name'] = d["Mã"]
                     element['industry'] = d["Tên"]
@@ -84,6 +90,7 @@ def import_master_data():
                                 """, element)
                     except Exception as ex:
                         frappe.log_error(f"Error inserting industry {d}: {ex}")
+
                 elif category == "UOM":
                     element['name'] = d["Mã"]
                     element['uom_name'] = d["Tên"]
@@ -98,6 +105,7 @@ def import_master_data():
                                 """, element)
                     except Exception as ex:
                         frappe.log_error(f"Error inserting uom {d}: {ex}")
+
                 elif category == "Customer Type":
                     element['customer_type_id'] = d["Mã"]
                     element['customer_type_name'] = d["Tên"]
@@ -111,6 +119,7 @@ def import_master_data():
                                 """, element)
                     except Exception as ex:
                         frappe.log_error(f"Error inserting Customer Type {d}: {ex}")
+
                 elif category == "DMS Customer Group":
                     element['customer_group'] = d["Ưu Tiên"]
                     element['name_customer_group'] = d["Bán Buôn"]
@@ -124,6 +133,7 @@ def import_master_data():
                                 """, element)
                     except Exception as ex:
                         frappe.log_error(f"Error inserting industry {d}: {ex}")
+
                 elif category == "Channel":
                     element['channel_name'] = d["Mã"]
                     element['channel_code'] = d["Tên"]
@@ -137,6 +147,7 @@ def import_master_data():
                                 """, element)
                     except Exception as ex:
                         frappe.log_error(f"Error inserting DMS Customer Group {d}: {ex}")
+
                 elif category == "Warehouse":
                     element['name'] = d["Mã"]
                     element['warehouse_name'] = d["Tên"]
@@ -154,6 +165,7 @@ def import_master_data():
                                 """, element)
                     except Exception as ex:
                         frappe.log_error(f"Error inserting warehouse {d}: {ex}")
+
                 elif category == "Territory":
                     element['name'] = d["Mã"]
                     element['territory_name'] = d["Tên"]
@@ -170,6 +182,7 @@ def import_master_data():
                                 """, element)
                     except Exception as ex:
                         frappe.log_error(f"Error inserting Territory {d}: {ex}")
+
                 elif category == "Supplier":
                     element['name'] = d["Mã"]
                     element['supplier_name'] = d["Tên"]

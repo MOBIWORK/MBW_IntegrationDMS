@@ -2,9 +2,8 @@
 # For license information, please see LICENSE
 
 import frappe
-
-from mbw_integration_dms.mbw_integration_dms.utils import create_dms_log, check_enable_integration_dms
 from mbw_integration_dms.mbw_integration_dms.apiclient import DMSApiClient
+from mbw_integration_dms.mbw_integration_dms.utils import create_dms_log, check_enable_integration_dms
 
 
 def create_delivery_note(doc, method):
@@ -18,7 +17,12 @@ def create_delivery_note(doc, method):
             ma_don_dms = frappe.get_value("Sales Order", {"name": ma_don_erp}, "dms_so_code")
             kho_hang = doc.set_warehouse
             ck_don = doc.discount_amount
+            ma_kh = doc.customer_code
             items = doc.items
+            ngay_xuat = doc.posting_date
+            tong_tien_hang = doc.total
+            phai_thanh_toan = doc.grand_total
+            tong_vat = doc.total_taxes_and_charges
             san_pham = []
 
             for i in items:
@@ -26,7 +30,7 @@ def create_delivery_note(doc, method):
                     "ma_sp": i.item_code,
                     "ma_dvt": i.uom,
                     "so_luong": i.qty,
-                    "don_gia": i.price_list_rate,
+                    "don_gia": i.rate,
                     "chiet_khau_sp": i.discount_amount,
                     "vat": 0,
                     "ghi_chu": "",
@@ -37,7 +41,15 @@ def create_delivery_note(doc, method):
                 "ma_don_lien_quan": ma_don_dms,
                 "ckdh": ck_don,
                 "kho_xuat": kho_hang,
-                "san_pham": san_pham
+                "ma_kh": ma_kh,
+                "ngay_xuat": ngay_xuat.strftime("%Y-%m-%d"),
+                "tong_tien_hang": tong_tien_hang,
+                "tong_vat": tong_vat,
+                "phai_thanh_toan": phai_thanh_toan,
+                "dien_giai": "ERP Delivery Note",
+                "nha_cung_cap":"",
+                "kho_nhap": "",
+                "data_san_pham": san_pham
             }
 
             # Ghi log request
@@ -90,5 +102,5 @@ def add_sales_order(doc, method):
 
     if so_name:
         doc.sales_order = so_name
-        so_id = frappe.get_value("Sales Order", so_name, "dms_so_id")
-        doc.id_dms = so_id
+        so_code = frappe.get_value("Sales Order", so_name, "dms_so_code")
+        doc.id_dms = so_code
