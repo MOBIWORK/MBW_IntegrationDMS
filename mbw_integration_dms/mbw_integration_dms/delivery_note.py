@@ -17,7 +17,7 @@ def create_delivery_note(doc, method):
             ma_don_dms = frappe.get_value("Sales Order", {"name": ma_don_erp}, "dms_so_code")
             kho_hang = doc.set_warehouse
             ck_don = doc.discount_amount
-            ma_kh = doc.customer_code
+            ma_kh = doc.customer
             items = doc.items
             ngay_xuat = doc.posting_date
             tong_tien_hang = doc.total
