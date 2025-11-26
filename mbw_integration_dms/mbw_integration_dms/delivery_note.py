@@ -95,12 +95,11 @@ def create_delivery_note(doc, method):
 
 def add_sales_order(doc, method):
     items = doc.items
-    so_name = None
+    si_name = None
 
     for i in items:
-        so_name = i.against_sales_order
+        si_name = i.against_sales_invoice
 
-    if so_name:
-        doc.sales_order = so_name
-        so_code = frappe.get_value("Sales Order", so_name, "dms_so_code")
-        doc.id_dms = so_code
+    if si_name:
+        si_code = frappe.get_value("Sales Invoice", si_name, "name")
+        doc.id_dms = si_code
