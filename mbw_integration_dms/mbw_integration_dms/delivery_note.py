@@ -13,8 +13,7 @@ def create_delivery_note(doc, method):
         try:
             dms_client = DMSApiClient()
 
-            ma_don_erp = doc.sales_order
-            ma_don_dms = frappe.get_value("Sales Order", {"name": ma_don_erp}, "dms_so_code")
+            ma_don_dms = doc.id_dms
             kho_hang = doc.set_warehouse
             ck_don = doc.discount_amount
             ma_kh = doc.customer
