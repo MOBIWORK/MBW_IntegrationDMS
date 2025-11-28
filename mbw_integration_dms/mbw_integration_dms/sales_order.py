@@ -12,7 +12,7 @@ from mbw_integration_dms.mbw_integration_dms.utils import create_dms_log
 # Tạo mới đơn hàng DMS to ERP
 @frappe.whitelist()
 def create_sale_order(**kwargs):
-    try:
+    # try:
         payload = kwargs if isinstance(kwargs, dict) else json.loads(kwargs or "{}")
 
         if isinstance(payload.get("data"), list):
@@ -69,8 +69,8 @@ def create_sale_order(**kwargs):
                 "qty": float(item.get("so_luong")),
                 "uom": item.get("ten_dvt") or "Nos",
                 "warehouse": item.get("ma_kho_xuat_km"),
-                "price_list_rate": float(item.get("don_gia")),
-                "rate": float(item.get("don_gia")),
+                "price_list_rate": float(item.get("don_gia")) if item.get("don_gia") != "" else 0,
+                "rate": float(item.get("don_gia")) if item.get("don_gia") != "" else 0,
                 "custom_item_discount": float(item.get("chiet_khau")) or 0,
                 "is_free_item": item.get("is_km") or 0,
                 "additional_notes": item.get("ghi_chu")
@@ -124,14 +124,14 @@ def create_sale_order(**kwargs):
         frappe.response["name"] = new_order.name
         return
 
-    except Exception as e:
-        frappe.db.rollback()
-        create_dms_log(
-            status="Error",
-            request_data=kwargs,
-            message=f"Lỗi tạo Sales Order: {str(e)}"
-        )
-        return {"error": str(e)}
+    # except Exception as e:
+    #     frappe.db.rollback()
+    #     create_dms_log(
+    #         status="Error",
+    #         request_data=kwargs,
+    #         message=f"Lỗi tạo Sales Order: {str(e)}"
+    #     )
+    #     return {"error": str(e)}
     
 
 def to_gmt7(dt_str):
