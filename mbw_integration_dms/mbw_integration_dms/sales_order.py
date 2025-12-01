@@ -12,7 +12,7 @@ from mbw_integration_dms.mbw_integration_dms.utils import create_dms_log
 # Tạo mới đơn hàng DMS to ERP
 @frappe.whitelist()
 def create_sale_order(**kwargs):
-    # try:
+    try:
         payload = kwargs if isinstance(kwargs, dict) else json.loads(kwargs or "{}")
 
         if isinstance(payload.get("data"), list):
@@ -124,14 +124,14 @@ def create_sale_order(**kwargs):
         frappe.response["name"] = new_order.name
         return
 
-    # except Exception as e:
-    #     frappe.db.rollback()
-    #     create_dms_log(
-    #         status="Error",
-    #         request_data=kwargs,
-    #         message=f"Lỗi tạo Sales Order: {str(e)}"
-    #     )
-    #     return {"error": str(e)}
+    except Exception as e:
+        frappe.db.rollback()
+        create_dms_log(
+            status="Error",
+            request_data=kwargs,
+            message=f"Lỗi tạo Sales Order: {str(e)}"
+        )
+        return {"error": str(e)}
     
 
 def to_gmt7(dt_str):
