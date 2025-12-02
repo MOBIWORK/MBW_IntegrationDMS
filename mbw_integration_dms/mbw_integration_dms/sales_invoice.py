@@ -160,7 +160,7 @@ def add_sales_order(doc, method):
     # Gán các field header
     so_fields = frappe.db.get_value(
         "Sales Order", so_name,
-        ["dms_so_code", "group_id", "sales_person_code"],
+        ["dms_so_code", "group_id", "sales_person_code", "delivery_date"],
         as_dict=True
     )
 
@@ -168,6 +168,7 @@ def add_sales_order(doc, method):
         doc.id_dms = so_fields.dms_so_code
         doc.group_id = so_fields.group_id
         doc.sales_person_code = so_fields.sales_person_code
+        doc.delivery_date = so_fields.delivery_date
 
     # Lấy toàn bộ item rows của SO
     so_items = frappe.get_all(

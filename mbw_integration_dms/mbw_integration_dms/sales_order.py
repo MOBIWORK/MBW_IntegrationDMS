@@ -3,11 +3,10 @@
 
 import frappe
 from frappe import _
-import json
 from datetime import datetime
-import pytz
-from frappe.utils import get_datetime, getdate
+import pytz, json
 from mbw_integration_dms.mbw_integration_dms.utils import create_dms_log
+
 
 # Tạo mới đơn hàng DMS to ERP
 @frappe.whitelist()
@@ -33,14 +32,20 @@ def create_sale_order(**kwargs):
         group_id = payload.get("ma_nhom")
         sales_person_code = payload.get("ma_nv_dat")
 
-        customer = frappe.get_value("Customer", {"customer_code_dms": customer_code}, "name")
-        if not customer:
+        customer_doc = frappe.db.get_value(
+            "Customer",
+            {"customer_code_dms": customer_code},
+            ["name", "custom_company"],
+            as_dict=True,
+        )
+
+        if not customer_doc:
             frappe.throw(f"Không tìm thấy khách hàng với mã {customer_code}")
 
         dt = to_gmt7(delivery_date)
         dt_tr = to_gmt7(transaction_date)
         new_order = frappe.new_doc("Sales Order")
-        new_order.customer = customer
+        new_order.customer = customer_doc.name
         new_order.customer_name = customer_name
         new_order.dms_so_code = sales_order_code
         new_order.delivery_date = dt.date()
@@ -50,6 +55,8 @@ def create_sale_order(**kwargs):
         new_order.set_warehouse = warehouse
         new_order.is_sale_dms = 1
         new_order.ignore_pricing_rule = 1
+        if customer_doc.custom_company:
+            new_order.company = customer_doc.custom_company
 
         if frappe.db.exists("Sales Person", {"sales_person_name": sales_person}):
             sales_person = frappe.get_value("Sales Person", {"sales_person_name": sales_person}, "name")
