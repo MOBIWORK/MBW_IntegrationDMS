@@ -7,7 +7,7 @@ def get_customer_outstanding(
     customer_code_dms=None,
     company=None,
     page=1,
-    page_size=20
+    page_size=2000
 ):
     """
     Lấy công nợ cuối (outstanding amount) của tất cả khách hàng với phân trang và lọc.
@@ -32,7 +32,7 @@ def get_customer_outstanding(
         page_size = int(page_size)
     except (ValueError, TypeError):
         page = 1
-        page_size = 20
+        page_size = 2000
     
     page = max(1, page)
     page_size = max(1, min(page_size, 2000))
