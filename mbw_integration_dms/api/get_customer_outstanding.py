@@ -35,7 +35,7 @@ def get_customer_outstanding(
         page_size = 20
     
     page = max(1, page)
-    page_size = max(1, min(page_size, 100))
+    page_size = max(1, min(page_size, 2000))
     
     offset = (page - 1) * page_size
     
